@@ -1,38 +1,31 @@
+.button:focus,
+.button:active:focus,
+.button.active:focus,
+.button.focus,
+.button:active.focus,
+.button.active.focus {
+  outline: none !important;
+}
+
+.button {
+  background: transparent;
+  font-size: 30px;
+  color: #fff;
+  border: none;
+}
+
+.button:active {
+  background: rgb(118, 40, 219);
+}
+
+body,
+html {
+  overflow-x: hidden;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  /* border: 3px solid rgb(73, 73, 73); */
+  /* background: rgba(0, 0, 0, 0.2); */
+  color: #ffffff;
+  padding: 10px;
 }
