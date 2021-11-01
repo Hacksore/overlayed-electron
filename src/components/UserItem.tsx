@@ -1,4 +1,5 @@
 import React from "react";
+import { styled } from '@mui/material/styles';
 
 interface IUserItemProps {
   nick: string;
@@ -7,16 +8,16 @@ interface IUserItemProps {
   avatarHash: string;
 }
 
+const Root = styled("div")(({ theme }) => ({
+  alignItems: "center",
+  display: "flex",
+  borderRadius: 24,
+  margin: "4px 0 4px 0",  
+}));
+
 const UserItem = React.memo(({ nick, userId, isTalking, avatarHash }: IUserItemProps) => {
   return (
-    <div
-      style={{
-        alignItems: "center",
-        display: "flex",
-        borderRadius: 24,
-        margin: "4px 0 4px 0",
-      }}
-    >
+    <Root>
       <img
         onError={(e) => {
           // @ts-ignore
@@ -45,7 +46,7 @@ const UserItem = React.memo(({ nick, userId, isTalking, avatarHash }: IUserItemP
       >
         {nick}
       </p>
-    </div>
+    </Root>
   );
 });
 

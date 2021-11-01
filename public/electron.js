@@ -13,10 +13,13 @@ function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 400,
-    height: 800,
+    minHeight: 200,
+    maxHeight: 800,
+    useContentSize: true,
     transparent: true,
     frame: false,
     icon: __dirname + "./img/icon.png",
+    hasShadow: false,
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, "./preload.js"),

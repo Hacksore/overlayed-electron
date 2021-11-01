@@ -3,12 +3,18 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface AppState {
   users: any[];
+  channelId: string | null;
+  clientId: string | null;
+  accessToken: string | null;
   isReady: boolean;
-  isPinned: boolean;
+  isPinned: boolean;  
 }
 
 const initialState: AppState = {
   users: [],
+  channelId: null,
+  clientId: null,
+  accessToken: null,
   isReady: false,
   isPinned: false,
 };
@@ -23,12 +29,15 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
-    setUsers: (state, action: PayloadAction<any>) => {
+    setAppUsers: (state, action: PayloadAction<any>) => {
       state.users = action.payload;
     },
     setReadyState: (state, action: PayloadAction<boolean>) => {
       state.isReady = action.payload;
     },
+    setPinned: (state, action: PayloadAction<boolean>) => {
+      state.isPinned = action.payload;
+    } 
   },
 });
 
