@@ -38,7 +38,9 @@ function createWindow() {
     if (data === "TOGGLE_PIN") {
       console.log("Toggle pin mode");
       isPinned = !isPinned;
-      win.setAlwaysOnTop(isPinned, "screen");
+      win.setAlwaysOnTop(isPinned, "floating");
+      win.setVisibleOnAllWorkspaces(true);
+      win.setFullScreenable(false);
     }
   });
 
