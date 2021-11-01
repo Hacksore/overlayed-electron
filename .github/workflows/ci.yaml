@@ -13,8 +13,8 @@ jobs:
           npm ci
           npm run build
           npm run pack
-          
+
       - uses: actions/upload-artifact@v2
         with:
-          name: vscode-tree-extension
-          path: 'dist/win-unpacked'
+          name: overlated-unstable
+          path: "dist/win-unpacked/*"
