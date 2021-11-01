@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: package
+        run: |
+          npm ci
+          npm run build
+          npm run pack
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: vscode-tree-extension
+          path: 'dist/win-unpacked'

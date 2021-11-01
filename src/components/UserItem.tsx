@@ -1,4 +1,13 @@
-const Avatar = ({ nick, userId, isTalking, avatarHash }) => {
+import React from "react";
+
+interface IUserItemProps {
+  nick: string;
+  userId: string;
+  isTalking: boolean;
+  avatarHash: string;
+}
+
+const UserItem = React.memo(({ nick, userId, isTalking, avatarHash }: IUserItemProps) => {
   return (
     <div
       style={{
@@ -10,7 +19,9 @@ const Avatar = ({ nick, userId, isTalking, avatarHash }) => {
     >
       <img
         onError={(e) => {
+          // @ts-ignore
           e.target.onerror = null;
+          // @ts-ignore
           e.target.src = "/img/default.png";
         }}
         style={{
@@ -36,6 +47,6 @@ const Avatar = ({ nick, userId, isTalking, avatarHash }) => {
       </p>
     </div>
   );
-};
+});
 
-export default Avatar;
+export default UserItem;
