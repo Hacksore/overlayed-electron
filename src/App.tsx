@@ -4,10 +4,12 @@ import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
 // import IPCSocketService from "./services/socketService";
 import { insertItemAtIndex } from "./utils";
 import { Root } from "./style";
-import { Button } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { RootState } from "./store";
 import { appSlice } from "./rootReducer";
+import PinIcon from "@mui/icons-material/PushPinRounded";
+import IconSettings from "@mui/icons-material/Settings";
 
 const { setAppUsers, setReadyState, setPinned } = appSlice.actions;
 declare global {
@@ -107,26 +109,29 @@ function App() {
       }
     });
 
-    return () => {
+    return () => {};
 
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // I think i need to understand if ignoring dispatch is a good idea
+    // I think i need to understand if ignoring dispatch is a good idea
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Root>
-      <Button
-        className="button"
-        variant="contained"
-        fullWidth
-        onClick={() => {
-          window.electron.send("toMain", "TOGGLE_PIN");
-          dispatch(setPinned(!isPinned));
-        }}
-      >
-        📌
-      </Button>
+      {/* // TODO: turn into toolbar component */}
+      {/* TODO: would be nice to have this only show on hover maybe? */}
+      <div style={{ display: "flex", justifyContent: "flex-end", flexDirection: "row" }}>
+        <IconButton>
+          <IconSettings style={{ color: "#fff" }} />
+        </IconButton>
+        <IconButton
+          onClick={() => {
+            window.electron.send("toMain", "TOGGLE_PIN");
+            dispatch(setPinned(!isPinned));
+          }}
+        >
+          <PinIcon style={{ color: isPinned ? "#73ef5b" : "#fff" }} />
+        </IconButton>
+      </div>
       <div>
         {users.map((u: any) => (
           <UserItem
@@ -137,7 +142,6 @@ function App() {
             isTalking={u.isTalking}
           />
         ))}
-        {JSON.stringify(["pinned", isPinned])}
       </div>
     </Root>
   );
