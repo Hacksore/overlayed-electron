@@ -47,7 +47,6 @@ const getRPCEvents = (id) => [
 
 class SocketManager {
   constructor(win) {
-    console.log("LOADING SOCKET on MAIN");
 
     this._win = win;
 
@@ -102,7 +101,6 @@ class SocketManager {
       this.subscribeEvents();
     }
 
-    console.log(data.toString());
     this._win.webContents.send("fromMain", data.toString());
   }
 

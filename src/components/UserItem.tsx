@@ -1,5 +1,5 @@
 import React from "react";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 
 interface IUserItemProps {
   nick: string;
@@ -12,14 +12,14 @@ const Root = styled("div")(({ theme }) => ({
   alignItems: "center",
   display: "flex",
   borderRadius: 24,
-  margin: "4px 0 4px 0",  
+  margin: "4px 0 4px 0",
 }));
 
 const UserItem = React.memo(({ nick, userId, isTalking, avatarHash }: IUserItemProps) => {
   return (
     <Root>
       <img
-        onError={(e) => {
+        onError={e => {
           // @ts-ignore
           e.target.onerror = null;
           // @ts-ignore
@@ -37,11 +37,13 @@ const UserItem = React.memo(({ nick, userId, isTalking, avatarHash }: IUserItemP
       <p
         style={{
           color: isTalking ? "#fff" : "#c1c1c1",
-          fontSize: isTalking ? 24 : 20,
-          background: "rgba(0,0,0,0.2)",
-          padding: "4px 8px 8px 8px",
+          fontSize: 22,
+          // TODO: alpha here makes it hard to see on light backgrounds
+          // using solid color for now
+          background: "rgba(40,40,40,1)",
+          padding: "4px 8px 6px 8px",
           borderRadius: 10,
-          margin: 0,
+          margin: "0 0 0 5px",
         }}
       >
         {nick}

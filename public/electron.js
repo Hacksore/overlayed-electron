@@ -14,7 +14,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 400,
     minHeight: 200,
-    maxHeight: 800,
+    height: 590,    
     useContentSize: true,
     transparent: true,
     frame: false,
@@ -28,8 +28,9 @@ function createWindow() {
 
   // load socket manager
   ipcMain.on("toMain", (event, data) => {
-    console.log("DATA", data);
-    if (data === "I_AM_READY") {
+    const payload = JSON.parse(data);
+
+    if (payload.event === "I_AM_READY") {
       if (socketManager) {
         socketManager.destroy();
         socketManager = null;
@@ -38,8 +39,13 @@ function createWindow() {
       }
     }
 
-    if (data === "TOGGLE_PIN") {
-      console.log("Toggle pin mode");
+    // attempt to scale vertially based on dom size?
+    // There has to be a better way?
+    if (payload.event === "UPDATE_WINDOW_HEIGHT") {
+      win.setSize(400, payload.value);
+    }
+
+    if (payload.event === "TOGGLE_PIN") {
       isPinned = !isPinned;
       win.setAlwaysOnTop(isPinned, "floating");
       win.setVisibleOnAllWorkspaces(true);
@@ -50,9 +56,7 @@ function createWindow() {
   // and load the index.html of the app.
   // win.loadFile("index.html");
   win.loadURL(
-    isDev
-      ? "http://localhost:3001"
-      : `file://${path.join(__dirname, "../build/index.html")}`
+    isDev ? "http://localhost:3001" : `file://${path.join(__dirname, "../build/index.html")}`
   );
 
   // disalbe frame prot
