@@ -39,12 +39,6 @@ function createWindow() {
       }
     }
 
-    // attempt to scale vertially based on dom size?
-    // There has to be a better way?
-    if (payload.event === "UPDATE_WINDOW_HEIGHT") {
-      win.setSize(400, payload.value);
-    }
-
     if (payload.event === "TOGGLE_PIN") {
       isPinned = !isPinned;
       win.setAlwaysOnTop(isPinned, "floating");

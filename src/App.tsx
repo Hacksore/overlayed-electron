@@ -110,30 +110,6 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // TODO: fix this later its not working
-  // set dynamic height
-  useEffect(() => {
-    if (!viewRef) {
-      return;
-    }
-
-    // @ts-ignore
-    const listener: any = viewRef?.current.addEventListener("resize", () => {
-      
-      // @ts-ignore
-      const windowHeight = viewRef?.current?.scrollHeight || 200;
-      // @ts-ignore
-      // const offsetY = viewRef?.current?.offsetHeight || 200;
-      const height = windowHeight;
-      window.electron.send("toMain", { event: "UPDATE_WINDOW_HEIGHT", value: height});
-    });
-
-    return () => {
-      // @ts-ignore
-      viewRef?.current.removeEventListener("resize", listener);
-    };
-  }, []);
-
   return (
     <Root>
       {/* // TODO: turn into toolbar component */}
