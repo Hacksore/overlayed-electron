@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import { IUser } from "../types/user";
 import IconDeafend from "@mui/icons-material/HeadsetOff";
 import IconMuted from "@mui/icons-material/MicOff";
+import NitroIcon from "./NitroIcon";
 
 const Root = styled("div")(({ theme }) => ({
   alignItems: "center",
@@ -13,7 +14,7 @@ const Root = styled("div")(({ theme }) => ({
 
 const UserItem = React.memo((props: IUser) => {
   const getIconColor = () => {
-    if (props.isTalking) {
+    if (props.talking) {
       return "#43b581";
     } else if (props.muted) {
       return "#565656";
@@ -33,6 +34,11 @@ const UserItem = React.memo((props: IUser) => {
   return (
     <Root>
       <div style={{ position: "relative" }}>
+        {props.premium > 0 && (
+          <div style={{ display: "flex",  padding: 3, position: "absolute", left: 0, bottom: 0, background: "rgba(0,0,0,0.6)", borderRadius: 15 }}>
+            <NitroIcon color="#f577ff" size="16" />
+          </div>
+        )}
         <img
           onError={e => {
             // @ts-ignore
@@ -68,7 +74,7 @@ const UserItem = React.memo((props: IUser) => {
           }}
         >
           <div style={{ marginRight: 6 }}>{props.username}</div>
-          {props.deafened &&  <IconDeafend />}
+          {props.deafened && <IconDeafend />}
           {props.muted && <IconMuted />}
         </div>
       </div>

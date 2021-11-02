@@ -3,10 +3,14 @@ export interface IUser {
   username: string;
   id: string;
   avatarHash: string;
-  isTalking: boolean;
+  talking: boolean;
   deafened: boolean;
   muted: boolean;
   volume: number;
+  bot: boolean;
+  premium: number;
+  flags: number;
+  discriminator: string;
 }
 
 export interface IDiscordUser {
@@ -16,7 +20,6 @@ export interface IDiscordUser {
   pan: Pan;
   voice_state: VoiceState;
   user: User;
-  isTalking: boolean;
 }
 
 interface Pan {

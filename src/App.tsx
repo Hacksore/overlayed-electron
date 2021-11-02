@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import UserItem from "./components/UserItem";
 import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
 import { Root } from "./style";
-import { IconButton } from "@mui/material";
+import { Button, IconButton, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { RootState } from "./store";
 import { appSlice } from "./rootReducer";
@@ -77,6 +77,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
   return (
     <Root>
       {/* // TODO: turn into toolbar component */}
@@ -117,6 +118,25 @@ function App() {
         {users.map((item: IUser) => (
           <UserItem key={item.id} {...item} />
         ))}
+
+        {/* TODO: add a FTUE component and a sync component */}
+        {users.length <= 0 && (
+          <div>
+            <Typography color="primary">You are not in a channel</Typography>
+            <Button
+              onClick={() => {
+                console.log(1);
+                // find channel im in and then tell electron to call subscribeEvents
+                // const user = users.find(item => )
+
+                // window.electron.send("toMain", { event: "SUBSCRIBE_EVENTS", channelId:  });
+              }}
+              variant="contained"
+            >
+              Click here to sync
+            </Button>
+          </div>
+        )}
       </div>
     </Root>
   );
