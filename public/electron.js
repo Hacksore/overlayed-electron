@@ -67,6 +67,9 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
+// TODO: if we turn this off we need a global hotkey to refocus it
+// app.dock.hide();
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

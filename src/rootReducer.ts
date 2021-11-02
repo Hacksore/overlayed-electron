@@ -1,13 +1,11 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-// import { RootState, AppThunk } from "./store";
-
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface AppState {
   users: any[];
   channelId: string | null;
   clientId: string | null;
   accessToken: string | null;
   isReady: boolean;
-  isPinned: boolean;  
+  isPinned: boolean;
 }
 
 const initialState: AppState = {
@@ -19,12 +17,7 @@ const initialState: AppState = {
   isPinned: false,
 };
 
-// TODO: example of async thunk
-export const incrementAsync = createAsyncThunk("counter/fetchCount", async (amount: number) => {
-  // The value we return becomes the `fulfilled` action payload
-  return [];
-});
-
+// TODO: we could move this user stuff to a seperate reducer
 export const appSlice = createSlice({
   name: "root",
   initialState,
@@ -37,7 +30,25 @@ export const appSlice = createSlice({
     },
     setPinned: (state, action: PayloadAction<boolean>) => {
       state.isPinned = action.payload;
-    } 
+    },
+    setUserTalking: (state, action: PayloadAction<any>) => {
+      state.users.forEach((u: any) => {
+        if (u.user.id === action.payload.id) {
+          u.isTalking = action.payload.value;
+        }
+      });
+    },
+    addUser: (state, action: PayloadAction<any>) => {
+      // TODO: this can't be the right place in the array?
+      state.users.push(action.payload);
+    },
+    removeUser: (state, action: PayloadAction<any>) => {
+      // TODO: this can't be the right place in the array?
+      state.users = state.users.filter((u: any) => u.user.id !== action.payload);
+    },
+    updateUser: (state, action: PayloadAction<any>) => {
+      // TODO: Need to implement      
+    },
   },
 });
 

@@ -2,13 +2,17 @@ import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
 import rootReducer from "./rootReducer";
 
-const logger = createLogger();
+const FILTERD_EVENTS = ["root/setUserTalking"];
+const logger = createLogger({
+  // @ts-ignore
+  predicate: (_, action) => !FILTERD_EVENTS.includes(action.type),
+});
 
 export const store = configureStore({
   reducer: {
-    root: rootReducer,       
+    root: rootReducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

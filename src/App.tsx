@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import UserItem from "./components/UserItem";
 import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
-// import IPCSocketService from "./services/socketService";
-import { insertItemAtIndex } from "./utils";
 import { Root } from "./style";
 import { IconButton } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
@@ -11,7 +9,7 @@ import { appSlice } from "./rootReducer";
 import PinIcon from "@mui/icons-material/PushPinRounded";
 import IconSettings from "@mui/icons-material/Settings";
 
-const { setAppUsers, setReadyState, setPinned } = appSlice.actions;
+const { updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState, setPinned } = appSlice.actions;
 declare global {
   // TODO: type this as a proper type
   interface Window {
@@ -20,10 +18,17 @@ declare global {
 }
 
 function App() {
-  const [users, setUsers] = useState([]);
   const dispatch = useAppDispatch();
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
+  const users = useAppSelector((state: RootState) => state.root.users);
   const viewRef = useRef(null);
+  const usersRef = useRef(null);
+
+  // we need users so lets hack with a ref?
+  useEffect(() => {
+    // @ts-ignore
+    usersRef.current = users;
+  }, [users]);
 
   useEffect(() => {
     // hey mr main I am ready
@@ -32,75 +37,35 @@ function App() {
     // we end up with way to many stale closures with async callbacks like this that need to ready react state vars
     window.electron.receive("fromMain", (msg: any) => {
       const packet = JSON.parse(msg);
+      const { cmd, evt } = packet;
 
-      if (packet.cmd === DiscordRPCEvents.GET_CHANNEL) {
-        setUsers(packet.data.voice_states);
-
+      if (cmd === DiscordRPCEvents.GET_CHANNEL) {
+        setAppUsers(packet.data.voice_states);
         dispatch(setAppUsers(packet.data.voice_states));
         dispatch(setReadyState(true));
       }
 
-      if (
-        packet.cmd === DiscordCMDEvents.DISPATCH &&
-        packet.evt === DiscordRPCEvents.SPEAKING_START
-      ) {
-        setUsers(userList => {
-          const clonedUserList = [...userList];
-          clonedUserList.forEach((u: any) => {
-            if (u.user.id === packet.data.user_id) {
-              u.isTalking = true;
-            }
-          });
-          return clonedUserList;
-        });
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.SPEAKING_START) {
+        dispatch(setUserTalking({ id: packet.data.user_id, value: true }));
       }
 
-      if (
-        packet.cmd === DiscordCMDEvents.DISPATCH &&
-        packet.evt === DiscordRPCEvents.SPEAKING_STOP
-      ) {
-        setUsers(userList => {
-          const clonedUserList = [...userList];
-          clonedUserList.forEach((u: any) => {
-            if (u.user.id === packet.data.user_id) {
-              u.isTalking = false;
-            }
-          });
-          return clonedUserList;
-        });
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.SPEAKING_STOP) {
+        dispatch(setUserTalking({ id: packet.data.user_id, value: false }));
       }
 
       // join
-      if (
-        packet.cmd === DiscordCMDEvents.DISPATCH &&
-        packet.evt === DiscordRPCEvents.VOICE_STATE_CREATE
-      ) {
-        // @ts-ignore
-        setUsers((userList: any) => {
-          return [...userList, packet.data];
-        });
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_CREATE) {
+        dispatch(addUser(packet.data));
       }
 
       // leave
-      if (
-        packet.cmd === DiscordCMDEvents.DISPATCH &&
-        packet.evt === DiscordRPCEvents.VOICE_STATE_DELETE
-      ) {
-        setUsers((userList: any) => userList.filter((u: any) => u.user.id !== packet.data.user.id));
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_DELETE) {
+        dispatch(removeUser(packet.data.user.id));
       }
 
       // update user info
-      if (
-        packet.cmd === DiscordCMDEvents.DISPATCH &&
-        packet.evt === DiscordRPCEvents.VOICE_STATE_UPDATE
-      ) {
-        // @ts-ignore
-        setUsers((userList: any) => {
-          // preserve last index so they dont move around
-          const lastIndex = userList.findIndex((u: any) => u.user.id === packet.data.user.id);
-          const oldUsers = userList.filter((u: any) => u.user.id !== packet.data.user.id);
-          return insertItemAtIndex([...oldUsers], lastIndex, packet.data);
-        });
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {
+        dispatch(updateUser(packet.data));
       }
     });
 
@@ -114,7 +79,25 @@ function App() {
     <Root>
       {/* // TODO: turn into toolbar component */}
       {/* TODO: would be nice to have this only show on hover maybe? */}
-      <div style={{ display: "flex", justifyContent: "flex-end", flexDirection: "row" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            textTransform: "uppercase",
+            fontSize: 20,
+            flex: 1,
+            display: "flex",
+            color: "#fff",
+          }}
+        >
+          overlayed™
+        </div>
         <IconButton>
           <IconSettings style={{ color: "#fff" }} />
         </IconButton>
@@ -127,7 +110,7 @@ function App() {
           <PinIcon style={{ color: isPinned ? "#73ef5b" : "#fff" }} />
         </IconButton>
       </div>
-      
+
       <div ref={viewRef} style={{ overflowY: "auto", height: "100vh" }}>
         {users.map((u: any) => (
           <UserItem
