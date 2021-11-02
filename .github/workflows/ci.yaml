@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  ci:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -17,5 +17,21 @@ jobs:
           ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
-          name: overlated-unstable
+          name: overlayed-unstable-linux
+          path: "dist/"
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: package
+        run: |
+          npm ci
+          npm run build
+          npm run pack
+      - name: echo dir
+        run: |
+          ls -hal dist/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: overlayed-unstable-mac
           path: "dist/"
