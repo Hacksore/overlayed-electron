@@ -23,6 +23,7 @@ const createUserStateItem = (payload: IDiscordUser) => ({
   avatarHash: payload.user.avatar,
   muted: payload.voice_state.self_mute,
   deafened: payload.voice_state.self_deaf,
+  // TODO: add states for showing my mute states for others
   talking: false,
   id: payload.user.id,
   volume: 100,

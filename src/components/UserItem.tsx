@@ -35,7 +35,18 @@ const UserItem = React.memo((props: IUser) => {
     <Root>
       <div style={{ position: "relative" }}>
         {props.premium > 0 && (
-          <div style={{ display: "flex",  padding: 3, position: "absolute", left: 0, bottom: 0, background: "rgba(0,0,0,0.6)", borderRadius: 15 }}>
+          <div
+            style={{
+              display: "flex",
+              padding: 2,
+              position: "absolute",
+              left: 0,
+              bottom: 0,
+              background: "rgba(0,0,0,0.6)",
+              border: "1px solid #000",
+              borderRadius: 15,
+            }}
+          >
             <NitroIcon color="#f577ff" size="16" />
           </div>
         )}
