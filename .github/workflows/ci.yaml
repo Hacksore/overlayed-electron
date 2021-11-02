@@ -11,7 +11,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run pack
+          npm run pack:linux
       - name: echo dir
         run: |
           ls -hal dist/
@@ -27,7 +27,23 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run pack
+          npm run pack:macos
+      - name: echo dir
+        run: |
+          ls -hal dist/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: overlayed-unstable-mac
+          path: "dist/"
+  build-windows:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: package
+        run: |
+          npm ci
+          npm run build
+          npm run pack:windows
       - name: echo dir
         run: |
           ls -hal dist/

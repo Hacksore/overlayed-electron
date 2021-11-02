@@ -29,7 +29,9 @@
     "react": "cross-env PORT=3001 BROWSER=none npm start",
     "dev": "concurrently -k npm:react npm:electron",
     "electron": "wait-on tcp:3001 && electron .",
-    "pack": "electron-builder --dir",
+    "pack:linux": "electron-builder --linux --dir",
+    "pack:macos": "electron-builder --mac --dir",
+    "pack:windows": "electron-builder --win --dir",
     "dist": "electron-builder"
   },
   "eslintConfig": {
