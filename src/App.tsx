@@ -8,6 +8,7 @@ import { RootState } from "./store";
 import { appSlice } from "./rootReducer";
 import PinIcon from "@mui/icons-material/PushPinRounded";
 import IconSettings from "@mui/icons-material/Settings";
+import { IUser } from "./types/user";
 
 const { updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState, setPinned } = appSlice.actions;
 declare global {
@@ -39,8 +40,7 @@ function App() {
       const packet = JSON.parse(msg);
       const { cmd, evt } = packet;
 
-      if (cmd === DiscordRPCEvents.GET_CHANNEL) {
-        setAppUsers(packet.data.voice_states);
+      if (cmd === DiscordRPCEvents.GET_CHANNEL) {  
         dispatch(setAppUsers(packet.data.voice_states));
         dispatch(setReadyState(true));
       }
@@ -64,7 +64,7 @@ function App() {
       }
 
       // update user info
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {      
         dispatch(updateUser(packet.data));
       }
     });
@@ -112,13 +112,13 @@ function App() {
       </div>
 
       <div ref={viewRef} style={{ overflowY: "auto", height: "100vh" }}>
-        {users.map((u: any) => (
+        {users.map((item: IUser) => (
           <UserItem
-            key={u.user.id}
-            nick={u.nick}
-            userId={u.user.id}
-            avatarHash={u.user.avatar}
-            isTalking={u.isTalking}
+            key={item.id}
+            nick={item.username}
+            userId={item.id}
+            avatarHash={item.avatarHash}
+            isTalking={item.isTalking}
           />
         ))}
         {/* Testing the overflow */}
