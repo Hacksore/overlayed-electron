@@ -40,5 +40,5 @@ jobs:
           npm run pack:windows
       - uses: actions/upload-artifact@v2
         with:
-          name: overlayed-unstable-mac
+          name: overlayed-unstable-windows
           path: "dist/"
