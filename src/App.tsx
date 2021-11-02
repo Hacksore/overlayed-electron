@@ -12,9 +12,11 @@ import { IUser } from "./types/user";
 
 const { updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState, setPinned } = appSlice.actions;
 declare global {
-  // TODO: type this as a proper type
   interface Window {
-    electron: any;
+    electron: {
+      send: Function;
+      receive: Function;
+    };
   }
 }
 
@@ -36,11 +38,11 @@ function App() {
     window.electron.send("toMain", { event: "I_AM_READY" });
     // TODO: this has to be a singleton service I think - will look at working with IPCSocketService later
     // we end up with way to many stale closures with async callbacks like this that need to ready react state vars
-    window.electron.receive("fromMain", (msg: any) => {
+    window.electron.receive("fromMain", (msg: string) => {
       const packet = JSON.parse(msg);
       const { cmd, evt } = packet;
 
-      if (cmd === DiscordRPCEvents.GET_CHANNEL) {  
+      if (cmd === DiscordRPCEvents.GET_CHANNEL) {
         dispatch(setAppUsers(packet.data.voice_states));
         dispatch(setReadyState(true));
       }
@@ -64,7 +66,7 @@ function App() {
       }
 
       // update user info
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {      
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {
         dispatch(updateUser(packet.data));
       }
     });
@@ -98,7 +100,7 @@ function App() {
         >
           overlayed™
         </div>
-        <IconButton>
+        <IconButton onClick={() => window.electron.send("toMain", { event: "TOGGLE_DEVTOOLS" })}>
           <IconSettings style={{ color: "#fff" }} />
         </IconButton>
         <IconButton
@@ -113,20 +115,8 @@ function App() {
 
       <div ref={viewRef} style={{ overflowY: "auto", height: "100vh" }}>
         {users.map((item: IUser) => (
-          <UserItem
-            key={item.id}
-            nick={item.username}
-            userId={item.id}
-            avatarHash={item.avatarHash}
-            isTalking={item.isTalking}
-          />
+          <UserItem key={item.id} {...item} />
         ))}
-        {/* Testing the overflow */}
-        {/* {Array(9)
-          .fill(10)
-          .map((u: any, i: any) => (
-            <UserItem key={i} nick="bot" userId={i} avatarHash={i} isTalking={false} />
-          ))} */}
       </div>
     </Root>
   );

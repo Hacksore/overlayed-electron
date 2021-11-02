@@ -14,7 +14,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 400,
     minHeight: 200,
-    height: 590,    
+    height: 590,
     useContentSize: true,
     transparent: true,
     frame: false,
@@ -29,6 +29,10 @@ function createWindow() {
   // load socket manager
   ipcMain.on("toMain", (event, data) => {
     const payload = JSON.parse(data);
+
+    if (payload.event === "TOGGLE_DEVTOOLS") {
+      win.webContents.openDevTools();
+    }
 
     if (payload.event === "I_AM_READY") {
       if (socketManager) {
@@ -47,22 +51,7 @@ function createWindow() {
     }
   });
 
-  // and load the index.html of the app.
-  // win.loadFile("index.html");
-  win.loadURL(
-    isDev ? "http://localhost:3001" : `file://${path.join(__dirname, "../build/index.html")}`
-  );
-
-  // disalbe frame prot
-  // win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-  //   callback({
-  //     responseHeaders: Object.fromEntries(
-  //       Object.entries(details.responseHeaders).filter(
-  //         (header) => !/x-frame-options/i.test(header[0])
-  //       )
-  //     ),
-  //   });
-  // });
+  win.loadURL(isDev ? "http://localhost:3001" : `file://${path.join(__dirname, "../build/index.html")}`);
 }
 
 app.whenReady().then(createWindow);

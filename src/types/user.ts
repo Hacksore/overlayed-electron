@@ -5,9 +5,10 @@ export interface IUser {
   avatarHash: string;
   isTalking: boolean;
   deafened: boolean;
-  selfMuted: boolean;
+  muted: boolean;
   volume: number;
 }
+
 export interface IDiscordUser {
   nick: string;
   mute: boolean;
@@ -17,10 +18,12 @@ export interface IDiscordUser {
   user: User;
   isTalking: boolean;
 }
+
 interface Pan {
   left: number;
   right: number;
 }
+
 interface VoiceState {
   mute: boolean;
   deaf: boolean;
@@ -28,6 +31,7 @@ interface VoiceState {
   self_deaf: boolean;
   suppress: boolean;
 }
+
 interface User {
   id: string;
   username: string;

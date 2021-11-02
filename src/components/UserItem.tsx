@@ -1,12 +1,8 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-
-interface IUserItemProps {
-  nick: string;
-  userId: string;
-  isTalking: boolean;
-  avatarHash: string;
-}
+import { IUser } from "../types/user";
+import IconDeafend from "@mui/icons-material/HeadsetOff";
+import IconMuted from "@mui/icons-material/MicOff";
 
 const Root = styled("div")(({ theme }) => ({
   alignItems: "center",
@@ -15,39 +11,67 @@ const Root = styled("div")(({ theme }) => ({
   margin: "4px 0 4px 0",
 }));
 
-const UserItem = React.memo(({ nick, userId, isTalking, avatarHash }: IUserItemProps) => {
+const UserItem = React.memo((props: IUser) => {
+  const getIconColor = () => {
+    if (props.isTalking) {
+      return "#43b581";
+    } else if (props.muted) {
+      return "#565656";
+    } else {
+      return "rgba(0,0,0,0)";
+    }
+  };
+
+  const getNameColor = () => {
+    if (props.muted) {
+      return "#515151";
+    }
+
+    return "#fff";
+  };
+
   return (
     <Root>
-      <img
-        onError={e => {
-          // @ts-ignore
-          e.target.onerror = null;
-          // @ts-ignore
-          e.target.src = "/img/default.png";
-        }}
+      <div style={{ position: "relative" }}>
+        <img
+          onError={e => {
+            // @ts-ignore
+            e.target.onerror = null;
+            // @ts-ignore
+            e.target.src = "/img/default.png";
+          }}
+          style={{
+            border: `3px solid ${getIconColor()}`,
+            filter: `${props.muted ? "grayscale(90%)" : "none"}`,
+            width: 48,
+            height: 48,
+            borderRadius: 26,
+          }}
+          alt="avatar"
+          src={`https://cdn.discordapp.com/avatars/${props.id}/${props.avatarHash}.jpg`}
+        />
+      </div>
+      <div
         style={{
-          border: `3px solid ${isTalking ? "#43b581" : "rgba(0,0,0,0)"}`,
-          width: 48,
-          height: 48,
-          borderRadius: 26,
-        }}
-        alt="avatar"
-        src={`https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.jpg`}
-      />
-      <p
-        style={{
-          color: isTalking ? "#fff" : "#c1c1c1",
-          fontSize: 22,
-          // TODO: alpha here makes it hard to see on light backgrounds
-          // using solid color for now
-          background: "rgba(40,40,40,1)",
-          padding: "4px 8px 6px 8px",
-          borderRadius: 10,
-          margin: "0 0 0 5px",
+          display: "flex",
         }}
       >
-        {nick}
-      </p>
+        <div
+          style={{
+            color: getNameColor(),
+            fontSize: 22,
+            background: "rgba(40,40,40,1)",
+            padding: "4px 8px 6px 8px",
+            borderRadius: 10,
+            display: "flex",
+            margin: "0 0 0 5px",
+          }}
+        >
+          <div style={{ marginRight: 6 }}>{props.username}</div>
+          {props.deafened &&  <IconDeafend />}
+          {props.muted && <IconMuted />}
+        </div>
+      </div>
     </Root>
   );
 });

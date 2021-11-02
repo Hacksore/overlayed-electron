@@ -18,21 +18,23 @@ const initialState: AppState = {
   isPinned: false,
 };
 
+const createUserStateItem = (payload: IDiscordUser) => ({
+  username: payload.nick,
+  avatarHash: payload.user.avatar,
+  muted: payload.voice_state.self_mute,
+  deafened: payload.voice_state.self_deaf,
+  isTalking: false,
+  id: payload.user.id,
+  volume: 100,
+});
+
 // TODO: we could move this user stuff to a seperate reducer
 export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
-      const users = action.payload.map((item: IDiscordUser) => ({
-        username: item.nick,
-        avatarHash: item.user.avatar,
-        selfMuted: false,
-        deafened: false,
-        isTalking: false,
-        id: item.user.id,
-        volume: 100,        
-      }));
+      const users = action.payload.map((item: IDiscordUser) => createUserStateItem(item));
       state.users = users;
     },
     setReadyState: (state, action: PayloadAction<boolean>) => {
@@ -41,7 +43,7 @@ export const appSlice = createSlice({
     setPinned: (state, action: PayloadAction<boolean>) => {
       state.isPinned = action.payload;
     },
-    setUserTalking: (state, action: PayloadAction<{id: string; value: boolean}>) => {
+    setUserTalking: (state, action: PayloadAction<{ id: string; value: boolean }>) => {
       state.users.forEach((item: IUser) => {
         if (item.id === action.payload.id) {
           item.isTalking = action.payload.value;
@@ -51,29 +53,17 @@ export const appSlice = createSlice({
     addUser: (state, action: PayloadAction<IDiscordUser>) => {
       // TODO: this can't be the right place in the array?
       const item = action.payload;
-      state.users.push({
-        username: item.nick,
-        avatarHash: item.user.avatar,
-        selfMuted: false,
-        deafened: false,
-        isTalking: false,
-        id: item.user.id,
-        volume: 100,  
-      });
+      state.users.push(createUserStateItem(item));
     },
     removeUser: (state, action: PayloadAction<string>) => {
       state.users = state.users.filter((item: IUser) => item.id !== action.payload);
     },
     updateUser: (state, action: PayloadAction<IDiscordUser>) => {
-      state.users = state.users.map((item: IUser) => item.id === action.payload.user.id ? {
-        username: action.payload.nick,
-        avatarHash: action.payload.user.avatar,
-        selfMuted: false,
-        deafened: false,
-        isTalking: false,
-        id: action.payload.user.id,
-        volume: 100,  
-      } : item);
+      state.users = state.users.map((item: IUser) =>
+        item.id === action.payload.user.id
+          ? createUserStateItem(action.payload)
+          : item
+      );
     },
   },
 });
