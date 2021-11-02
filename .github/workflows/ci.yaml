@@ -5,7 +5,6 @@ on: [push]
 jobs:
   ci:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v1
       - name: package
@@ -13,8 +12,10 @@ jobs:
           npm ci
           npm run build
           npm run pack
-
+      - name: echo dir
+        run: |
+          ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
           name: overlated-unstable
-          path: "dist/win-unpacked/*"
+          path: "dist/"
