@@ -76,6 +76,7 @@ class SocketManager {
 
   message(data) {
     const packet = JSON.parse(data.toString());
+
     // we are ready, so send auth token
     if (packet.evt === "READY") {
       this._socket.send(
@@ -87,6 +88,17 @@ class SocketManager {
       );
     }
 
+    // handle no auth
+    console.log(packet)
+    if (packet.cmd === "AUTHENTICATE" && packet.evt === "ERROR") {
+      if (packet.data.code === 4009) {
+        // TELL CLIENT WE AINT GOT NO AUTH :(
+        console.log("we got bad auth bail now")
+        this._socket.close();
+        return this._win.webContents.send("fromMain", data.toString());
+      }
+    }
+    
     // we are authed asked for channels and guilds ;)
     if (packet.cmd === "AUTHENTICATE") {
       // get users

@@ -3,7 +3,7 @@ import IconPin from "@mui/icons-material/PushPinRounded";
 import IconSettings from "@mui/icons-material/Settings";
 import IconDebug from "@mui/icons-material/BugReport";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { appSlice } from "../rootReducer";
+import { appSlice } from "../reducers/rootReducer";
 import { RootState } from "../store";
 
 const {

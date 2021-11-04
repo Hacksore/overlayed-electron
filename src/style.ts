@@ -7,9 +7,5 @@ export const Root = styled("div")(({ theme }) => ({
   // height: "calc(100vh - 45px)",
   WebkitAppRegion: "drag",
   fontFamily: "'Roboto', sans-serif",
-  userSelect: "none",
-  "&:hover": {
-    borderColor: "rgba(0, 0, 0, 0.1)",
-    backgroundColor: "rgba(0, 0, 0, 0.2)"
-  }
+  userSelect: "none"
 }));

@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
-import rootReducer from "./rootReducer";
+import rootReducer from "./reducers/rootReducer";
 
 const FILTERD_EVENTS = ["root/setUserTalking", "root/updateUser"];
 const logger = createLogger({

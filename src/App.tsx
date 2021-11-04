@@ -1,21 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
 import { Root } from "./style";
 import { useAppDispatch } from "./hooks/redux";
-import { appSlice } from "./rootReducer";
+import { appSlice } from "./reducers/rootReducer";
 import Toolbar from "./components/Toolbar";
 import UserList from "./components/UserList";
+import FirstTimeExperience from "./components/FirstTimeExperience";
 
-const {
-  setGuilds,
-  setClientId,
-  updateUser,
-  removeUser,
-  addUser,
-  setAppUsers,
-  setUserTalking,
-  setReadyState,
-} = appSlice.actions;
+const { setGuilds, setClientId, updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState } =
+  appSlice.actions;
+
 declare global {
   interface Window {
     electron: {
@@ -28,6 +22,9 @@ declare global {
 function App() {
   const dispatch = useAppDispatch();
 
+  // TODO: move to redux
+  const [authed, setAuthed] = useState(false);
+
   useEffect(() => {
     // Tell main we are ready
     window.electron.send("toMain", { event: "I_AM_READY" });
@@ -36,9 +33,21 @@ function App() {
       const packet = JSON.parse(msg);
       const { cmd, evt } = packet;
 
+      // check for no auth or bad auth
+      // handle no auth
+      console.log(packet);
+      if (cmd === DiscordCMDEvents.AUTHENTICATE && DiscordRPCEvents.ERROR) {
+        if (packet.data.code === 4009) {
+          console.log("We have bad authz, make client login somehow :(");
+          setAuthed(false);
+          return;
+        }
+      }
+
       // we get auth data
-      if (cmd === DiscordRPCEvents.AUTHENTICATE) {
+      if (cmd === DiscordCMDEvents.AUTHENTICATE) {
         dispatch(setClientId(packet.data.application.id));
+        setAuthed(true);
       }
 
       // get a list of the channel voice states
@@ -91,9 +100,14 @@ function App() {
 
   return (
     <Root>
-      <Toolbar />
-      <UserList />
-      
+      {!authed ? (
+        <FirstTimeExperience />
+      ) : (
+        <>
+          <Toolbar />
+          <UserList />
+        </>
+      )}
     </Root>
   );
 }

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IUser, IDiscordUser } from "./types/user";
+import { IUser, IDiscordUser } from "../types/user";
 export interface AppState {
   users: Array<IUser>;
   channelId: string | null;
@@ -55,6 +55,7 @@ export const appSlice = createSlice({
       state.clientId = action.payload;
     },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
+      // don't get updates yet until the client is read
       const users = action.payload.map((item: IDiscordUser) => createUserStateItem(item));
       state.users = users;
     },
