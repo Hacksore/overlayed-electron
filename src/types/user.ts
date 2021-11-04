@@ -6,6 +6,9 @@ export interface IUser {
   talking: boolean;
   deafened: boolean;
   muted: boolean;
+  suppress: boolean;
+  selfDeafened: boolean;
+  selfMuted: boolean;
   volume: number;
   bot: boolean;
   premium: number;

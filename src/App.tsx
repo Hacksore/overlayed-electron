@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import UserItem from "./components/UserItem";
 import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
 import { Root } from "./style";
@@ -10,7 +10,7 @@ import PinIcon from "@mui/icons-material/PushPinRounded";
 import IconSettings from "@mui/icons-material/Settings";
 import { IUser } from "./types/user";
 
-const { updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState, setPinned } = appSlice.actions;
+const { setClientId, updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState, setPinned } = appSlice.actions;
 declare global {
   interface Window {
     electron: {
@@ -24,33 +24,33 @@ function App() {
   const dispatch = useAppDispatch();
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const users = useAppSelector((state: RootState) => state.root.users);
-  const viewRef = useRef(null);
-  const usersRef = useRef(null);
-
-  // we need users so lets hack with a ref?
-  useEffect(() => {
-    // @ts-ignore
-    usersRef.current = users;
-  }, [users]);
+  const clientId = useAppSelector((state: RootState) => state.root.clientId);
 
   useEffect(() => {
-    // hey mr main I am ready
+    // Tell main we are ready
     window.electron.send("toMain", { event: "I_AM_READY" });
-    // TODO: this has to be a singleton service I think - will look at working with IPCSocketService later
-    // we end up with way to many stale closures with async callbacks like this that need to ready react state vars
+
     window.electron.receive("fromMain", (msg: string) => {
       const packet = JSON.parse(msg);
       const { cmd, evt } = packet;
 
+      // we get auth data
+      if (cmd === DiscordRPCEvents.AUTHENTICATE) {
+        dispatch(setClientId(packet.data.application.id));
+      }
+
+      // get a list of the channel voice states
       if (cmd === DiscordRPCEvents.GET_CHANNEL) {
         dispatch(setAppUsers(packet.data.voice_states));
         dispatch(setReadyState(true));
       }
 
+      // start speaking
       if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.SPEAKING_START) {
         dispatch(setUserTalking({ id: packet.data.user_id, value: true }));
       }
 
+      // stop speaking
       if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.SPEAKING_STOP) {
         dispatch(setUserTalking({ id: packet.data.user_id, value: false }));
       }
@@ -69,6 +69,11 @@ function App() {
       if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {
         dispatch(updateUser(packet.data));
       }
+
+      // guilds test
+      if (cmd === DiscordCMDEvents.DISPATCH && evt === "GET_GUILDS") {
+        console.log("GUOLDS", packet);
+      }
     });
 
     return () => {};
@@ -76,7 +81,6 @@ function App() {
     // I think i need to understand if ignoring dispatch is a good idea
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   return (
     <Root>
@@ -114,7 +118,7 @@ function App() {
         </IconButton>
       </div>
 
-      <div ref={viewRef} style={{ overflowY: "auto", height: "100vh" }}>
+      <div style={{ overflowY: "auto", height: "100vh" }}>
         {users.map((item: IUser) => (
           <UserItem key={item.id} {...item} />
         ))}
@@ -122,7 +126,7 @@ function App() {
         {/* TODO: add a FTUE component and a sync component */}
         {users.length <= 0 && (
           <div>
-            <Typography color="primary">You are not in a channel</Typography>
+            <Typography color="primary">Sync current channel</Typography>
             <Button
               onClick={() => {
                 console.log(1);

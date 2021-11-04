@@ -1,8 +1,8 @@
 // socket on the main proc
 const WebSocket = require("ws");
-require('dotenv').config();
+require("dotenv").config();
 
-const { CLIENT_ID, CHANNEL_ID, ACCESS_TOKEN } = process.env;
+const { GUILD_ID, CLIENT_ID, CHANNEL_ID, ACCESS_TOKEN } = process.env;
 
 function uuid() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -12,7 +12,7 @@ function uuid() {
   });
 }
 
-const getRPCEvents = (id) => [
+const getRPCEvents = id => [
   {
     cmd: "SUBSCRIBE",
     args: { channel_id: id },
@@ -47,18 +47,14 @@ const getRPCEvents = (id) => [
 
 class SocketManager {
   constructor(win) {
-
     this._win = win;
 
-    this._socket = new WebSocket(
-      `ws://127.0.0.1:6463/?v=1&client_id=${CLIENT_ID}`,
-      {
-        headers: {
-          Origin: "https://streamkit.discord.com",
-          Host: "https://streamkit.discord.com",
-        },
-      }
-    );
+    this._socket = new WebSocket(`ws://127.0.0.1:6463/?v=1&client_id=${CLIENT_ID}`, {
+      headers: {
+        Origin: "https://streamkit.discord.com",
+        Host: "https://streamkit.discord.com",
+      },
+    });
 
     this._socket.on("open", this.open.bind(this));
     this._socket.on("close", this.close.bind(this));
@@ -67,7 +63,7 @@ class SocketManager {
 
   // sub to all the events
   subscribeEvents() {
-    getRPCEvents(CHANNEL_ID).map((e) => this._socket.send(JSON.stringify(e)));
+    getRPCEvents(CHANNEL_ID).map(e => this._socket.send(JSON.stringify(e)));
   }
 
   open() {
@@ -92,9 +88,12 @@ class SocketManager {
       );
     }
 
-    // we are authed asked for channels ;)
+    // we are authed asked for channels and guilds ;)
     if (packet.cmd === "AUTHENTICATE") {
       // get channels
+      // this.fetchGuilds();
+
+      // get users
       this.fetchUsers();
 
       // sub events
@@ -102,6 +101,26 @@ class SocketManager {
     }
 
     this._win.webContents.send("fromMain", data.toString());
+  }
+
+  fetchChannels() {
+    this._socket.send(
+      JSON.stringify({
+        cmd: "GET_CHANNELS",
+        args: { channel_id: GUILD_ID },
+        nonce: uuid(),
+      })
+    );
+  }
+
+  fetchGuilds() {
+    this._socket.send(
+      JSON.stringify({
+        cmd: "GET_GUILDS",
+        args: {},
+        nonce: uuid(),
+      })
+    );
   }
 
   fetchUsers() {
@@ -117,7 +136,6 @@ class SocketManager {
   destroy() {
     this._socket.close();
   }
-
 }
 
 module.exports = SocketManager;

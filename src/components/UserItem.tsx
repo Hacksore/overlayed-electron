@@ -3,7 +3,10 @@ import { styled } from "@mui/material/styles";
 import { IUser } from "../types/user";
 import IconDeafend from "@mui/icons-material/HeadsetOff";
 import IconMuted from "@mui/icons-material/MicOff";
-import NitroIcon from "./NitroIcon";
+import IconTroll from "@mui/icons-material/Dangerous";
+
+// TODO: rename for consistancy
+import IconNitro from "./IconNitro";
 
 const Root = styled("div")(({ theme }) => ({
   alignItems: "center",
@@ -24,8 +27,10 @@ const UserItem = React.memo((props: IUser) => {
   };
 
   const getNameColor = () => {
-    if (props.muted) {
+    if (props.selfDeafened) {
       return "#515151";
+    } else if (props.deafened) {
+      return "green";
     }
 
     return "#fff";
@@ -47,7 +52,21 @@ const UserItem = React.memo((props: IUser) => {
               borderRadius: 15,
             }}
           >
-            <NitroIcon color="#f577ff" size="16" />
+            <IconNitro color="#f577ff" size="16" />
+          </div>
+        )}
+
+        {/* // TODO: FIX */}
+        {false && (
+          <div
+            style={{
+              padding: 2,
+              position: "absolute",
+              left: 0,
+              top: 0,
+            }}
+          >
+            <IconTroll style={{ color: "red", fontSize: 48 }} />
           </div>
         )}
         <img
@@ -59,7 +78,7 @@ const UserItem = React.memo((props: IUser) => {
           }}
           style={{
             border: `3px solid ${getIconColor()}`,
-            filter: `${props.muted ? "grayscale(90%)" : "none"}`,
+            filter: `${props.selfDeafened ? "grayscale(90%)" : "none"}`,
             width: 48,
             height: 48,
             borderRadius: 26,
@@ -78,15 +97,21 @@ const UserItem = React.memo((props: IUser) => {
             color: getNameColor(),
             fontSize: 22,
             background: "rgba(40,40,40,1)",
-            padding: "4px 8px 6px 8px",
+            padding: "4px 8px 4px 8px",
+            border: "1px solid #3a3a3a",
+            alignItems: "center",
             borderRadius: 10,
             display: "flex",
             margin: "0 0 0 5px",
           }}
         >
-          <div style={{ marginRight: 6 }}>{props.username}</div>
-          {props.deafened && <IconDeafend />}
-          {props.muted && <IconMuted />}
+          <div>{props.username}</div>
+          {(props.selfDeafened || props.selfMuted) && (
+            <div style={{ marginLeft: 6 }}>
+              {props.selfDeafened && <IconDeafend />}
+              {props.selfMuted && <IconMuted style={{ color: "#d84949" }} />}
+            </div>
+          )}
         </div>
       </div>
     </Root>

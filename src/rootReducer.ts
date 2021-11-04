@@ -3,26 +3,33 @@ import { IUser, IDiscordUser } from "./types/user";
 export interface AppState {
   users: Array<IUser>;
   channelId: string | null;
+  channels: Array<any>, // TODO: type
   clientId: string | null;
   accessToken: string | null;
   isReady: boolean;
   isPinned: boolean;
+  channelName: string | null;
 }
 
 const initialState: AppState = {
   users: [],
+  channels: [],
   channelId: null,
   clientId: null,
   accessToken: null,
   isReady: false,
   isPinned: false,
+  channelName: null,
 };
 
 const createUserStateItem = (payload: IDiscordUser) => ({
   username: payload.nick,
   avatarHash: payload.user.avatar,
-  muted: payload.voice_state.self_mute,
-  deafened: payload.voice_state.self_deaf,
+  muted: payload.voice_state.mute,
+  deafened: payload.voice_state.deaf,
+  selfDeafened: payload.voice_state.self_deaf,
+  selfMuted: payload.voice_state.self_mute,
+  suppress: payload.voice_state.suppress,
   // TODO: add states for showing my mute states for others
   talking: false,
   id: payload.user.id,
@@ -38,6 +45,9 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
+    setClientId: (state, action: PayloadAction<string>) => {
+      state.clientId = action.payload;      
+    },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
       const users = action.payload.map((item: IDiscordUser) => createUserStateItem(item));
       state.users = users;
@@ -70,14 +80,25 @@ export const appSlice = createSlice({
       }
 
       state.users = state.users
+        // TODO: sort like discord if we can
         .sort((userA: IUser, userB: IUser) => {
-          if (userA.muted && userB.muted) {
+          if (userA.username.toLowerCase() === userB.username.toLowerCase()) {
             return 0;
-          } else if (userA.muted && !userB.muted) return 1;
-          else {
+          } else if (userA.username.toLowerCase() > userB.username.toLowerCase()) {
+            return 1;
+          } else {
             return -1;
           }
         })
+        // FIXME: maybe we think about this more as this is kinda sus
+        // .sort((userA: IUser, userB: IUser) => {
+        //   if (userA.muted && userB.muted) {
+        //     return 0;
+        //   } else if (userA.muted && !userB.muted) return 1;
+        //   else {
+        //     return -1;
+        //   }
+        // })
         .map((item: IUser) => (item.id === action.payload.user.id ? createUserStateItem(action.payload) : item));
     },
   },
