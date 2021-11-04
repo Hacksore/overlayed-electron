@@ -76,7 +76,6 @@ class SocketManager {
 
   message(data) {
     const packet = JSON.parse(data.toString());
-
     // we are ready, so send auth token
     if (packet.evt === "READY") {
       this._socket.send(
@@ -90,17 +89,34 @@ class SocketManager {
 
     // we are authed asked for channels and guilds ;)
     if (packet.cmd === "AUTHENTICATE") {
-      // get channels
-      // this.fetchGuilds();
-
       // get users
       this.fetchUsers();
 
-      // sub events
+      // get guilds
+      this.fetchGuilds();
+
+      // sub to guild status
+      this.fetchGuldStatus();
+
+      // subscribe to channel for talking events
       this.subscribeEvents();
     }
 
     this._win.webContents.send("fromMain", data.toString());
+  }
+
+  fetchGuldStatus() {
+    console.log("Fetching guild status..")
+    this._socket.send(
+      JSON.stringify({
+        args: {
+          guild_id: GUILD_ID,
+        },  
+        cmd: "SUBSCRIBE",
+        evt: "GUILD_STATUS",
+        nonce: uuid(),
+      })
+    );
   }
 
   fetchChannels() {

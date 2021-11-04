@@ -31,11 +31,11 @@ interface Pan {
 }
 
 interface VoiceState {
-  mute: boolean;
-  deaf: boolean;
+  mute: boolean; // TBD
+  deaf: boolean; // TBD
   self_mute: boolean;
   self_deaf: boolean;
-  suppress: boolean;
+  suppress: boolean; // maybe its a channel where you dont have perms to talk in aka suppress
 }
 
 interface User {

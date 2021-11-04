@@ -36,6 +36,10 @@ const UserItem = React.memo((props: IUser) => {
     return "#fff";
   };
 
+  const avatarUrl = props.avatarHash
+    ? `https://cdn.discordapp.com/avatars/${props.id}/${props.avatarHash}.jpg`
+    : "/img/default.png";
+
   return (
     <Root>
       <div style={{ position: "relative" }}>
@@ -84,7 +88,7 @@ const UserItem = React.memo((props: IUser) => {
             borderRadius: 26,
           }}
           alt="avatar"
-          src={`https://cdn.discordapp.com/avatars/${props.id}/${props.avatarHash}.jpg`}
+          src={avatarUrl}
         />
       </div>
       <div
@@ -109,7 +113,7 @@ const UserItem = React.memo((props: IUser) => {
           {(props.selfDeafened || props.selfMuted) && (
             <div style={{ marginLeft: 6 }}>
               {props.selfDeafened && <IconDeafend />}
-              {props.selfMuted && <IconMuted style={{ color: "#d84949" }} />}
+              {props.selfMuted && <IconMuted />}
             </div>
           )}
         </div>

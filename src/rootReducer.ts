@@ -3,7 +3,8 @@ import { IUser, IDiscordUser } from "./types/user";
 export interface AppState {
   users: Array<IUser>;
   channelId: string | null;
-  channels: Array<any>, // TODO: type
+  channels: Array<any>; // TODO: type
+  guilds: Array<any> | null; // TODO: type
   clientId: string | null;
   accessToken: string | null;
   isReady: boolean;
@@ -15,6 +16,7 @@ const initialState: AppState = {
   users: [],
   channels: [],
   channelId: null,
+  guilds: null,
   clientId: null,
   accessToken: null,
   isReady: false,
@@ -45,8 +47,12 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
+    // TODO: type
+    setGuilds: (state, action: PayloadAction<Array<any>>) => {
+      state.guilds = action.payload;
+    },
     setClientId: (state, action: PayloadAction<string>) => {
-      state.clientId = action.payload;      
+      state.clientId = action.payload;
     },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
       const users = action.payload.map((item: IDiscordUser) => createUserStateItem(item));

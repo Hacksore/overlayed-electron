@@ -15,7 +15,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-linux
-          path: "dist/"
+          path: "dist/.zip"
   build-mac:
     runs-on: macos-latest
     steps:
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-mac
-          path: "dist/"
+          path: "dist/.zip"
   build-windows:
     runs-on: windows-latest
     steps:
@@ -41,4 +41,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-windows
-          path: "dist/"
+          path: "dist/*.zip"
