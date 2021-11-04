@@ -36,6 +36,7 @@ const UserItem = React.memo((props: IUser) => {
     return "#fff";
   };
 
+  // discord avatar hash can be null so we fix this
   const avatarUrl = props.avatarHash
     ? `https://cdn.discordapp.com/avatars/${props.id}/${props.avatarHash}.jpg`
     : "/img/default.png";
@@ -109,7 +110,7 @@ const UserItem = React.memo((props: IUser) => {
             margin: "0 0 0 5px",
           }}
         >
-          <div>{props.username}</div>
+          <div title={JSON.stringify(props)}>{props.username}</div>
           {(props.selfDeafened || props.selfMuted) && (
             <div style={{ marginLeft: 6 }}>
               {props.selfDeafened && <IconDeafend />}
