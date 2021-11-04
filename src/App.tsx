@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import UserItem from "./components/UserItem";
 import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
 import { Root } from "./style";
-import { Button, FormControl, IconButton, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Button, IconButton, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { RootState } from "./store";
 import { appSlice } from "./rootReducer";
@@ -36,7 +36,7 @@ function App() {
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const users = useAppSelector((state: RootState) => state.root.users);
   // const clientId = useAppSelector((state: RootState) => state.root.clientId);
-  const guilds = useAppSelector((state: RootState) => state.root.guilds);
+  // const guilds = useAppSelector((state: RootState) => state.root.guilds);
 
   useEffect(() => {
     // Tell main we are ready
