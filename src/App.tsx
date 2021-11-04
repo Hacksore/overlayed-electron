@@ -24,7 +24,7 @@ function App() {
   const dispatch = useAppDispatch();
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const users = useAppSelector((state: RootState) => state.root.users);
-  const clientId = useAppSelector((state: RootState) => state.root.clientId);
+  // const clientId = useAppSelector((state: RootState) => state.root.clientId);
 
   useEffect(() => {
     // Tell main we are ready
