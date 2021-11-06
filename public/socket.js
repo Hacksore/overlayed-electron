@@ -3,7 +3,7 @@ const got = require("got");
 const WebSocket = require("ws");
 require("dotenv").config();
 
-const { GUILD_ID, CLIENT_ID, ACCESS_TOKEN } = process.env;
+const { GUILD_ID, CLIENT_ID = "207646673902501888", ACCESS_TOKEN } = process.env;
 
 let curentChannelId = null;
 

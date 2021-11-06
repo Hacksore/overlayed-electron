@@ -11,6 +11,8 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "electron-is-dev": "^2.0.0",
+    "dotenv": "^10.0.0",
     "got": "^11.8.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -56,10 +58,8 @@
     "@types/redux-logger": "^3.0.9",
     "concurrently": "^6.3.0",
     "cross-env": "^7.0.3",
-    "dotenv": "^10.0.0",
-    "electron": "^15.3.0",
+    "electron": "^16.0.0-beta.7",
     "electron-builder": "^22.13.1",
-    "electron-is-dev": "^2.0.0",
     "wait-on": "^6.0.0"
   }
 }

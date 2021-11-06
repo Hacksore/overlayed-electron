@@ -7,7 +7,7 @@ require("./socket");
 
 let win;
 let socketManager;
-let isPinned = false;
+let isPinned = true;
 
 function createWindow() {
   // Create the browser window.
@@ -15,16 +15,22 @@ function createWindow() {
     width: 400,
     minHeight: 200,
     height: 590,
-    useContentSize: true,
     transparent: true,
     frame: false,
     icon: __dirname + "./img/icon.png",
     hasShadow: false,
+    show:true,
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, "./preload.js"),
     },
   });
+
+  
+  win.setAlwaysOnTop(isPinned, "floating");
+
+  // enableing click through
+  // win.setIgnoreMouseEvents(true);
 
   // load socket manager
   ipcMain.on("toMain", (event, data) => {

@@ -25,7 +25,7 @@ const Root = styled("div")(({ theme }) => ({
     background: "rgba(0,0,0,0.6)",
     border: "1px solid #000",
     borderRadius: 15,
-  }
+  },
 }));
 
 const UserItem = React.memo((props: IUser) => {
@@ -40,10 +40,8 @@ const UserItem = React.memo((props: IUser) => {
   };
 
   const getNameColor = () => {
-    if (props.selfDeafened) {
+    if (props.selfDeafened || props.muted) {
       return "#515151";
-    } else if (props.deafened) {
-      return "green";
     }
 
     return "#fff";
@@ -91,18 +89,31 @@ const UserItem = React.memo((props: IUser) => {
             color: getNameColor(),
             fontSize: 22,
             background: "rgba(40,40,40,1)",
-            padding: "4px 8px 4px 8px",
+            padding: "6px 10px 6px 10px",
             border: "1px solid #3a3a3a",
-            alignItems: "center",
             borderRadius: 10,
             display: "flex",
+            alignItems: "flex-start",
             margin: "0 0 0 5px",
           }}
         >
-          <div title={JSON.stringify(props)}>{props.username}</div>
-          {(props.selfDeafened || props.selfMuted) && (
-            <div style={{ marginLeft: 6 }}>
-              {props.selfDeafened && <IconDeafend />}
+          <div
+            title={JSON.stringify(props)}
+            style={{
+              minWidth: "auto",
+              maxWidth: 150,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {props.username}
+          </div>
+          {(props.selfDeafened || props.selfMuted || props.muted) && (
+            <div style={{ marginLeft: 10, display: "flex", alignSelf: "self-end" }}>
+              {(props.selfDeafened || props.muted) && (
+                <IconDeafend style={{ color: props.muted ? "red" : "inherit" }} />
+              )}
               {props.selfMuted && <IconMuted />}
             </div>
           )}

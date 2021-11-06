@@ -2,7 +2,7 @@ import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
 import rootReducer from "./reducers/rootReducer";
 
-const FILTERD_EVENTS = ["root/setUserTalking", "root/updateUser"];
+const FILTERD_EVENTS = ["root/setUserTalking"];
 const logger = createLogger({
   // @ts-ignore
   predicate: (_, action) => !FILTERD_EVENTS.includes(action.type),

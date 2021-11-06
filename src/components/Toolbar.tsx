@@ -22,6 +22,7 @@ const Root = styled("div")(({ theme }) => ({
   [`&.${classes.root}`]: {
     overflowY: "auto",
     height: "100vh",
+   
   },
 }));
 

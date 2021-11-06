@@ -105,6 +105,9 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(removeUser(packet.data.user.id));
     }
 
+    // FIXME: There is a rate limit on RPC for this to only allow update per 15 seconds
+    // so when someone spams a mic/headphone mute it can bug the state in the UI as events dont get queued and sent to us
+    // we just stop recieving events - not sure how to handle this?
     // update user info
     if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_UPDATE) {
       store.dispatch(updateUser(packet.data));
