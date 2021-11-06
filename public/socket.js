@@ -50,10 +50,7 @@ const getRPCEvents = id => [
 // This is meant ot send and recieve messages from the discord RPC
 // TODO: make it scan for port ranges from [6463, 6472] - prolly can use makeRange
 class SocketManager {
-  constructor({
-    win,
-    overlayed
-  }) {
+  constructor({ win, overlayed }) {
     this._win = win;
     this.tries = 0;
     this._socket = null;
@@ -92,13 +89,11 @@ class SocketManager {
   }
 
   authenticate(token) {
-    this._socket.send(
-      JSON.stringify({
-        cmd: "AUTHENTICATE",
-        args: { access_token: token },
-        nonce: uuid(),
-      })
-    );
+    this.sendDiscordMessage({
+      cmd: "AUTHENTICATE",
+      args: { access_token: token },
+      nonce: uuid(),
+    });
   }
 
   /**
@@ -112,7 +107,6 @@ class SocketManager {
     }
 
     if (event === "I_AM_READY") {
-
     }
 
     if (event === "AUTH") {
@@ -141,14 +135,10 @@ class SocketManager {
       this._win.setVisibleOnAllWorkspaces(true);
       this._win.setFullScreenable(false);
 
-      // swithc with ipc not discord socket lol
-      this._win.webContents.send(
-        "fromMain",
-        JSON.stringify({
-          evt: "PINNED_STATUS",
-          value: this.overlayed.isPinned,
-        })
-      );
+      this.sendElectronMessage({
+        evt: "PINNED_STATUS",
+        value: this.overlayed.isPinned,
+      });
     }
   }
 
@@ -175,21 +165,18 @@ class SocketManager {
           code: packet.data.code,
         },
       }).json();
-      
+
       // attempt to auth
       this.authenticate(response.access_token);
 
       // inform client of access token - should we though? really only electron needs it
       // TODO: client doesnt use the token but might be nice to have for now?
-      this._win.webContents.send(
-        "fromMain",
-        JSON.stringify({
-          evt: "ACCESS_TOKEN_AQUIRED",
-          data: {
-            accessToken: response.access_token,
-          },
-        })
-      );
+      this.sendElectronMessage({
+        evt: "ACCESS_TOKEN_AQUIRED",
+        data: {
+          accessToken: response.access_token,
+        },
+      });
     }
 
     // handle no auth
@@ -198,7 +185,7 @@ class SocketManager {
         // TELL CLIENT WE AINT GOT NO AUTH :(
         console.log("We tried an auth token that was invalid");
 
-        return this._win.webContents.send("fromMain", data.toString());
+        return this.sendElectronMessage(data.toString());
       }
     }
 
@@ -208,63 +195,49 @@ class SocketManager {
       this.requestCurrentChannel();
     }
 
-    this._win.webContents.send("fromMain", data.toString());
+    this.sendElectronMessage(data.toString());
   }
 
   fetchGuldStatus() {
-    this._socket.send(
-      JSON.stringify({
-        args: {
-          guild_id: GUILD_ID,
-        },
-        cmd: "SUBSCRIBE",
-        evt: "GUILD_STATUS",
-        nonce: uuid(),
-      })
-    );
-  }
-
-  fetchChannels() {
-    this._socket.send(
-      JSON.stringify({
-        cmd: "GET_CHANNELS",
-        args: { channel_id: GUILD_ID },
-        nonce: uuid(),
-      })
-    );
-  }
-
-  fetchGuilds() {
-    this._socket.send(
-      JSON.stringify({
-        cmd: "GET_GUILDS",
-        args: {},
-        nonce: uuid(),
-      })
-    );
+    this.sendDiscordMessage({
+      args: {
+        guild_id: GUILD_ID,
+      },
+      cmd: "SUBSCRIBE",
+      evt: "GUILD_STATUS",
+      nonce: uuid(),
+    });
   }
 
   fetchUsers(channelId) {
-    this._socket.send(
-      JSON.stringify({
-        cmd: "GET_CHANNEL",
-        args: { channel_id: channelId },
-        nonce: uuid(),
-      })
-    );
+    this.sendDiscordMessage({
+      cmd: "GET_CHANNEL",
+      args: { channel_id: channelId },
+      nonce: uuid(),
+    });
   }
 
   requestCurrentChannel() {
-    this._socket.send(
-      JSON.stringify({
-        cmd: "GET_SELECTED_VOICE_CHANNEL",
-        nonce: uuid(),
-      })
-    );
+    this.sendDiscordMessage({
+      cmd: "GET_SELECTED_VOICE_CHANNEL",
+      nonce: uuid(),
+    });
   }
 
-  send(val) {
-    this._socket.send(JSON.stringify(val));
+  /**
+   * Send a message to electron main
+   * @param {Object} data - the message to send in object format
+   */
+  sendElectronMessage(data) {
+    this._win.webContents.send("fromMain", data);
+  }
+
+  /**
+   * Send a message to discord socket
+   * @param {Object} data - the message to send in object format
+   */
+  sendDiscordMessage(data) {
+    this._socket.send(JSON.stringify(data));
   }
 
   destroy() {
@@ -277,14 +250,13 @@ class SocketManager {
     } catch {} // eslint-disable-line no-empty
 
     if (this.tries > 20) {
-      this.emit('error', event.error);
+      this.emit("error", event.error);
     } else {
       setTimeout(() => {
         this.connect();
       }, 250);
     }
   }
-
 }
 
 module.exports = SocketManager;

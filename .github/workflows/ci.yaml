@@ -23,23 +23,23 @@ jobs:
         with:
           name: overlayed-unstable-linux
           path: "dist/**/*.7z"
-  build-mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "${{env.NODE_VERSION}}"
-      - name: package
-        run: |
-          npm ci
-          npm run build
-          npm run pack
-          ls -hal dist/
-      - uses: actions/upload-artifact@v2
-        with:
-          name: overlayed-unstable-mac
-          path: "dist/**/*.zip"
+  # build-mac:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "${{env.NODE_VERSION}}"
+  #     - name: package
+  #       run: |
+  #         npm ci
+  #         npm run build
+  #         npm run pack
+  #         ls -hal dist/
+  #     - uses: actions/upload-artifact@v2
+  #       with:
+  #         name: overlayed-unstable-mac
+  #         path: "dist/**/*.zip"
   build-windows:
     runs-on: windows-latest
     steps:
