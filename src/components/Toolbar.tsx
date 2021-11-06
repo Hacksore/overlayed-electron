@@ -22,7 +22,6 @@ const Root = styled("div")(({ theme }) => ({
   [`&.${classes.root}`]: {
     overflowY: "auto",
     height: "100vh",
-   
   },
 }));
 
@@ -39,9 +38,12 @@ const Toolbar = () => {
           flex: 1,
           display: "flex",
           color: "#fff",
+          // @ts-ignore
+          WebkitAppRegion: "drag",
         }}
       >
-        {channel && channel.name}
+        {/* TODO: fix for login window */}
+        {channel && channel.name ? channel.name : "Private Call"}
       </div>
       <IconButton
         onClick={() => {

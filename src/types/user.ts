@@ -14,6 +14,7 @@ export interface IUser {
   premium: number;
   flags: number;
   discriminator: string;
+  lastUpdate: number;
 }
 
 export interface IDiscordUser {

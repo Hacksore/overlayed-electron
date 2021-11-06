@@ -63,13 +63,15 @@ class IPCSocketService extends EventEmitter {
     if (cmd === RPCCommands.AUTHENTICATE) {
       store.dispatch(setClientId(packet.data.application.id));
       store.dispatch(setIsAuthed(true));
-
     }
 
     // get a list of the channel voice states
     if (cmd === RPCCommands.GET_CHANNEL) {
       store.dispatch(setAppUsers(packet.data.voice_states));
       store.dispatch(setReadyState(true));
+
+      // TODO: figure out where to best set isAuthed
+      store.dispatch(setIsAuthed(true));
     }
 
     // get current channel

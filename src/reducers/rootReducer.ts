@@ -42,6 +42,7 @@ const createUserStateItem = (payload: IDiscordUser) => ({
   flags: payload.user.flags,
   premium: payload.user.premium_type,
   discriminator: payload.user.discriminator,
+  lastUpdate: 0,
 });
 
 // TODO: we could move this user stuff to a seperate reducer
@@ -96,7 +97,7 @@ export const appSlice = createSlice({
       if (!state.isReady) {
         return;
       }
-
+      
       state.users = state.users
         // TODO: sort like discord if we can
         .sort((userA: IUser, userB: IUser) => {
@@ -108,15 +109,6 @@ export const appSlice = createSlice({
             return -1;
           }
         })
-        // FIXME: maybe we think about this more as this is kinda sus
-        // .sort((userA: IUser, userB: IUser) => {
-        //   if (userA.muted && userB.muted) {
-        //     return 0;
-        //   } else if (userA.muted && !userB.muted) return 1;
-        //   else {
-        //     return -1;
-        //   }
-        // })
         .map((item: IUser) => (item.id === action.payload.user.id ? createUserStateItem(action.payload) : item));
     },
   },

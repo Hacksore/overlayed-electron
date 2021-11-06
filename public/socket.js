@@ -1,11 +1,10 @@
 // socket on the main proc
 const got = require("got");
 const WebSocket = require("ws");
+
 require("dotenv").config();
 
 const { GUILD_ID, CLIENT_ID = "207646673902501888", ACCESS_TOKEN } = process.env;
-
-let curentChannelId = null;
 
 function uuid() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -51,13 +50,26 @@ const getRPCEvents = id => [
 // This is meant ot send and recieve messages from the discord RPC
 // TODO: make it scan for port ranges from [6463, 6472] - prolly can use makeRange
 class SocketManager {
-  constructor(win) {
+  constructor({
+    win,
+    overlayed
+  }) {
     this._win = win;
+    this.tries = 0;
+    this._socket = null;
+    this.overlayed = overlayed;
 
-    this._socket = new WebSocket(`ws://127.0.0.1:6463/?v=1&client_id=${CLIENT_ID}`, {
+    this.connect();
+  }
+
+  connect() {
+    const port = 6463 + (this.tries % 10);
+    this.tries += 1;
+
+    this._socket = new WebSocket(`ws://127.0.0.1:${port}/?v=1&client_id=${CLIENT_ID}`, {
       headers: {
         Origin: "https://streamkit.discord.com",
-        Host: "127.0.0.1:6463",
+        Host: `127.0.0.1:${port}`,
       },
     });
 
@@ -89,6 +101,57 @@ class SocketManager {
     );
   }
 
+  /**
+   * An IPC message is a something that is render process to the main
+   */
+  onIPCMessage(message) {
+    const { event, data } = JSON.parse(message);
+
+    if (event === "TOGGLE_DEVTOOLS") {
+      this._win.webContents.openDevTools();
+    }
+
+    if (event === "I_AM_READY") {
+
+    }
+
+    if (event === "AUTH") {
+      this.send(data);
+    }
+
+    // ask for the current channel from discord
+    if (event === "REQUEST_CURRENT_CHANNEL") {
+      this.requestCurrentChannel();
+    }
+
+    if (event === "SUBSCRIBE_CHANNEL") {
+      const { channelId } = data;
+
+      // request to sub to new channel events
+      this.subscribeEvents(channelId);
+
+      // ask for all the users?
+      this.fetchUsers(channelId);
+    }
+
+    if (event === "TOGGLE_PIN") {
+      this.overlayed.isPinned = !this.overlayed.isPinned;
+
+      this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
+      this._win.setVisibleOnAllWorkspaces(true);
+      this._win.setFullScreenable(false);
+
+      // swithc with ipc not discord socket lol
+      this._win.webContents.send(
+        "fromMain",
+        JSON.stringify({
+          evt: "PINNED_STATUS",
+          value: this.overlayed.isPinned,
+        })
+      );
+    }
+  }
+
   async message(data) {
     const packet = JSON.parse(data.toString());
 
@@ -99,7 +162,9 @@ class SocketManager {
 
     // store current channel in electron main
     if (packet.cmd === "GET_CHANNEL") {
-      curentChannelId = packet.data.id;
+      // attempt to save last channel id
+      this.overlayed.lastChannelId = this.overlayed.curentChannelId;
+      this.overlayed.curentChannelId = packet.data.id;
     }
 
     // we just got an auth token, get access token
@@ -110,7 +175,7 @@ class SocketManager {
           code: packet.data.code,
         },
       }).json();
-
+      
       // attempt to auth
       this.authenticate(response.access_token);
 
@@ -205,6 +270,21 @@ class SocketManager {
   destroy() {
     this._socket.close();
   }
+
+  onError(event) {
+    try {
+      this._socket.close();
+    } catch {} // eslint-disable-line no-empty
+
+    if (this.tries > 20) {
+      this.emit('error', event.error);
+    } else {
+      setTimeout(() => {
+        this.connect();
+      }, 250);
+    }
+  }
+
 }
 
 module.exports = SocketManager;
