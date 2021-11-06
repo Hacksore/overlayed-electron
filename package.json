@@ -69,16 +69,6 @@
       "build/**/*",
       "node_modules/**/*"
     ],
-    "appId": "com.hacksore.overlayed",
-    "windows": {
-      "target": "zip"
-    },
-    "linux": {
-      "target": "deb"
-    },
-    "mac": {
-      "target": "dmg",
-      "category": "hacksore.overlayed.category.type"
-    }
+    "appId": "com.hacksore.overlayed"
   }
 }
