@@ -4,6 +4,7 @@ export interface AppState {
   users: Array<IUser>;
   channelId: string | null;
   channels: Array<any>; // TODO: type
+  currentChannel: any; // TODO: type
   guilds: Array<any> | null; // TODO: type
   clientId: string | null;
   accessToken: string | null;
@@ -16,6 +17,7 @@ const initialState: AppState = {
   users: [],
   channels: [],
   channelId: null,
+  currentChannel: null,
   guilds: null,
   clientId: null,
   accessToken: null,
@@ -47,9 +49,15 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
+    setAccessToken: (state, action: PayloadAction<string>) => {
+      state.accessToken = action.payload;
+    },
     // TODO: type
     setGuilds: (state, action: PayloadAction<Array<any>>) => {
       state.guilds = action.payload;
+    },
+    setCurrentVoiceChannel: (state, action: PayloadAction<any>) => {
+      state.currentChannel = action.payload;
     },
     setClientId: (state, action: PayloadAction<string>) => {
       state.clientId = action.payload;

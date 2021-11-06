@@ -1,4 +1,5 @@
 // socket on the main proc
+const got = require("got");
 const WebSocket = require("ws");
 require("dotenv").config();
 
@@ -52,7 +53,7 @@ class SocketManager {
     this._socket = new WebSocket(`ws://127.0.0.1:6463/?v=1&client_id=${CLIENT_ID}`, {
       headers: {
         Origin: "https://streamkit.discord.com",
-        Host: "https://streamkit.discord.com",
+        Host: "127.0.0.1:6463",
       },
     });
 
@@ -62,8 +63,8 @@ class SocketManager {
   }
 
   // sub to all the events
-  subscribeEvents() {
-    getRPCEvents(CHANNEL_ID).map(e => this._socket.send(JSON.stringify(e)));
+  subscribeEvents(channelId) {
+    getRPCEvents(channelId).map(e => this._socket.send(JSON.stringify(e)));
   }
 
   open() {
@@ -74,27 +75,54 @@ class SocketManager {
     console.log("disconnected", err);
   }
 
-  message(data) {
+  authenticate(token) {
+    this._socket.send(
+      JSON.stringify({
+        cmd: "AUTHENTICATE",
+        args: { access_token: token },
+        nonce: uuid(),
+      })
+    );
+  }
+
+  async message(data) {
     const packet = JSON.parse(data.toString());
+    console.log(packet);
 
     // we are ready, so send auth token
     if (packet.evt === "READY") {
-      this._socket.send(
-        JSON.stringify({
-          cmd: "AUTHENTICATE",
-          args: { access_token: ACCESS_TOKEN },
-          nonce: uuid(),
-        })
-      );
+      this.authenticate(ACCESS_TOKEN);
+    }
+
+    // we just got an auth token, get access token
+    if (packet.cmd === "AUTHORIZE") {
+      console.log(packet);
+      const response = await got("https://streamkit.discord.com/overlay/token", {
+        method: "post",
+        json: {
+          code: packet.data.code
+        }
+      }).json();
+
+      // attempt to auth
+      this.authenticate(response.access_token);
+
+      // inform client of access token - should we though? really only electron needs it
+      // TODO: client doesnt use the token but might be nice to have for now?
+      this._win.webContents.send("fromMain", JSON.stringify({
+        evt: "ACCESS_TOKEN_AQUIRED",
+        data: {
+          accessToken: response.access_token
+        }
+      }));
     }
 
     // handle no auth
-    console.log(packet)
     if (packet.cmd === "AUTHENTICATE" && packet.evt === "ERROR") {
       if (packet.data.code === 4009) {
         // TELL CLIENT WE AINT GOT NO AUTH :(
-        console.log("we got bad auth bail now")
-        this._socket.close();
+        console.log("We tried an auth token that was invalid")
+        
         return this._win.webContents.send("fromMain", data.toString());
       }
     }
@@ -102,16 +130,16 @@ class SocketManager {
     // we are authed asked for channels and guilds ;)
     if (packet.cmd === "AUTHENTICATE") {
       // get users
-      this.fetchUsers();
+      this.fetchUsers(CHANNEL_ID);
 
       // get guilds
-      this.fetchGuilds();
+      // this.fetchGuilds();
 
       // sub to guild status
-      this.fetchGuldStatus();
+      // this.fetchGuldStatus();
 
       // subscribe to channel for talking events
-      this.subscribeEvents();
+      this.subscribeEvents(CHANNEL_ID);
     }
 
     this._win.webContents.send("fromMain", data.toString());
@@ -151,14 +179,27 @@ class SocketManager {
     );
   }
 
-  fetchUsers() {
+  fetchUsers(channelId) {
     this._socket.send(
       JSON.stringify({
         cmd: "GET_CHANNEL",
-        args: { channel_id: CHANNEL_ID },
+        args: { channel_id: channelId },
         nonce: uuid(),
       })
     );
+  }
+
+  requestCurrentChannel() {
+    this._socket.send(
+      JSON.stringify({
+        cmd: "GET_SELECTED_VOICE_CHANNEL",
+        nonce: uuid(),
+      })
+    );
+  }
+
+  send(val) {
+    this._socket.send(JSON.stringify(val));
   }
 
   destroy() {

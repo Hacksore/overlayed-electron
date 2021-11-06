@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
-import { DiscordCMDEvents, DiscordRPCEvents } from "./constants/discord";
+import { RPCEvents, RPCCommands, CustomEvents } from "./constants/discord";
 import { Root } from "./style";
 import { useAppDispatch } from "./hooks/redux";
 import { appSlice } from "./reducers/rootReducer";
 import Toolbar from "./components/Toolbar";
 import UserList from "./components/UserList";
-import FirstTimeExperience from "./components/FirstTimeExperience";
+import LoginView from "./components/LoginView";
 
-const { setGuilds, setClientId, updateUser, removeUser, addUser, setAppUsers, setUserTalking, setReadyState } =
-  appSlice.actions;
+const {
+  setCurrentVoiceChannel,
+  setGuilds,
+  setClientId,
+  updateUser,
+  removeUser,
+  addUser,
+  setAppUsers,
+  setUserTalking,
+  setReadyState,
+  setAccessToken,
+} = appSlice.actions;
 
 declare global {
   interface Window {
@@ -33,10 +43,13 @@ function App() {
       const packet = JSON.parse(msg);
       const { cmd, evt } = packet;
 
+      // electron did the work for us and got a token ;)
+      if (evt === CustomEvents.ACCESS_TOKEN_AQUIRED) {
+        dispatch(setAccessToken(packet.data.accessToken));
+      }
+
       // check for no auth or bad auth
-      // handle no auth
-      console.log(packet);
-      if (cmd === DiscordCMDEvents.AUTHENTICATE && DiscordRPCEvents.ERROR) {
+      if (cmd === RPCCommands.AUTHENTICATE && RPCEvents.ERROR) {
         if (packet.data.code === 4009) {
           console.log("We have bad authz, make client login somehow :(");
           setAuthed(false);
@@ -45,49 +58,63 @@ function App() {
       }
 
       // we get auth data
-      if (cmd === DiscordCMDEvents.AUTHENTICATE) {
+      if (cmd === RPCCommands.AUTHENTICATE) {
         dispatch(setClientId(packet.data.application.id));
         setAuthed(true);
       }
 
       // get a list of the channel voice states
-      if (cmd === DiscordRPCEvents.GET_CHANNEL) {
+      if (cmd === RPCCommands.GET_CHANNEL) {
         dispatch(setAppUsers(packet.data.voice_states));
         dispatch(setReadyState(true));
       }
 
+      // get current channel
+      if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL) {
+        console.log("Got current chan", packet);
+        dispatch(setCurrentVoiceChannel(packet.data));
+        dispatch(setAppUsers([]));
+
+        window.electron.send("toMain", {
+          event: "SUBSCRIBE_CHANNEL",
+          data: {
+            channelId: packet.data.id,
+          },
+        });
+      }
+
       // start speaking
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.SPEAKING_START) {
+      if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.SPEAKING_START) {
         dispatch(setUserTalking({ id: packet.data.user_id, value: true }));
       }
 
       // stop speaking
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.SPEAKING_STOP) {
+      if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.SPEAKING_STOP) {
         dispatch(setUserTalking({ id: packet.data.user_id, value: false }));
       }
 
       // join
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_CREATE) {
+      if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_CREATE) {
         dispatch(addUser(packet.data));
       }
 
       // leave
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_DELETE) {
+      if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_DELETE) {
         dispatch(removeUser(packet.data.user.id));
       }
 
       // update user info
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.VOICE_STATE_UPDATE) {
+      if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_UPDATE) {
         dispatch(updateUser(packet.data));
       }
 
       // Info about current connected guild?
-      if (cmd === DiscordCMDEvents.DISPATCH && evt === DiscordRPCEvents.GUILD_STATUS) {
+      if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.GUILD_STATUS) {
         // console.log("gs", packet);
       }
 
       // fetch all guilds and set to state
-      if (cmd === DiscordCMDEvents.GET_GUILDS) {
+      if (cmd === RPCCommands.GET_GUILDS) {
         dispatch(setGuilds(packet.data.guilds));
       }
     });
@@ -100,11 +127,11 @@ function App() {
 
   return (
     <Root>
+      <Toolbar />
       {!authed ? (
-        <FirstTimeExperience />
+        <LoginView />
       ) : (
         <>
-          <Toolbar />
           <UserList />
         </>
       )}

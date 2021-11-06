@@ -30,6 +30,7 @@ function createWindow() {
   ipcMain.on("toMain", (event, data) => {
     const payload = JSON.parse(data);
 
+    // console.log(payload)
     if (payload.event === "TOGGLE_DEVTOOLS") {
       win.webContents.openDevTools();
     }
@@ -41,6 +42,25 @@ function createWindow() {
       } else {
         socketManager = new SocketManager(win);
       }
+    }
+
+    if (payload.event === "AUTH") {
+      socketManager.send(payload.data);
+    }
+
+    if (payload.event === "REQUEST_CURRENT_CHANNEL") {
+      socketManager.requestCurrentChannel();
+    }
+
+    if (payload.event === "SUBSCRIBE_CHANNEL") {
+      console.log("SUBSCRIBE_CHANNEL", payload);
+      const { channelId } = payload.data;
+
+      // request to sub to new channel events
+      socketManager.subscribeEvents(channelId);
+
+      // ask for all the users?
+      socketManager.fetchUsers(channelId);
     }
 
     if (payload.event === "TOGGLE_PIN") {

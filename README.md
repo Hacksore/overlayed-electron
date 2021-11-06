@@ -1,6 +1,8 @@
 # overlayed
 
-This is an electron based overlay application for Discord that leverages the local RPC websocket the client has running on `ws://127.0.0.1:6463`.
+This is an electron based overlay application for Discord that leverages the local RPC websocket the client has running on `ws://127.0.0.1:6463` (seems this can be ranged 6463-6472).
+
+[Discord RPC docs](https://discord.com/developers/docs/topics/rpc)
 
 With this app you can view who talking in your current channel.
 

@@ -3,16 +3,29 @@ import { styled } from "@mui/material/styles";
 import { IUser } from "../types/user";
 import IconDeafend from "@mui/icons-material/HeadsetOff";
 import IconMuted from "@mui/icons-material/MicOff";
-import IconTroll from "@mui/icons-material/Dangerous";
-
-// TODO: rename for consistancy
 import IconNitro from "./IconNitro";
+
+const PREFIX = "UserItem";
+const classes = {
+  root: `${PREFIX}-root`,
+  iconNitro: `${PREFIX}-iconNitro`,
+};
 
 const Root = styled("div")(({ theme }) => ({
   alignItems: "center",
   display: "flex",
   borderRadius: 24,
   margin: "4px 0 4px 0",
+  [`& .${classes.iconNitro}`]: {
+    display: "flex",
+    padding: 2,
+    position: "absolute",
+    left: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.6)",
+    border: "1px solid #000",
+    borderRadius: 15,
+  }
 }));
 
 const UserItem = React.memo((props: IUser) => {
@@ -45,35 +58,11 @@ const UserItem = React.memo((props: IUser) => {
     <Root>
       <div style={{ position: "relative" }}>
         {props.premium > 0 && (
-          <div
-            style={{
-              display: "flex",
-              padding: 2,
-              position: "absolute",
-              left: 0,
-              bottom: 0,
-              background: "rgba(0,0,0,0.6)",
-              border: "1px solid #000",
-              borderRadius: 15,
-            }}
-          >
+          <div className={classes.iconNitro}>
             <IconNitro color="#f577ff" size="16" />
           </div>
         )}
 
-        {/* // TODO: FIX */}
-        {false && (
-          <div
-            style={{
-              padding: 2,
-              position: "absolute",
-              left: 0,
-              top: 0,
-            }}
-          >
-            <IconTroll style={{ color: "red", fontSize: 48 }} />
-          </div>
-        )}
         <img
           onError={e => {
             // @ts-ignore
