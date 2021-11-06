@@ -12,7 +12,7 @@ jobs:
           npm ci
           npm run build
           npm run pack:linux
-          npm ls dist -hal
+          ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-linux
@@ -26,7 +26,7 @@ jobs:
           npm ci
           npm run build
           npm run pack:macos
-          npm ls dist -hal
+          ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-mac
@@ -40,7 +40,7 @@ jobs:
           npm ci
           npm run build
           npm run pack:windows
-          npm ls dist -hal
+          ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-windows
