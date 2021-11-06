@@ -11,7 +11,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run pack:linux
+          npm run pack
           ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
@@ -25,7 +25,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run pack:macos
+          npm run pack
           ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
@@ -39,7 +39,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run pack:windows
+          npm run pack
           dir dist/
       - uses: actions/upload-artifact@v2
         with:

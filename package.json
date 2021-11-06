@@ -30,9 +30,7 @@
     "react": "cross-env PORT=3001 BROWSER=none npm start",
     "dev": "concurrently -k npm:react npm:electron",
     "electron": "wait-on tcp:3001 && electron .",
-    "pack:linux": "electron-builder -p never --linux ",
-    "pack:macos": "electron-builder -p never --mac",
-    "pack:windows": "electron-builder -p never --win"
+    "pack": "electron-builder -c electron-builder.json"
   },
   "eslintConfig": {
     "extends": [
@@ -63,12 +61,5 @@
     "electron-builder": "^22.13.1",
     "electron-is-dev": "^2.0.0",
     "wait-on": "^6.0.0"
-  },
-  "build": {
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
-    "appId": "com.hacksore.overlayed"
   }
 }

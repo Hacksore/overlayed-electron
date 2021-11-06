@@ -1,0 +1,39 @@
+{
+  "productName": "overlayed",
+  "appId": "com.hacksore.overlayed",
+  "directories": {
+    "buildResources": "buildResources",
+    "output": "dist"
+  },
+  "files": [
+    "build/**/*",
+    "node_modules/**/*"
+  ],
+  "mac": {
+    "target": ["dmg"],
+    "artifactName": "${productName}-${version}-${os}.${ext}"
+  },
+  "win": {
+    "target": ["zip"],
+    "artifactName": "${productName}-${version}-${os}.${ext}"
+  },
+  "linux": {
+    "target": ["zip"],
+    "artifactName": "${productName}-${version}-${os}.${ext}"
+  },
+  "dmg": {
+    "title": "${productName}-${version}",
+    "contents": [
+      {
+        "x": 300,
+        "y": 360
+      },
+      {
+        "x": 490,
+        "y": 360,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ]
+  }
+}
