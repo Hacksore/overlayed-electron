@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: package
+      - uses: actions/setup-node@v2
         with:
-          node-version: "$NODE_VERSION"
+          node-version: "${{env.NODE_VERSION}}"
+      - name: package
         run: |
           npm ci
           npm run build
@@ -26,9 +27,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
-      - name: package
+      - uses: actions/setup-node@v2
         with:
-          node-version: "$NODE_VERSION"
+          node-version: "${{env.NODE_VERSION}}"
+      - name: package
         run: |
           npm ci
           npm run build
@@ -42,9 +44,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
-      - name: package
+      - uses: actions/setup-node@v2
         with:
-          node-version: "$NODE_VERSION"
+          node-version: "${{env.NODE_VERSION}}"
+      - name: package
         run: |
           npm ci
           npm run build
