@@ -40,7 +40,7 @@ jobs:
           npm ci
           npm run build
           npm run pack:windows
-          ls -hal dist/
+          dir dist/
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-windows

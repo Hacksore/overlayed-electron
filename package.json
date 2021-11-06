@@ -30,7 +30,7 @@
     "react": "cross-env PORT=3001 BROWSER=none npm start",
     "dev": "concurrently -k npm:react npm:electron",
     "electron": "wait-on tcp:3001 && electron .",
-    "pack:linux": "electron-builder -p never --linux",
+    "pack:linux": "electron-builder -p never --linux ",
     "pack:macos": "electron-builder -p never --mac",
     "pack:windows": "electron-builder -p never --win"
   },
@@ -70,8 +70,15 @@
       "node_modules/**/*"
     ],
     "appId": "com.hacksore.overlayed",
+    "windows": {
+      "target": "zip"
+    },
+    "linux": {
+      "target": "deb"
+    },
     "mac": {
-      "category": "your.app.category.type"
+      "target": "dmg",
+      "category": "hacksore.overlayed.category.type"
     }
   }
 }
