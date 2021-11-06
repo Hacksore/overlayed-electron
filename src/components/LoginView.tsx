@@ -1,43 +1,62 @@
 import { Button, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { borderRadius, styled } from "@mui/system";
 import { nanoid } from "@reduxjs/toolkit";
+import socketService from "../services/socketService";
 
-// const PREFIX = "LoginView";
-// const classes = {
-//   root: `${PREFIX}-root`,
-// };
+const PREFIX = "LoginView";
+const classes = {
+  root: `${PREFIX}-root`,
+  instructions: `${PREFIX}-instructions`,
+};
 
 export const Root = styled("div")(({ theme }) => ({
-  padding: "4px 12px 0 12px",
-  background: "#383838",
+  padding: 16,
+  background: "rgba(0,0,0,0.5)",
   color: theme.palette.primary.contrastText,
   height: "100vh",
   display: "flex",
   flexDirection: "column",
+
+  [`& .${classes.instructions}`]: {
+    [`& div`]: {
+      margin: "10px 0 10px 0",
+      padding: "10px 12px 10px 12px",
+      background: "#000",
+      border: "2px solid #2b2b2b",
+      borderRadius: 8
+    },
+  },
 }));
 
 const LoginView = () => {
   return (
     <Root>
-      <Typography variant="h5" color="textPrimary">
-        Authentication Required
+      <Typography gutterBottom variant="h4" color="textPrimary">
+        Login Required
       </Typography>
-      <Typography variant="body2" color="textPrimary">
-        Since the RPC is not available to all developers at this time you;ll need to authenticate with streamkit.
+      <Typography variant="subtitle1" color="textPrimary">
+        You need to authenticate with discord streamkit in order to get connected
       </Typography>
 
-      <ol>
-        <li>
-          Visit <a href="https://streamkit.discord.com/overlay">https://streamkit.discord.com/overlay</a>
-        </li>
-        <li>Click install for OBS</li>
-        <li>Follow the steps to authenticate</li>
-      </ol>
+      <div className={classes.instructions}>
+        <div>
+          <Button
+            variant="contained"
+            onClick={() => {
+              window.electron.openInBrowser("https://streamkit.discord.com/overlay");
+            }}
+          >
+            Visit Discord Streamkit Overlay
+          </Button>
+        </div>
+        <div>Click Install for OBS</div>
+        <div>Follow the steps to authenticate</div>
+      </div>
 
       <Button
         variant="contained"
-        onClick={() => {
-          window.electron.send("toMain", {
+        onClick={() =>
+          socketService.send({
             event: "AUTH",
             data: {
               cmd: "AUTHORIZE",
@@ -48,8 +67,8 @@ const LoginView = () => {
                 prompt: "none",
               },
             },
-          });
-        }}
+          })
+        }
       >
         Validate Auth
       </Button>

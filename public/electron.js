@@ -30,7 +30,6 @@ function createWindow() {
   ipcMain.on("toMain", (event, data) => {
     const payload = JSON.parse(data);
 
-    // console.log(payload)
     if (payload.event === "TOGGLE_DEVTOOLS") {
       win.webContents.openDevTools();
     }
@@ -53,7 +52,6 @@ function createWindow() {
     }
 
     if (payload.event === "SUBSCRIBE_CHANNEL") {
-      console.log("SUBSCRIBE_CHANNEL", payload);
       const { channelId } = payload.data;
 
       // request to sub to new channel events
@@ -65,9 +63,16 @@ function createWindow() {
 
     if (payload.event === "TOGGLE_PIN") {
       isPinned = !isPinned;
+
       win.setAlwaysOnTop(isPinned, "floating");
       win.setVisibleOnAllWorkspaces(true);
       win.setFullScreenable(false);
+
+      // swithc with ipc not discord socket lol
+      win.webContents.send("fromMain", JSON.stringify({
+        evt: "PINNED_STATUS",
+        value: isPinned        
+      }));
     }
   });
 

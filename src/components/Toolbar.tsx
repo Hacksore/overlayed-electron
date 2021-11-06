@@ -3,14 +3,11 @@ import IconPin from "@mui/icons-material/PushPinRounded";
 import IconSettings from "@mui/icons-material/Settings";
 import IconDebug from "@mui/icons-material/BugReport";
 import IconSync from "@mui/icons-material/Sync";
-import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { appSlice } from "../reducers/rootReducer";
+import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
-
-const {
-  setPinned,
-} = appSlice.actions;
+import socketService from "../services/socketService";
+import { CustomEvents } from "../constants/discord";
 
 const PREFIX = "Toolbar";
 const classes = {
@@ -29,7 +26,6 @@ const Root = styled("div")(({ theme }) => ({
 }));
 
 const Toolbar = () => {
-  const dispatch = useAppDispatch();
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
 
@@ -46,9 +42,11 @@ const Toolbar = () => {
       >
         {channel && channel.name}
       </div>
-      <IconButton onClick={() => {
-        window.electron.send("toMain", { event: "REQUEST_CURRENT_CHANNEL" })
-      }}>
+      <IconButton
+        onClick={() => {
+          socketService.send({ event: CustomEvents.REQUEST_CURRENT_CHANNEL });
+        }}
+      >
         <IconSync style={{ color: "#fff" }} />
       </IconButton>
       <IconButton onClick={() => window.electron.send("toMain", { event: "TOGGLE_DEVTOOLS" })}>
@@ -59,9 +57,7 @@ const Toolbar = () => {
       </IconButton>
       <IconButton
         onClick={() => {
-          window.electron.send("toMain", { event: "TOGGLE_PIN" });
-          // TODO: dont leave state on UI the main proc should handle it
-          dispatch(setPinned(!isPinned));
+          socketService.send({ event: "TOGGLE_PIN" });
         }}
       >
         <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />

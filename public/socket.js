@@ -3,7 +3,9 @@ const got = require("got");
 const WebSocket = require("ws");
 require("dotenv").config();
 
-const { GUILD_ID, CLIENT_ID, CHANNEL_ID, ACCESS_TOKEN } = process.env;
+const { GUILD_ID, CLIENT_ID, ACCESS_TOKEN } = process.env;
+
+let curentChannelId = null;
 
 function uuid() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -46,6 +48,8 @@ const getRPCEvents = id => [
   },
 ];
 
+// This is meant ot send and recieve messages from the discord RPC
+// TODO: make it scan for port ranges from [6463, 6472] - prolly can use makeRange
 class SocketManager {
   constructor(win) {
     this._win = win;
@@ -87,21 +91,24 @@ class SocketManager {
 
   async message(data) {
     const packet = JSON.parse(data.toString());
-    console.log(packet);
 
     // we are ready, so send auth token
     if (packet.evt === "READY") {
       this.authenticate(ACCESS_TOKEN);
     }
 
+    // store current channel in electron main
+    if (packet.cmd === "GET_CHANNEL") {
+      curentChannelId = packet.data.id;
+    }
+
     // we just got an auth token, get access token
     if (packet.cmd === "AUTHORIZE") {
-      console.log(packet);
       const response = await got("https://streamkit.discord.com/overlay/token", {
         method: "post",
         json: {
-          code: packet.data.code
-        }
+          code: packet.data.code,
+        },
       }).json();
 
       // attempt to auth
@@ -109,49 +116,42 @@ class SocketManager {
 
       // inform client of access token - should we though? really only electron needs it
       // TODO: client doesnt use the token but might be nice to have for now?
-      this._win.webContents.send("fromMain", JSON.stringify({
-        evt: "ACCESS_TOKEN_AQUIRED",
-        data: {
-          accessToken: response.access_token
-        }
-      }));
+      this._win.webContents.send(
+        "fromMain",
+        JSON.stringify({
+          evt: "ACCESS_TOKEN_AQUIRED",
+          data: {
+            accessToken: response.access_token,
+          },
+        })
+      );
     }
 
     // handle no auth
     if (packet.cmd === "AUTHENTICATE" && packet.evt === "ERROR") {
       if (packet.data.code === 4009) {
         // TELL CLIENT WE AINT GOT NO AUTH :(
-        console.log("We tried an auth token that was invalid")
-        
+        console.log("We tried an auth token that was invalid");
+
         return this._win.webContents.send("fromMain", data.toString());
       }
     }
-    
-    // we are authed asked for channels and guilds ;)
+
+    // we are authed asked for currentChannel
     if (packet.cmd === "AUTHENTICATE") {
-      // get users
-      this.fetchUsers(CHANNEL_ID);
-
-      // get guilds
-      // this.fetchGuilds();
-
-      // sub to guild status
-      // this.fetchGuldStatus();
-
-      // subscribe to channel for talking events
-      this.subscribeEvents(CHANNEL_ID);
+      // after auth request current channel
+      this.requestCurrentChannel();
     }
 
     this._win.webContents.send("fromMain", data.toString());
   }
 
   fetchGuldStatus() {
-    console.log("Fetching guild status..")
     this._socket.send(
       JSON.stringify({
         args: {
           guild_id: GUILD_ID,
-        },  
+        },
         cmd: "SUBSCRIBE",
         evt: "GUILD_STATUS",
         nonce: uuid(),

@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IUser, IDiscordUser } from "../types/user";
 export interface AppState {
   users: Array<IUser>;
-  channelId: string | null;
   channels: Array<any>; // TODO: type
   currentChannel: any; // TODO: type
   guilds: Array<any> | null; // TODO: type
@@ -10,19 +9,20 @@ export interface AppState {
   accessToken: string | null;
   isReady: boolean;
   isPinned: boolean;
+  isAuthed: boolean;
   channelName: string | null;
 }
 
 const initialState: AppState = {
   users: [],
   channels: [],
-  channelId: null,
   currentChannel: null,
   guilds: null,
   clientId: null,
   accessToken: null,
   isReady: false,
   isPinned: false,
+  isAuthed: false,
   channelName: null,
 };
 
@@ -49,6 +49,9 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
+    setIsAuthed: (state, action: PayloadAction<boolean>) => {
+      state.isAuthed = action.payload;
+    },
     setAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
     },

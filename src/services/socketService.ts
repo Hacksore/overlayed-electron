@@ -1,5 +1,26 @@
 import { EventEmitter } from "events";
+import { store } from "../store";
+import { appSlice } from "../reducers/rootReducer";
+import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";
 
+const {
+  setCurrentVoiceChannel,
+  setGuilds,
+  setClientId,
+  updateUser,
+  removeUser,
+  addUser,
+  setAppUsers,
+  setUserTalking,
+  setReadyState,
+  setAccessToken,
+  setIsAuthed,
+  setPinned,
+} = appSlice.actions;
+
+let instance;
+
+// this lets us send messages back to the main electron process who also holds the discord socket
 class IPCSocketService extends EventEmitter {
   constructor() {
     super();
@@ -7,7 +28,99 @@ class IPCSocketService extends EventEmitter {
     window.electron.receive("fromMain", this.onMessage.bind(this));
   }
 
+  init() {
+    this.send({ event: "I_AM_READY" });
+  }
+
+  send(message: any) {
+    window.electron.send("toMain", message);
+  }
+
   onMessage(message: any) {
+    const packet = JSON.parse(message);
+    const { cmd, evt } = packet;
+    
+    // electron did the work for us and got a token ;)
+    if (evt === CustomEvents.ACCESS_TOKEN_AQUIRED) {
+      store.dispatch(setAccessToken(packet.data.accessToken));
+    }
+
+    // custom pin status from main proc
+    if (evt === CustomEvents.PINNED_STATUS) {
+      store.dispatch(setPinned(packet.value));
+    }
+
+    // check for no auth or bad auth
+    if (cmd === RPCCommands.AUTHENTICATE && RPCEvents.ERROR) {
+      if (packet.data.code === 4009) {
+        console.log("We received an authentication error with the token we provided");
+        store.dispatch(setIsAuthed(false));
+        return;
+      }
+    }
+
+    // we get auth data
+    if (cmd === RPCCommands.AUTHENTICATE) {
+      store.dispatch(setClientId(packet.data.application.id));
+      store.dispatch(setIsAuthed(true));
+
+    }
+
+    // get a list of the channel voice states
+    if (cmd === RPCCommands.GET_CHANNEL) {
+      store.dispatch(setAppUsers(packet.data.voice_states));
+      store.dispatch(setReadyState(true));
+    }
+
+    // get current channel
+    if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL) {
+      store.dispatch(setCurrentVoiceChannel(packet.data));
+      store.dispatch(setAppUsers([]));
+
+      window.electron.send("toMain", {
+        event: "SUBSCRIBE_CHANNEL",
+        data: {
+          channelId: packet.data.id,
+        },
+      });
+    }
+
+    // start speaking
+    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.SPEAKING_START) {
+      store.dispatch(setUserTalking({ id: packet.data.user_id, value: true }));
+    }
+
+    // stop speaking
+    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.SPEAKING_STOP) {
+      store.dispatch(setUserTalking({ id: packet.data.user_id, value: false }));
+    }
+
+    // join
+    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_CREATE) {
+      store.dispatch(addUser(packet.data));
+    }
+
+    // leave
+    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_DELETE) {
+      store.dispatch(removeUser(packet.data.user.id));
+    }
+
+    // update user info
+    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_UPDATE) {
+      store.dispatch(updateUser(packet.data));
+    }
+
+    // Info about current connected guild?
+    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.GUILD_STATUS) {
+      // console.log("gs", packet);
+    }
+
+    // fetch all guilds and set to state
+    if (cmd === RPCCommands.GET_GUILDS) {
+      store.dispatch(setGuilds(packet.data.guilds));
+    }
+
+    // for any extneral listeners
     this.emit("message", message);
   }
 
@@ -21,4 +134,8 @@ class IPCSocketService extends EventEmitter {
   }
 }
 
-export default IPCSocketService;
+if (!instance) {
+  instance = new IPCSocketService();
+}
+
+export default instance as IPCSocketService;
