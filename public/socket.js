@@ -215,11 +215,10 @@ class SocketManager {
         }
       } else {
         // we already are authed lets get the otken
-        console.log("already have auth token that works", packet.data);
+        console.log("already have auth token that works, so just call commands");
         this.overlayed.accessToken = packet.data.access_token;
 
-        // tell client
-        console.log("Sending client", packet.data.access_token);
+        // tell client we got the token
         this.sendElectronMessage({
           evt: "ACCESS_TOKEN_ACQUIRED",
           data: {

@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, darken } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { TooltipProps } from "@mui/material";
 
 ///               V wat.jpg
@@ -41,14 +41,14 @@ const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
     color: theme.palette.background.default,
     "&::before": {
       // apply to the border of the arrow
-      border: `1px solid ${darken(theme.palette.background.default, 0.2)}`,
+      border: `1px solid #3a3a3a`,
       backgroundColor: theme.palette.background.default,
       boxSizing: "border-box"
     }
   },
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: theme.palette.background.default,
-    border: `1px solid ${darken(theme.palette.background.default, 0.5)}`,
+    border: `1px solid #3a3a3a`,
     fontSize: 20,
   },
 }));

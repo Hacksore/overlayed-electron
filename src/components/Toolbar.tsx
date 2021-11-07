@@ -18,9 +18,12 @@ const Root = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
   flexDirection: "row",
   alignItems: "center",
+  padding: "0 10px 0 10px",
   [`&.${classes.root}`]: {
     overflowY: "auto",
-    height: "100vh",
+  },
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
   },
 }));
 
@@ -39,14 +42,16 @@ const Toolbar = () => {
           display: "flex",
           color: "#fff",
           // @ts-ignore
-          WebkitAppRegion: "drag",
+          appRegion: "drag",
         }}
       >
-        {/* Render name of channel */}
-        {channel && channel.name}
+        <div>
+          {/* Render name of channel */}
+          {channel && channel.name ? channel.name : "Private Call"}
 
-        {/* When not authed show app name */}
-        {!isAuthed && "Overlayed"}
+          {/* When not authed show app name */}
+          {!isAuthed && "Overlayed"}
+        </div>
       </div>
       <IconButton
         onClick={() => {
@@ -62,7 +67,6 @@ const Toolbar = () => {
         onClick={() => {
           // TODO: still borken
           socketService.send({ event: CustomEvents.TOGGLE_PIN });
-
         }}
       >
         <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />

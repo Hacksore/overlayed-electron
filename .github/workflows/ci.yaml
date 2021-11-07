@@ -22,7 +22,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: overlayed-unstable-linux
-          path: "dist/**/*.7z"
+          path: "dist/**/*.zip"
   # build-mac:
   #   runs-on: macos-latest
   #   steps:
