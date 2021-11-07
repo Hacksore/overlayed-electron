@@ -101,16 +101,20 @@ class SocketManager {
    */
   onIPCMessage(message) {
     const { event, data } = JSON.parse(message);
-
+    
     if (event === "TOGGLE_DEVTOOLS") {
       this._win.webContents.openDevTools();
     }
 
+    // IDK?
     if (event === "I_AM_READY") {
     }
 
-    if (event === "AUTH") {
-      this.send(data);
+    // Allow the main process to proxy a message straight to the discord RPC socket
+    // we just pass the full data message
+    if (event === "DISCORD_RPC") {
+      // TODO: why are we having to to string this?
+      this.sendDiscordMessage(data);
     }
 
     // ask for the current channel from discord
@@ -144,6 +148,7 @@ class SocketManager {
 
   async message(data) {
     const packet = JSON.parse(data.toString());
+    console.log(packet);
 
     // we are ready, so send auth token
     if (packet.evt === "READY") {
@@ -157,14 +162,16 @@ class SocketManager {
       this.overlayed.curentChannelId = packet.data.id;
     }
 
-    // we just got an auth token, get access token
-    if (packet.cmd === "AUTHORIZE") {
+    // we just got an code, get access token with it
+    if (packet.cmd === "AUTHORIZE" && packet.evt !== "ERROR") {
       const response = await got("https://streamkit.discord.com/overlay/token", {
         method: "post",
         json: {
           code: packet.data.code,
         },
       }).json();
+
+      console.log("Just got a token from discord", response.access_token)
 
       // attempt to auth
       this.authenticate(response.access_token);
@@ -179,23 +186,25 @@ class SocketManager {
       });
     }
 
-    // handle no auth
-    if (packet.cmd === "AUTHENTICATE" && packet.evt === "ERROR") {
-      if (packet.data.code === 4009) {
-        // TELL CLIENT WE AINT GOT NO AUTH :(
-        console.log("We tried an auth token that was invalid");
+    // handle auth errors
+    if (packet.cmd === "AUTHENTICATE") {
+      if (packet.evt === "ERROR") {
+        if (packet.data.code === 4002) {
+          console.log("We are already authed");
+        }
 
-        return this.sendElectronMessage(data.toString());
+        // TELL CLIENT WE AINT GOT NO AUTH :(
+        if (packet.data.code === 4009) {
+          console.log("We tried an auth token that was invalid");
+        }
+      } else {
+        // we already are authed lets get the otken
+        console.log("already have auth token that works", packet.data);
+        this.overlayed.accessToken = packet.data.access_token;
       }
     }
 
-    // we are authed asked for currentChannel
-    if (packet.cmd === "AUTHENTICATE") {
-      // after auth request current channel
-      this.requestCurrentChannel();
-    }
-
-    this.sendElectronMessage(data.toString());
+    this.sendElectronMessage(data);
   }
 
   fetchGuldStatus() {
@@ -229,7 +238,7 @@ class SocketManager {
    * @param {Object} data - the message to send in object format
    */
   sendElectronMessage(data) {
-    this._win.webContents.send("fromMain", data);
+    this._win.webContents.send("fromMain", data.toString());
   }
 
   /**
@@ -247,7 +256,7 @@ class SocketManager {
   onError(event) {
     try {
       this._socket.close();
-    } catch {} // eslint-disable-line no-empty
+    } catch {}
 
     if (this.tries > 20) {
       this.emit("error", event.error);

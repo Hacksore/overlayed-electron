@@ -32,10 +32,19 @@ class IPCSocketService extends EventEmitter {
     this.send({ event: "I_AM_READY" });
   }
 
-  send(message: any) {
+  /**
+   * Send a message to the main process via IPC
+   * @param message - Object
+   */
+  send(message: Object) {
+    console.log(message);
     window.electron.send("toMain", message);
   }
 
+  /**
+   * Handle messages from the main process
+   * @param message 
+   */
   onMessage(message: any) {
     const packet = JSON.parse(message);
     const { cmd, evt } = packet;
@@ -113,11 +122,6 @@ class IPCSocketService extends EventEmitter {
     // update user info
     if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_UPDATE) {
       store.dispatch(updateUser(packet.data));
-    }
-
-    // Info about current connected guild?
-    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.GUILD_STATUS) {
-      // console.log("gs", packet);
     }
 
     // fetch all guilds and set to state

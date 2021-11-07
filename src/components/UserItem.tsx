@@ -1,5 +1,10 @@
 import React from "react";
-import { styled } from "@mui/material/styles";
+import { styled, darken } from "@mui/material/styles";
+import { TooltipProps } from "@mui/material";
+
+///               V wat.jpg
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+
 import { IUser } from "../types/user";
 import IconDeafend from "@mui/icons-material/HeadsetOff";
 import IconMuted from "@mui/icons-material/MicOff";
@@ -28,11 +33,42 @@ const Root = styled("div")(({ theme }) => ({
   },
 }));
 
+// note to self, this probably belongs on a cringe list somewhere
+const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.arrow}`]: {
+    color: theme.palette.background.default,
+    "&::before": {
+      // apply to the border of the arrow
+      border: `1px solid ${darken(theme.palette.background.default, 0.2)}`,
+      backgroundColor: theme.palette.background.default,
+      boxSizing: "border-box"
+    }
+  },
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.background.default,
+    border: `1px solid ${darken(theme.palette.background.default, 0.5)}`,
+    fontSize: 20,
+  },
+}));
+
+const RichToolTip = (props: IUser) => {
+  const { username, discriminator } = props;
+  return (
+    <div>      
+      {username}#{discriminator}
+    </div>
+  );
+};
+
 const UserItem = React.memo((props: IUser) => {
+  const { id, username, avatarHash, talking, muted, selfDeafened, selfMuted, premium } = props;
+
   const getIconColor = () => {
-    if (props.talking) {
+    if (talking) {
       return "#43b581";
-    } else if (props.muted) {
+    } else if (muted) {
       return "#565656";
     } else {
       return "rgba(0,0,0,0)";
@@ -40,7 +76,7 @@ const UserItem = React.memo((props: IUser) => {
   };
 
   const getNameColor = () => {
-    if (props.selfDeafened || props.muted) {
+    if (selfDeafened || muted) {
       return "#515151";
     }
 
@@ -48,14 +84,12 @@ const UserItem = React.memo((props: IUser) => {
   };
 
   // discord avatar hash can be null so we fix this
-  const avatarUrl = props.avatarHash
-    ? `https://cdn.discordapp.com/avatars/${props.id}/${props.avatarHash}.jpg`
-    : "/img/default.png";
+  const avatarUrl = avatarHash ? `https://cdn.discordapp.com/avatars/${id}/${avatarHash}.jpg` : "./img/default.png";
 
   return (
-    <Root>
+    <Root className={classes.root}>
       <div style={{ position: "relative" }}>
-        {props.premium > 0 && (
+        {premium > 0 && (
           <div className={classes.iconNitro}>
             <IconNitro color="#f577ff" size="16" />
           </div>
@@ -70,7 +104,7 @@ const UserItem = React.memo((props: IUser) => {
           }}
           style={{
             border: `3px solid ${getIconColor()}`,
-            filter: `${props.selfDeafened ? "grayscale(90%)" : "none"}`,
+            filter: `${selfDeafened ? "grayscale(90%)" : "none"}`,
             width: 48,
             height: 48,
             borderRadius: 26,
@@ -97,24 +131,23 @@ const UserItem = React.memo((props: IUser) => {
             margin: "0 0 0 5px",
           }}
         >
-          <div
-            title={JSON.stringify(props)}
-            style={{
-              minWidth: "auto",
-              maxWidth: 150,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {props.username}
-          </div>
-          {(props.selfDeafened || props.selfMuted || props.muted) && (
+          <StyledTooltip arrow title={<RichToolTip {...props} />}>
+            <div
+              style={{
+                minWidth: "auto",
+                maxWidth: 150,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {username}
+            </div>
+          </StyledTooltip>
+          {(selfDeafened || selfMuted || muted) && (
             <div style={{ marginLeft: 10, display: "flex", alignSelf: "self-end" }}>
-              {(props.selfDeafened || props.muted) && (
-                <IconDeafend style={{ color: props.muted ? "red" : "inherit" }} />
-              )}
-              {props.selfMuted && <IconMuted />}
+              {(selfDeafened || muted) && <IconDeafend style={{ color: muted ? "red" : "inherit" }} />}
+              {selfMuted && <IconMuted />}
             </div>
           )}
         </div>

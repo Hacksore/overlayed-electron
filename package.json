@@ -1,6 +1,8 @@
 {
   "name": "overlayed",
+  "description": "A discord overlay",  
   "version": "0.1.0",
+  "author": "Hacksore",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.5.0",
@@ -34,6 +36,7 @@
     "electron": "wait-on tcp:3001 && electron .",
     "pack": "electron-builder -c electron-builder.json"
   },
+  "homepage": "./",
   "eslintConfig": {
     "extends": [
       "react-app",

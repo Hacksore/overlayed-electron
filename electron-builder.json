@@ -15,7 +15,8 @@
   },
   "win": {
     "target": ["zip"],
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "icon": "build/img/icon.png"
   },
   "linux": {
     "target": ["zip"],

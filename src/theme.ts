@@ -1,10 +1,13 @@
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
+  components: {
+
+  },
   spacing: 0,
   palette: {
     background: {
-      default: "#3c3c3c",
+      default: "rgba(40,40,40,1)",
     },
     error: {
       main: "#f44336"

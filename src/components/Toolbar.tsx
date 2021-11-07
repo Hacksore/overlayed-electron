@@ -1,6 +1,5 @@
 import { IconButton } from "@mui/material";
 import IconPin from "@mui/icons-material/PushPinRounded";
-import IconSettings from "@mui/icons-material/Settings";
 import IconDebug from "@mui/icons-material/BugReport";
 import IconSync from "@mui/icons-material/Sync";
 import { useAppSelector } from "../hooks/redux";
@@ -28,6 +27,7 @@ const Root = styled("div")(({ theme }) => ({
 const Toolbar = () => {
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
+  const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
 
   return (
     <Root>
@@ -42,8 +42,11 @@ const Toolbar = () => {
           WebkitAppRegion: "drag",
         }}
       >
-        {/* TODO: fix for login window */}
-        {channel && channel.name ? channel.name : "Private Call"}
+        {/* Render name of channel */}
+        {channel && channel.name}
+
+        {/* When not authed show app name */}
+        {!isAuthed && "Overlayed"}
       </div>
       <IconButton
         onClick={() => {
@@ -52,11 +55,8 @@ const Toolbar = () => {
       >
         <IconSync style={{ color: "#fff" }} />
       </IconButton>
-      <IconButton onClick={() => window.electron.send("toMain", { event: "TOGGLE_DEVTOOLS" })}>
+      <IconButton onClick={() => socketService.send({ event: "TOGGLE_DEVTOOLS" })}>
         <IconDebug style={{ color: "#fff" }} />
-      </IconButton>
-      <IconButton onClick={() => window.open("?test")}>
-        <IconSettings style={{ color: "#fff" }} />
       </IconButton>
       <IconButton
         onClick={() => {

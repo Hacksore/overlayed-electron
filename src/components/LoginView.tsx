@@ -1,7 +1,9 @@
 import { Button, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import { nanoid } from "@reduxjs/toolkit";
+import { CustomEvents } from "../constants/discord";
 import socketService from "../services/socketService";
+import IconExternal from "@mui/icons-material/Launch";
+import { nanoid } from "@reduxjs/toolkit";
 
 const PREFIX = "LoginView";
 const classes = {
@@ -19,11 +21,11 @@ export const Root = styled("div")(({ theme }) => ({
 
   [`& .${classes.instructions}`]: {
     [`& div`]: {
+      textAlign: "center",
       margin: "10px 0 10px 0",
       padding: "10px 12px 10px 12px",
-      background: "#000",
-      border: "2px solid #2b2b2b",
-      borderRadius: 8
+      background: "#1c1c1c",
+      borderRadius: 4
     },
   },
 }));
@@ -46,7 +48,7 @@ const LoginView = () => {
               window.electron.openInBrowser("https://streamkit.discord.com/overlay");
             }}
           >
-            Visit Discord Streamkit Overlay
+            Visit Discord Streamkit Overlay <IconExternal />
           </Button>
         </div>
         <div>Click Install for OBS</div>
@@ -55,9 +57,11 @@ const LoginView = () => {
 
       <Button
         variant="contained"
-        onClick={() =>
+        onClick={() => {
+
+          // TODO: just make the main proc do this?
           socketService.send({
-            event: "AUTH",
+            event: "DISCORD_RPC",
             data: {
               cmd: "AUTHORIZE",
               nonce: nanoid(),
@@ -68,7 +72,10 @@ const LoginView = () => {
               },
             },
           })
-        }
+
+          // send test
+          socketService.send({ event: CustomEvents.REQUEST_CURRENT_CHANNEL });
+        }}
       >
         Validate Auth
       </Button>

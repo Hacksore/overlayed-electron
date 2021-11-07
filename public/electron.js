@@ -9,7 +9,7 @@ let win;
 let socketManager;
 
 // use this namespace to be able to pass by ref to other files
-const overlayed = { curentChannelId: null, lastChannelId: null, isPinned: true };
+const overlayed = { accessToken: null, curentChannelId: null, lastChannelId: null, isPinned: true };
 
 function createWindow() {
   // Create the browser window.
