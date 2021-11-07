@@ -47,9 +47,11 @@ const getRPCEvents = id => [
   },
 ];
 
-// This is meant ot send and recieve messages from the discord RPC
-// TODO: make it scan for port ranges from [6463, 6472] - prolly can use makeRange
 class SocketManager {
+  /**
+   * This is meant to send and recieve messages from the discord RPC
+   * As well as relay the messages over IPC to the electron main/render processes
+   */
   constructor({ win, overlayed }) {
     this._win = win;
     this.tries = 0;
@@ -72,22 +74,33 @@ class SocketManager {
 
     this._socket.on("open", this.open.bind(this));
     this._socket.on("close", this.close.bind(this));
-    this._socket.on("message", this.message.bind(this));
+    this._socket.on("message", this.onDiscordMessage.bind(this));
   }
 
-  // sub to all the events
+  /**
+   * Subscribe to events by channelId defined in getRPCEvents
+   */
   subscribeEvents(channelId) {
     getRPCEvents(channelId).map(e => this._socket.send(JSON.stringify(e)));
   }
 
+  /**
+   * When we connect to the discord RPC websocket
+   */
   open() {
     console.log("connected");
   }
 
+  /**
+   * When we disconnect from the discord RPC websocket
+   */
   close(err) {
     console.log("disconnected", err);
   }
 
+  /**
+   * Send an auth request with a valid token to the discord RPC websocket
+   */
   authenticate(token) {
     this.sendDiscordMessage({
       cmd: "AUTHENTICATE",
@@ -97,9 +110,10 @@ class SocketManager {
   }
 
   /**
-   * An IPC message is a something that is render process to the main
+   * Receieve message from the electron renderer process
+   * @param {string} message 
    */
-  onIPCMessage(message) {
+  onElectronMessage(message) {
     const { event, data } = JSON.parse(message);
     
     if (event === "TOGGLE_DEVTOOLS") {
@@ -110,11 +124,10 @@ class SocketManager {
     if (event === "I_AM_READY") {
     }
 
-    // Allow the main process to proxy a message straight to the discord RPC socket
-    // we just pass the full data message
+
+    // TODO: add a proxy event
     if (event === "DISCORD_RPC") {
-      // TODO: why are we having to to string this?
-      this.sendDiscordMessage(data);
+      this.sendDiscordMessage(data);      
     }
 
     // ask for the current channel from discord
@@ -146,9 +159,12 @@ class SocketManager {
     }
   }
 
-  async message(data) {
-    const packet = JSON.parse(data.toString());
-    console.log(packet);
+  /**
+   * Receieve message from the discord RPC websocket
+   * @param {string} message 
+   */
+  async onDiscordMessage(message) {
+    const packet = JSON.parse(message.toString());
 
     // we are ready, so send auth token
     if (packet.evt === "READY") {
@@ -204,18 +220,7 @@ class SocketManager {
       }
     }
 
-    this.sendElectronMessage(data);
-  }
-
-  fetchGuldStatus() {
-    this.sendDiscordMessage({
-      args: {
-        guild_id: GUILD_ID,
-      },
-      cmd: "SUBSCRIBE",
-      evt: "GUILD_STATUS",
-      nonce: uuid(),
-    });
+    this.sendElectronMessage(message);
   }
 
   fetchUsers(channelId) {
@@ -249,10 +254,17 @@ class SocketManager {
     this._socket.send(JSON.stringify(data));
   }
 
+  /**
+   * Destroy he discord websocket
+   */
   destroy() {
     this._socket.close();
   }
 
+  /**
+   * When the discord websocket errors
+   * @param {Error} event 
+   */
   onError(event) {
     try {
       this._socket.close();

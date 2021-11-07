@@ -60,7 +60,9 @@ const Toolbar = () => {
       </IconButton>
       <IconButton
         onClick={() => {
+          // TODO: still borken
           socketService.send({ event: "TOGGLE_PIN" });
+
         }}
       >
         <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />

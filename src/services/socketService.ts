@@ -42,8 +42,8 @@ class IPCSocketService extends EventEmitter {
   }
 
   /**
-   * Handle messages from the main process
-   * @param message 
+   * Handles messages from the main process via IPC
+   * @param {string} message
    */
   onMessage(message: any) {
     const packet = JSON.parse(message);
@@ -137,6 +137,10 @@ class IPCSocketService extends EventEmitter {
   on(event: "message", fnc: (msg: any) => void): this;
 
 
+
+  /**
+   * Remove all the attached listeners
+   */
   // @ts-ignore
   removeAllListeners() {
 
