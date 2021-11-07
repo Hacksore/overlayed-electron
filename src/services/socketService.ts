@@ -37,7 +37,6 @@ class IPCSocketService extends EventEmitter {
    * @param message - Object
    */
   send(message: Object) {
-    console.log(message);
     window.electron.send("toMain", message);
   }
 
@@ -48,9 +47,9 @@ class IPCSocketService extends EventEmitter {
   onMessage(message: any) {
     const packet = JSON.parse(message);
     const { cmd, evt } = packet;
-    
+
     // electron did the work for us and got a token ;)
-    if (evt === CustomEvents.ACCESS_TOKEN_AQUIRED) {
+    if (evt === CustomEvents.ACCESS_TOKEN_ACQUIRED) {
       store.dispatch(setAccessToken(packet.data.accessToken));
     }
 
@@ -88,8 +87,8 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(setCurrentVoiceChannel(packet.data));
       store.dispatch(setAppUsers([]));
 
-      window.electron.send("toMain", {
-        event: "SUBSCRIBE_CHANNEL",
+      this.send({
+        event: CustomEvents.SUBSCRIBE_CHANNEL,
         data: {
           channelId: packet.data.id,
         },
@@ -136,15 +135,11 @@ class IPCSocketService extends EventEmitter {
   // @ts-ignore
   on(event: "message", fnc: (msg: any) => void): this;
 
-
-
   /**
    * Remove all the attached listeners
    */
   // @ts-ignore
-  removeAllListeners() {
-
-  }
+  removeAllListeners() {}
 }
 
 if (!instance) {

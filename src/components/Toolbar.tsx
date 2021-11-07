@@ -55,13 +55,13 @@ const Toolbar = () => {
       >
         <IconSync style={{ color: "#fff" }} />
       </IconButton>
-      <IconButton onClick={() => socketService.send({ event: "TOGGLE_DEVTOOLS" })}>
+      <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
         <IconDebug style={{ color: "#fff" }} />
       </IconButton>
       <IconButton
         onClick={() => {
           // TODO: still borken
-          socketService.send({ event: "TOGGLE_PIN" });
+          socketService.send({ event: CustomEvents.TOGGLE_PIN });
 
         }}
       >

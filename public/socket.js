@@ -120,12 +120,23 @@ class SocketManager {
       this._win.webContents.openDevTools();
     }
 
+    if (event === "TOGGLE_PIN") {
+      this.overlayed.isPinned = !this.overlayed.isPinned;
+
+      this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
+      this._win.setVisibleOnAllWorkspaces(true);
+      this._win.setFullScreenable(false);
+
+      this.sendElectronMessage({
+        evt: "PINNED_STATUS",
+        value: this.overlayed.isPinned,
+      });
+    }
+
     // IDK?
     if (event === "I_AM_READY") {
     }
 
-
-    // TODO: add a proxy event
     if (event === "DISCORD_RPC") {
       this.sendDiscordMessage(data);      
     }
@@ -145,18 +156,7 @@ class SocketManager {
       this.fetchUsers(channelId);
     }
 
-    if (event === "TOGGLE_PIN") {
-      this.overlayed.isPinned = !this.overlayed.isPinned;
 
-      this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
-      this._win.setVisibleOnAllWorkspaces(true);
-      this._win.setFullScreenable(false);
-
-      this.sendElectronMessage({
-        evt: "PINNED_STATUS",
-        value: this.overlayed.isPinned,
-      });
-    }
   }
 
   /**
@@ -164,7 +164,7 @@ class SocketManager {
    * @param {string} message 
    */
   async onDiscordMessage(message) {
-    const packet = JSON.parse(message.toString());
+    const packet = JSON.parse(message);
 
     // we are ready, so send auth token
     if (packet.evt === "READY") {
@@ -195,7 +195,7 @@ class SocketManager {
       // inform client of access token - should we though? really only electron needs it
       // TODO: client doesnt use the token but might be nice to have for now?
       this.sendElectronMessage({
-        evt: "ACCESS_TOKEN_AQUIRED",
+        evt: "ACCESS_TOKEN_ACQUIRED",
         data: {
           accessToken: response.access_token,
         },
@@ -217,10 +217,21 @@ class SocketManager {
         // we already are authed lets get the otken
         console.log("already have auth token that works", packet.data);
         this.overlayed.accessToken = packet.data.access_token;
+
+        // tell client
+        console.log("Sending client", packet.data.access_token);
+        this.sendElectronMessage({
+          evt: "ACCESS_TOKEN_ACQUIRED",
+          data: {
+            accessToken:  packet.data.access_token
+          },
+        });
+
       }
     }
 
-    this.sendElectronMessage(message);
+    // forward every packet from the socket to the client
+    this.sendElectronMessage(packet);
   }
 
   fetchUsers(channelId) {
@@ -240,18 +251,18 @@ class SocketManager {
 
   /**
    * Send a message to electron main
-   * @param {Object} data - the message to send in object format
+   * @param {Object} message - the message to send in object format
    */
-  sendElectronMessage(data) {
-    this._win.webContents.send("fromMain", data.toString());
+  sendElectronMessage(message) {
+    this._win.webContents.send("fromMain", JSON.stringify(message));
   }
 
   /**
    * Send a message to discord socket
-   * @param {Object} data - the message to send in object format
+   * @param {Object} message - the message to send in object format
    */
-  sendDiscordMessage(data) {
-    this._socket.send(JSON.stringify(data));
+  sendDiscordMessage(message) {
+    this._socket.send(JSON.stringify(message));
   }
 
   /**
