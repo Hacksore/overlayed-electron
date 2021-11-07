@@ -32,10 +32,18 @@ class IPCSocketService extends EventEmitter {
     this.send({ event: "I_AM_READY" });
   }
 
-  send(message: any) {
+  /**
+   * Sends a message to the main process via IPC
+   * @param {string} message
+   */
+  send(message: object) {
     window.electron.send("toMain", message);
   }
 
+  /**
+   * Handles messages from the main process via IPC
+   * @param {string} message
+   */
   onMessage(message: any) {
     const packet = JSON.parse(message);
     const { cmd, evt } = packet;
@@ -133,6 +141,10 @@ class IPCSocketService extends EventEmitter {
   on(event: "message", fnc: (msg: any) => void): this;
 
 
+
+  /**
+   * Remove all the attached listeners
+   */
   // @ts-ignore
   removeAllListeners() {
 

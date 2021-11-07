@@ -8,6 +8,7 @@ import { RootState } from "../store";
 import { styled } from "@mui/system";
 import socketService from "../services/socketService";
 import { CustomEvents } from "../constants/discord";
+import { nanoid } from "@reduxjs/toolkit";
 
 const PREFIX = "Toolbar";
 const classes = {
@@ -60,7 +61,9 @@ const Toolbar = () => {
       </IconButton>
       <IconButton
         onClick={() => {
+          // TODO: still borken
           socketService.send({ event: "TOGGLE_PIN" });
+
         }}
       >
         <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />

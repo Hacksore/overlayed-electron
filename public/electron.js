@@ -41,7 +41,7 @@ function createWindow() {
 
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", (_, msg) => {
-    socketManager.onIPCMessage(msg);
+    socketManager.onElectronMessage(msg);
   });
 
   win.loadURL(isDev ? "http://localhost:3001" : `file://${path.join(__dirname, "../build/index.html")}`);
