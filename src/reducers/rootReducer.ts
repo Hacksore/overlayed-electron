@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IDiscordChannel } from "../types/channel";
 import { IUser, IDiscordUser } from "../types/user";
+import socketSerivce from "../services/socketService";
 
 export type IUserProfile = Pick<IUser, "id" | "username" | "avatarHash" | "discriminator">;
 export interface AppState {
@@ -28,7 +29,7 @@ const initialState: AppState = {
 const createUserStateItem = (payload: IDiscordUser) => ({
   username: payload.nick,
   avatarHash: payload.user.avatar,
-  muted:payload.voice_state.mute,
+  muted: payload.voice_state.mute,
   deafened: payload.voice_state.deaf, // Probably only bots can deafen themselves
   selfDeafened: payload.voice_state.self_deaf,
   selfMuted: payload.voice_state.self_mute,
@@ -87,6 +88,18 @@ export const appSlice = createSlice({
       state.users.push(createUserStateItem(item));
     },
     removeUser: (state, action: PayloadAction<string>) => {
+      // check for myself leaving a channel so that I can unsubscribe from the old channel      
+      if (action.payload === state.profile?.id) {
+        // unset channel
+        state.currentChannel = null;
+
+        // unsub old channel events
+        // TODO: do this on electron side
+        // socketSerivce.send({
+        //   evt: "UNSBUSCRIBE"
+        // })
+      }
+
       state.users = state.users.filter((item: IUser) => item.id !== action.payload);
     },
     updateUser: (state, action: PayloadAction<IDiscordUser>) => {
@@ -94,7 +107,7 @@ export const appSlice = createSlice({
       if (!state.isReady) {
         return;
       }
-      
+
       state.users = state.users
         // TODO: sort like discord if we can
         .sort((userA: IUser, userB: IUser) => {

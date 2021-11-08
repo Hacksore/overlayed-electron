@@ -11,7 +11,8 @@
   ],
   "mac": {
     "target": ["dmg"],
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "icon": "build/img/icon.icns"
   },
   "win": {
     "target": ["zip"],
@@ -20,18 +21,19 @@
   },
   "linux": {
     "target": ["zip"],
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "icon": "build/img/icon.png"
   },
   "dmg": {
     "title": "${productName}-${version}",
     "contents": [
       {
-        "x": 300,
-        "y": 360
+        "x": 100,
+        "y": 160
       },
       {
-        "x": 490,
-        "y": 360,
+        "x": 190,
+        "y": 260,
         "type": "link",
         "path": "/Applications"
       }

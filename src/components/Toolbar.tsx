@@ -13,7 +13,16 @@ const classes = {
   root: `${PREFIX}-root`,
 };
 
-const Root = styled("div")(({ theme }) => ({
+
+interface RootProps {
+  clickThrough: boolean;
+};
+
+// Might be on the top tier cringe list for muiv5
+const Root = styled("div", {
+  shouldForwardProp: (prop) => prop !== "clickThrough"
+})<RootProps>(({ clickThrough }) => ({
+  visibility: clickThrough ? "hidden" : "visible",
   display: "flex",
   justifyContent: "flex-end",
   flexDirection: "row",
@@ -46,13 +55,8 @@ const Toolbar = () => {
     }
   };
 
-  // works for now
-  if (clickThrough) {
-    return null;
-  }
-
   return (
-    <Root>
+    <Root clickThrough={clickThrough}>
       <div
         style={{
           textTransform: "uppercase",

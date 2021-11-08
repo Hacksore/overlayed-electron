@@ -5,6 +5,8 @@ const SocketManager = require("./socket");
 
 require("./socket");
 
+const icon = process.platform !== "darwin" ? "logo.ico" : "logo.icns";
+
 let win;
 let socketManager;
 
@@ -26,7 +28,7 @@ function createWindow() {
     height: 590,
     transparent: true,
     frame: false,
-    icon: __dirname + "./img/icon.png",
+    icon: `${__dirname}/img/${icon}`,
     hasShadow: false,
     show: true,
     webPreferences: {
@@ -48,7 +50,7 @@ function createWindow() {
     socketManager.onElectronMessage(msg);
   });
 
-  win.loadURL(isDev ? "http://localhost:3001" : `file://${path.join(__dirname, "../build/index.html")}`);
+  win.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`);
 }
 
 app

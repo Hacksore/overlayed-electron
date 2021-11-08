@@ -14,37 +14,13 @@ function uuid() {
   });
 }
 
-const getRPCEvents = id => [
-  {
-    cmd: "SUBSCRIBE",
-    args: { channel_id: id },
-    evt: "VOICE_STATE_CREATE",
-    nonce: uuid(),
-  },
-  {
-    cmd: "SUBSCRIBE",
-    args: { channel_id: id },
-    evt: "VOICE_STATE_DELETE",
-    nonce: uuid(),
-  },
-  {
-    cmd: "SUBSCRIBE",
-    args: { channel_id: id },
-    evt: "VOICE_STATE_UPDATE",
-    nonce: uuid(),
-  },
-  {
-    cmd: "SUBSCRIBE",
-    args: { channel_id: id },
-    evt: "SPEAKING_START",
-    nonce: uuid(),
-  },
-  {
-    cmd: "SUBSCRIBE",
-    args: { channel_id: id },
-    evt: "SPEAKING_STOP",
-    nonce: uuid(),
-  },
+// Events that we want to sub/unsub from
+const SUBSCRIBABLE_EVENTS = [
+  "VOICE_STATE_CREATE",
+  "VOICE_STATE_DELETE",
+  "VOICE_STATE_UPDATE",
+  "SPEAKING_START",
+  "SPEAKING_STOP",
 ];
 
 class SocketManager {
@@ -80,8 +56,29 @@ class SocketManager {
   /**
    * Subscribe to events by channelId defined in getRPCEvents
    */
-  subscribeEvents(channelId) {
-    getRPCEvents(channelId).map(e => this._socket.send(JSON.stringify(e)));
+  subscribeAllEvents(channelId) {
+    SUBSCRIBABLE_EVENTS.map(eventName =>
+      this.sendDiscordMessage({
+        cmd: "SUBSCRIBE",
+        args: { channel_id: channelId },
+        evt: eventName,
+        nonce: uuid(),
+      })
+    );
+  }
+
+  /**
+   * Unsubscribe to events by channelId defined in getRPCEvents
+   */
+  unsubscribeAllEvents(channelId) {
+    SUBSCRIBABLE_EVENTS.map(eventName =>
+      this.sendDiscordMessage({
+        cmd: "UNSUBSCRIBE",
+        args: { channel_id: channelId },
+        evt: eventName,
+        nonce: uuid(),
+      })
+    );
   }
 
   /**
@@ -111,11 +108,11 @@ class SocketManager {
 
   /**
    * Receieve message from the electron renderer process
-   * @param {string} message 
+   * @param {string} message
    */
   onElectronMessage(message) {
     const { event, data } = JSON.parse(message);
-    
+
     if (event === "TOGGLE_DEVTOOLS") {
       this._win.webContents.openDevTools();
     }
@@ -142,7 +139,7 @@ class SocketManager {
       this.sendElectronMessage({
         evt: "ACCESS_TOKEN_ACQUIRED",
         data: {
-          accessToken: this.overlayed.accessToken 
+          accessToken: this.overlayed.accessToken,
         },
       });
 
@@ -152,13 +149,13 @@ class SocketManager {
         data: {
           profile: this.overlayed.userProfile,
           clientId: this.overlayed.clientId,
-          isAuthed: isAuthed
-        }
+          isAuthed: isAuthed,
+        },
       });
     }
 
     if (event === "DISCORD_RPC") {
-      this.sendDiscordMessage(data);      
+      this.sendDiscordMessage(data);
     }
 
     // ask for the current channel from discord
@@ -170,18 +167,16 @@ class SocketManager {
       const { channelId } = data;
 
       // request to sub to new channel events
-      this.subscribeEvents(channelId);
+      this.subscribeAllEvents(channelId);
 
       // ask for all the users?
       this.fetchUsers(channelId);
     }
-
-
   }
 
   /**
    * Receieve message from the discord RPC websocket
-   * @param {string} message 
+   * @param {string} message
    */
   async onDiscordMessage(message) {
     const packet = JSON.parse(message);
@@ -208,11 +203,10 @@ class SocketManager {
         },
       }).json();
 
-      console.log("Just got a token from discord", response.access_token)
+      console.log("Just got a token from discord", response.access_token);
 
       // attempt to auth
       this.authenticate(response.access_token);
-
     }
 
     // handle auth errors
@@ -230,7 +224,19 @@ class SocketManager {
         // we are already authed lets get the token
         console.log("already have auth token that works, so just call commands");
         this.overlayed.accessToken = data.access_token;
-        this.overlayed.userProfile = data.user;        
+        this.overlayed.userProfile = data.user;
+      }
+    }
+
+    if (cmd === "DISPATCH" && evt === "VOICE_STATE_DELETE") {
+      if (data.user.id === this.overlayed.userProfile.id) {
+        console.log("I leaved");
+      }
+    }
+
+    if (cmd === "DISPATCH" && evt === "VOICE_STATE_CREATE") {
+      if (data.user.id === this.overlayed.userProfile.id) {
+        console.log("I joined");
       }
     }
 
@@ -278,7 +284,7 @@ class SocketManager {
 
   /**
    * When the discord websocket errors
-   * @param {Error} event 
+   * @param {Error} event
    */
   onError(event) {
     try {

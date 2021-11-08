@@ -19,4 +19,4 @@ TODO:
 
 ### Running locally
 
-Make sure you `npm install` all the dependencies then just run `npm run dev`.
+Make sure you `npm install` all the dependencies then just run `npm start`.

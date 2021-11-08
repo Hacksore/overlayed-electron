@@ -27,13 +27,12 @@
   },
   "main": "public/electron.js",
   "scripts": {
-    "start": "react-scripts start",
+    "react": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "react": "cross-env PORT=3001 BROWSER=none npm start",
-    "dev": "concurrently -k npm:react npm:electron",
-    "electron": "wait-on tcp:3001 && electron .",
+    "start": "concurrently -k npm:react npm:electron",
+    "electron": "wait-on tcp:3000 && electron .",
     "pack": "electron-builder -c electron-builder.json"
   },
   "homepage": "./",
