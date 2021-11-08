@@ -5,8 +5,6 @@ import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";
 
 const {
   setCurrentVoiceChannel,
-  setGuilds,
-  setClientId,
   updateUser,
   removeUser,
   addUser,
@@ -16,6 +14,7 @@ const {
   setAccessToken,
   setIsAuthed,
   setPinned,
+  setProfile,
 } = appSlice.actions;
 
 let instance;
@@ -48,6 +47,15 @@ class IPCSocketService extends EventEmitter {
     const packet = JSON.parse(message);
     const { cmd, evt } = packet;
 
+    // we get any ready data from main process
+    if (evt === CustomEvents.READY) {
+      if (packet.data.isAuthed) {     
+        store.dispatch(setIsAuthed(true));
+        store.dispatch(setReadyState(true));
+        store.dispatch(setProfile(packet.data.profile));
+      }  
+    }
+
     // electron did the work for us and got a token ;)
     if (evt === CustomEvents.ACCESS_TOKEN_ACQUIRED) {
       store.dispatch(setAccessToken(packet.data.accessToken));
@@ -67,19 +75,9 @@ class IPCSocketService extends EventEmitter {
       }
     }
 
-    // we get auth data
-    if (cmd === RPCCommands.AUTHENTICATE) {
-      store.dispatch(setClientId(packet.data.application.id));
-      store.dispatch(setIsAuthed(true));
-    }
-
     // get a list of the channel voice states
     if (cmd === RPCCommands.GET_CHANNEL) {
       store.dispatch(setAppUsers(packet.data.voice_states));
-      store.dispatch(setReadyState(true));
-
-      // TODO: figure out where to best set isAuthed
-      store.dispatch(setIsAuthed(true));
     }
 
     // get current channel
@@ -116,16 +114,8 @@ class IPCSocketService extends EventEmitter {
     }
 
     // FIXME: There is a rate limit on RPC for this to only allow update per 15 seconds
-    // so when someone spams a mic/headphone mute it can bug the state in the UI as events dont get queued and sent to us
-    // we just stop recieving events - not sure how to handle this?
-    // update user info
     if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_UPDATE) {
       store.dispatch(updateUser(packet.data));
-    }
-
-    // fetch all guilds and set to state
-    if (cmd === RPCCommands.GET_GUILDS) {
-      store.dispatch(setGuilds(packet.data.guilds));
     }
 
     // for any extneral listeners

@@ -4,7 +4,7 @@ const WebSocket = require("ws");
 
 require("dotenv").config();
 
-const { GUILD_ID, CLIENT_ID = "207646673902501888", ACCESS_TOKEN } = process.env;
+const { CLIENT_ID = "207646673902501888", ACCESS_TOKEN } = process.env;
 
 function uuid() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -133,8 +133,28 @@ class SocketManager {
       });
     }
 
-    // IDK?
+    // client has setup their IPC connection and is ready to recieve messages
     if (event === "I_AM_READY") {
+      // get current channel
+      this.requestCurrentChannel();
+
+      // tell client about the token we have
+      this.sendElectronMessage({
+        evt: "ACCESS_TOKEN_ACQUIRED",
+        data: {
+          accessToken: this.overlayed.accessToken 
+        },
+      });
+
+      const isAuthed = this.overlayed.accessToken !== null;
+      this.sendElectronMessage({
+        evt: "READY",
+        data: {
+          profile: this.overlayed.userProfile,
+          clientId: this.overlayed.clientId,
+          isAuthed: isAuthed
+        }
+      });
     }
 
     if (event === "DISCORD_RPC") {
@@ -165,25 +185,26 @@ class SocketManager {
    */
   async onDiscordMessage(message) {
     const packet = JSON.parse(message);
+    const { evt, cmd, data = {} } = packet;
 
     // we are ready, so send auth token
-    if (packet.evt === "READY") {
+    if (evt === "READY") {
       this.authenticate(ACCESS_TOKEN);
     }
 
     // store current channel in electron main
-    if (packet.cmd === "GET_CHANNEL") {
+    if (cmd === "GET_CHANNEL") {
       // attempt to save last channel id
       this.overlayed.lastChannelId = this.overlayed.curentChannelId;
-      this.overlayed.curentChannelId = packet.data.id;
+      this.overlayed.curentChannelId = data.id;
     }
 
     // we just got an code, get access token with it
-    if (packet.cmd === "AUTHORIZE" && packet.evt !== "ERROR") {
+    if (cmd === "AUTHORIZE" && evt !== "ERROR") {
       const response = await got("https://streamkit.discord.com/overlay/token", {
         method: "post",
         json: {
-          code: packet.data.code,
+          code: data.code,
         },
       }).json();
 
@@ -192,40 +213,24 @@ class SocketManager {
       // attempt to auth
       this.authenticate(response.access_token);
 
-      // inform client of access token - should we though? really only electron needs it
-      // TODO: client doesnt use the token but might be nice to have for now?
-      this.sendElectronMessage({
-        evt: "ACCESS_TOKEN_ACQUIRED",
-        data: {
-          accessToken: response.access_token,
-        },
-      });
     }
 
     // handle auth errors
-    if (packet.cmd === "AUTHENTICATE") {
-      if (packet.evt === "ERROR") {
-        if (packet.data.code === 4002) {
+    if (cmd === "AUTHENTICATE") {
+      if (evt === "ERROR") {
+        if (data.code === 4002) {
           console.log("We are already authed");
         }
 
         // TELL CLIENT WE AINT GOT NO AUTH :(
-        if (packet.data.code === 4009) {
+        if (data.code === 4009) {
           console.log("We tried an auth token that was invalid");
         }
       } else {
-        // we already are authed lets get the otken
+        // we are already authed lets get the token
         console.log("already have auth token that works, so just call commands");
-        this.overlayed.accessToken = packet.data.access_token;
-
-        // tell client we got the token
-        this.sendElectronMessage({
-          evt: "ACCESS_TOKEN_ACQUIRED",
-          data: {
-            accessToken:  packet.data.access_token
-          },
-        });
-
+        this.overlayed.accessToken = data.access_token;
+        this.overlayed.userProfile = data.user;        
       }
     }
 
@@ -249,7 +254,7 @@ class SocketManager {
   }
 
   /**
-   * Send a message to electron main
+   * Send a message to electron renderer process
    * @param {Object} message - the message to send in object format
    */
   sendElectronMessage(message) {

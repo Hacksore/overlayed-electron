@@ -1,40 +1,36 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IDiscordChannel } from "../types/channel";
 import { IUser, IDiscordUser } from "../types/user";
+
+export type IUserProfile = Pick<IUser, "id" | "username" | "avatarHash" | "discriminator">;
 export interface AppState {
   users: Array<IUser>;
-  channels: Array<any>; // TODO: type
-  currentChannel: any; // TODO: type
-  guilds: Array<any> | null; // TODO: type
-  clientId: string | null;
+  currentChannel: IDiscordChannel | null;
+  profile: IUserProfile | null;
   accessToken: string | null;
   isReady: boolean;
   isPinned: boolean;
   isAuthed: boolean;
-  channelName: string | null;
 }
 
 const initialState: AppState = {
   users: [],
-  channels: [],
   currentChannel: null,
-  guilds: null,
-  clientId: null,
+  profile: null,
   accessToken: null,
   isReady: false,
   isPinned: true,
   isAuthed: false,
-  channelName: null,
 };
 
 const createUserStateItem = (payload: IDiscordUser) => ({
   username: payload.nick,
   avatarHash: payload.user.avatar,
-  muted: payload.mute,
+  muted:payload.voice_state.mute,
   deafened: payload.voice_state.deaf, // Probably only bots can deafen themselves
   selfDeafened: payload.voice_state.self_deaf,
   selfMuted: payload.voice_state.self_mute,
   suppress: payload.voice_state.suppress,
-  // TODO: add states for showing my mute states for others
   talking: false,
   id: payload.user.id,
   volume: 100,
@@ -56,15 +52,11 @@ export const appSlice = createSlice({
     setAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
     },
-    // TODO: type
-    setGuilds: (state, action: PayloadAction<Array<any>>) => {
-      state.guilds = action.payload;
-    },
     setCurrentVoiceChannel: (state, action: PayloadAction<any>) => {
       state.currentChannel = action.payload;
     },
-    setClientId: (state, action: PayloadAction<string>) => {
-      state.clientId = action.payload;
+    setProfile: (state, action: PayloadAction<IUserProfile>) => {
+      state.profile = action.payload;
     },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
       // don't get updates yet until the client is read
@@ -101,9 +93,12 @@ export const appSlice = createSlice({
       state.users = state.users
         // TODO: sort like discord if we can
         .sort((userA: IUser, userB: IUser) => {
-          if (userA.username.toLowerCase() === userB.username.toLowerCase()) {
+          const nameA = userA.username.toLowerCase();
+          const nameB = userB.username.toLowerCase();
+
+          if (nameA === nameB) {
             return 0;
-          } else if (userA.username.toLowerCase() > userB.username.toLowerCase()) {
+          } else if (nameA > nameB) {
             return 1;
           } else {
             return -1;

@@ -1,7 +1,7 @@
 import { IconButton } from "@mui/material";
 import IconPin from "@mui/icons-material/PushPinRounded";
 import IconDebug from "@mui/icons-material/BugReport";
-import IconSync from "@mui/icons-material/Sync";
+import IconSync from "@mui/icons-material/Refresh";
 import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
@@ -32,6 +32,17 @@ const Toolbar = () => {
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
 
+  const getTitle = () => {
+    if (channel && channel.name) {
+      return channel.name;
+    } else if (!channel && !isAuthed) {
+      return "Overlayed";
+    } else if (!channel && isAuthed) {
+      // if they are authed but don't have a channel, then they are a private call
+      return "Private call";
+    }
+  };
+
   return (
     <Root>
       <div
@@ -45,13 +56,7 @@ const Toolbar = () => {
           appRegion: "drag",
         }}
       >
-        <div>
-          {/* Render name of channel */}
-          {channel && channel.name ? channel.name : "Private Call"}
-
-          {/* When not authed show app name */}
-          {!isAuthed && "Overlayed"}
-        </div>
+        {getTitle()}
       </div>
       <IconButton
         onClick={() => {
@@ -63,12 +68,7 @@ const Toolbar = () => {
       <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
         <IconDebug style={{ color: "#fff" }} />
       </IconButton>
-      <IconButton
-        onClick={() => {
-          // TODO: still borken
-          socketService.send({ event: CustomEvents.TOGGLE_PIN });
-        }}
-      >
+      <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_PIN })}>
         <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />
       </IconButton>
     </Root>
