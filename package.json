@@ -33,7 +33,7 @@
     "eject": "react-scripts eject",
     "start": "concurrently -k npm:react npm:electron",
     "electron": "wait-on tcp:3000 && electron .",
-    "pack": "electron-builder -c electron-builder.json"
+    "pack": "electron-builder --publish=never -c electron-builder.json"
   },
   "homepage": "./",
   "eslintConfig": {
