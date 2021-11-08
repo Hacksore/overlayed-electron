@@ -37,11 +37,6 @@ const Root = styled("div")(({ theme }) => ({
     display: "flex",
     alignItems: "flex-start",
     margin: "0 0 0 5px",
-    minWidth: "auto",
-    maxWidth: 150,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
   },
   [`& .${classes.iconNitro}`]: {
     display: "flex",
@@ -144,7 +139,17 @@ const UserItem = React.memo((props: IUser) => {
         }}
       >
         <StyledTooltip arrow title={<RichToolTip {...props} />}>
-          <div>{username}</div>
+          <div
+            style={{
+              minWidth: "auto",
+              maxWidth: 150,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {username}
+          </div>
         </StyledTooltip>
         {shouldShowIcons && (
           <div style={{ marginLeft: 10, display: "flex", alignSelf: "self-end" }}>

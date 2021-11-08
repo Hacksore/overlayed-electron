@@ -23,8 +23,10 @@ const Root = styled("div")(({ theme }) => ({
     overflowY: "auto",
   },
   "&:hover": {
-    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    cursor: "hand !important",
+    background: "#495bfc",
   },
+  backgroundColor: "#5c69ff",
 }));
 
 const Toolbar = () => {
