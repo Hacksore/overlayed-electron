@@ -10,7 +10,7 @@
     "node_modules/**/*"
   ],
   "mac": {
-    "target": ["dmg"],
+    "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
     "icon": "build/img/icon.icns"
   },
