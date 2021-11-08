@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IDiscordChannel } from "../types/channel";
 import { IUser, IDiscordUser } from "../types/user";
-import socketSerivce from "../services/socketService";
 
 export type IUserProfile = Pick<IUser, "id" | "username" | "avatarHash" | "discriminator">;
 export interface AppState {
