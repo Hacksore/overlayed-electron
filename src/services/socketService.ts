@@ -15,6 +15,7 @@ const {
   setIsAuthed,
   setPinned,
   setProfile,
+  setClickThrough,
 } = appSlice.actions;
 
 let instance;
@@ -54,6 +55,11 @@ class IPCSocketService extends EventEmitter {
         store.dispatch(setReadyState(true));
         store.dispatch(setProfile(packet.data.profile));
       }  
+    }
+
+    // electron did the work for us and got a token ;)
+    if (evt === CustomEvents.CLICKTHROUGH_STATUS) {
+      store.dispatch(setClickThrough(packet.value));
     }
 
     // electron did the work for us and got a token ;)

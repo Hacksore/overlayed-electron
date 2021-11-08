@@ -31,6 +31,7 @@ const Toolbar = () => {
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
+  const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
 
   const getTitle = () => {
     if (channel && channel.name) {
@@ -42,6 +43,11 @@ const Toolbar = () => {
       return "Private call";
     }
   };
+
+  // works for now
+  if (clickThrough) {
+    return null;
+  }
 
   return (
     <Root>

@@ -11,6 +11,7 @@ export interface AppState {
   isReady: boolean;
   isPinned: boolean;
   isAuthed: boolean;
+  clickThrough: boolean;
 }
 
 const initialState: AppState = {
@@ -21,6 +22,7 @@ const initialState: AppState = {
   isReady: false,
   isPinned: true,
   isAuthed: false,
+  clickThrough: false,
 };
 
 const createUserStateItem = (payload: IDiscordUser) => ({
@@ -46,6 +48,9 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
+    setClickThrough: (state, action: PayloadAction<boolean>) => {
+      state.clickThrough = action.payload;
+    },
     setIsAuthed: (state, action: PayloadAction<boolean>) => {
       state.isAuthed = action.payload;
     },

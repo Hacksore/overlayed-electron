@@ -1,5 +1,5 @@
 const path = require("path");
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 
@@ -9,7 +9,14 @@ let win;
 let socketManager;
 
 // use this namespace to be able to pass by ref to other files
-const overlayed = { accessToken: null, userProfile: null, curentChannelId: null, lastChannelId: null, isPinned: true };
+const overlayed = {
+  accessToken: null,
+  userProfile: null,
+  curentChannelId: null,
+  lastChannelId: null,
+  clickThrough: false,
+  isPinned: true,
+};
 
 function createWindow() {
   // Create the browser window.
@@ -30,9 +37,6 @@ function createWindow() {
 
   win.setAlwaysOnTop(overlayed.isPinned, "floating");
 
-  // enableing click through
-  // win.setIgnoreMouseEvents(true);
-
   // load up the socket manager
   socketManager = new SocketManager({
     win,
@@ -47,8 +51,22 @@ function createWindow() {
   win.loadURL(isDev ? "http://localhost:3001" : `file://${path.join(__dirname, "../build/index.html")}`);
 }
 
-app.whenReady().then(createWindow);
-
+app
+  .whenReady()
+  .then(() => {
+    // TODO: allow custom keybindings
+    globalShortcut.register("Alt+Shift+Z", () => {
+      overlayed.clickThrough = !overlayed.clickThrough;
+      // inform the UI to toggle the overlay
+      socketManager.sendElectronMessage({
+        evt: "CLICKTHROUGH_STATUS",
+        value: overlayed.clickThrough,
+      });
+      // enableing click through
+      win.setIgnoreMouseEvents(overlayed.clickThrough);
+    });
+  })
+  .then(createWindow);
 // TODO: if we turn this off we need a global hotkey to refocus it
 // app.dock.hide();
 
