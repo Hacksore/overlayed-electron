@@ -135,6 +135,14 @@ class SocketManager {
       // get current channel
       this.requestCurrentChannel();
 
+      // subscribe to channel changes
+      this.sendDiscordMessage({
+        cmd: "SUBSCRIBE",
+        args: {},
+        evt: "VOICE_CHANNEL_SELECT",
+        nonce: uuid(),
+      });
+
       // tell client about the token we have
       this.sendElectronMessage({
         evt: "ACCESS_TOKEN_ACQUIRED",
@@ -163,6 +171,7 @@ class SocketManager {
       this.requestCurrentChannel();
     }
 
+    // TODO: why does the client send this event? we shouldnt be sending it on behalf of the client
     if (event === "SUBSCRIBE_CHANNEL") {
       const { channelId } = data;
 
@@ -171,6 +180,8 @@ class SocketManager {
 
       // ask for all the users?
       this.fetchUsers(channelId);
+
+
     }
   }
 
@@ -228,22 +239,42 @@ class SocketManager {
       }
     }
 
-    if (cmd === "DISPATCH" && evt === "VOICE_STATE_DELETE") {
-      if (data.user.id === this.overlayed.userProfile.id) {
-        console.log("I leaved");
+    // when you leave a channel and the id was you make sure to remove all old listeners
+    if (cmd === "DISPATCH" && evt === "VOICE_CHANNEL_SELECT") {
+      if (!data.channel_id) {
+        this.overlayed.curentChannelId = null;
+        // tell electron we have no users for now
+        this.sendElectronMessage({
+          cmd: "GET_CHANNEL",
+          data: {
+            voice_states: [],
+          },
+        });
+        return;
       }
-    }
 
-    if (cmd === "DISPATCH" && evt === "VOICE_STATE_CREATE") {
-      if (data.user.id === this.overlayed.userProfile.id) {
-        console.log("I joined");
-      }
+      // remove old subs if we had a prior id
+      this.unsubscribeAllEvents(this.overlayed.curentChannelId);
+
+      const newChannelId = data.channel_id;
+      this.fetchUsers(newChannelId);     
+      this.overlayed.curentChannelId = newChannelId;
+
+      // subscribe to new channel events
+      this.subscribeAllEvents(newChannelId);
+
+      // send the client the updated channel name 
+      this.requestCurrentChannel();
     }
 
     // forward every packet from the socket to the client
     this.sendElectronMessage(packet);
   }
 
+  /**
+   * Fetch the current channel by id from discord
+   * @param {string} channelId
+   */
   fetchUsers(channelId) {
     this.sendDiscordMessage({
       cmd: "GET_CHANNEL",
@@ -252,6 +283,9 @@ class SocketManager {
     });
   }
 
+  /**
+   * Ask discord for the current channel
+   */
   requestCurrentChannel() {
     this.sendDiscordMessage({
       cmd: "GET_SELECTED_VOICE_CHANNEL",

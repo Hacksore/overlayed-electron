@@ -87,6 +87,7 @@ class IPCSocketService extends EventEmitter {
     }
 
     // get current channel
+    // TODO: client really shouldnt do this we have electron do it in - VOICE_CHANNEL_SELECT
     if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL) {
       store.dispatch(setCurrentVoiceChannel(packet.data));
       store.dispatch(setAppUsers([]));

@@ -1,4 +1,5 @@
 import { IconButton } from "@mui/material";
+import { darken } from "@mui/material/styles";
 import IconPin from "@mui/icons-material/PushPinRounded";
 import IconDebug from "@mui/icons-material/BugReport";
 import IconSync from "@mui/icons-material/Refresh";
@@ -21,21 +22,26 @@ interface RootProps {
 // Might be on the top tier cringe list for muiv5
 const Root = styled("div", {
   shouldForwardProp: (prop) => prop !== "clickThrough"
-})<RootProps>(({ clickThrough }) => ({
+})<RootProps>(({ theme, clickThrough }) => ({
   visibility: clickThrough ? "hidden" : "visible",
   display: "flex",
   justifyContent: "flex-end",
   flexDirection: "row",
   alignItems: "center",
   padding: "0 10px 0 10px",
+  borderTopLeftRadius: 6,
+  borderTopRightRadius: 6,
+
+  // @ts-ignore
+  appRegion: "drag",
+  "&:hover": {
+    background: darken(theme.palette.primary.main, 0.2),
+    cursor: "move",
+  },
+  backgroundColor: "#495bfc",
   [`&.${classes.root}`]: {
     overflowY: "auto",
   },
-  "&:hover": {
-    cursor: "hand !important",
-    background: "#495bfc",
-  },
-  backgroundColor: "#5c69ff",
 }));
 
 const Toolbar = () => {
@@ -64,8 +70,6 @@ const Toolbar = () => {
           flex: 1,
           display: "flex",
           color: "#fff",
-          // @ts-ignore
-          appRegion: "drag",
         }}
       >
         {getTitle()}

@@ -8,15 +8,13 @@ import { styled } from "@mui/system";
 const PREFIX = "UserList";
 const classes = {
   root: `${PREFIX}-root`,
-  header: `${PREFIX}-header`,
 };
 
 const Root = styled("div")(({ theme }) => ({
   [`&.${classes.root}`]: {
     overflowY: "auto",
     height: "100vh",
-  },
-  [`&.${classes.header}`]: {
+    marginTop: 8
   },
 }));
 
