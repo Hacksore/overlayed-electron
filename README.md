@@ -11,7 +11,7 @@ Mainly because the native overlay only supports games.
 1. You can use this in any application
 
 ### Demo
-<img src="https://user-images.githubusercontent.com/996134/139773800-4a607e0c-e2db-410a-b2ad-b338bb70ab6d.png" width="205" height="270">
+![UIYqSWS8Ja](https://user-images.githubusercontent.com/996134/140843479-0f349668-5e1d-48aa-b546-1ca90212ec2e.gif)
 
 ### Features
 
