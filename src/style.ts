@@ -5,5 +5,5 @@ export const Root = styled("div")(({ theme }) => ({
   border: "3px solid rgba(0, 0,0,0)",
   borderStyle: "solid inset solid solid;",
   fontFamily: "'Roboto', sans-serif",
-  userSelect: "none",
+  userSelect: "none"
 }));

@@ -14,14 +14,13 @@ const classes = {
   root: `${PREFIX}-root`,
 };
 
-
 interface RootProps {
   clickThrough: boolean;
-};
+}
 
 // Might be on the top tier cringe list for muiv5
 const Root = styled("div", {
-  shouldForwardProp: (prop) => prop !== "clickThrough"
+  shouldForwardProp: prop => prop !== "clickThrough",
 })<RootProps>(({ theme, clickThrough }) => ({
   visibility: clickThrough ? "hidden" : "visible",
   display: "flex",
@@ -31,12 +30,11 @@ const Root = styled("div", {
   padding: "0 10px 0 10px",
   borderTopLeftRadius: 6,
   borderTopRightRadius: 6,
-
   // @ts-ignore
   appRegion: "drag",
+  // HACK: maybe this works for the drag bug?
   "&:hover": {
     background: darken(theme.palette.primary.main, 0.2),
-    cursor: "move",
   },
   backgroundColor: "#495bfc",
   [`&.${classes.root}`]: {
@@ -45,6 +43,8 @@ const Root = styled("div", {
 }));
 
 const Toolbar = () => {
+
+  // TODO: Should this be once selecter pull?
   const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
@@ -72,21 +72,29 @@ const Toolbar = () => {
           color: "#fff",
         }}
       >
-        {getTitle()}
+        {/* TODO: make it css based  */}
+        {getTitle()?.substr(0, 20)}
       </div>
-      <IconButton
-        onClick={() => {
-          socketService.send({ event: CustomEvents.REQUEST_CURRENT_CHANNEL });
+      <div
+        style={{
+          // @ts-ignore
+          appRegion: "no-drag",
         }}
       >
-        <IconSync style={{ color: "#fff" }} />
-      </IconButton>
-      <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
-        <IconDebug style={{ color: "#fff" }} />
-      </IconButton>
-      <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_PIN })}>
-        <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />
-      </IconButton>
+        <IconButton
+          onClick={() => {
+            socketService.send({ event: CustomEvents.REQUEST_CURRENT_CHANNEL });
+          }}
+        >
+          <IconSync style={{ color: "#fff" }} />
+        </IconButton>
+        <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
+          <IconDebug style={{ color: "#fff" }} />
+        </IconButton>
+        <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_PIN })}>
+          <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />
+        </IconButton>
+      </div>
     </Root>
   );
 };
