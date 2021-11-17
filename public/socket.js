@@ -1,18 +1,7 @@
-// socket on the main proc
-const got = require("got");
-const WebSocket = require("ws");
+const RPC = require("discord-rpc");
 
-require("dotenv").config();
-
-const { CLIENT_ID = "207646673902501888", ACCESS_TOKEN } = process.env;
-
-function uuid() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
+// The overlayed prod client id
+const CLIENT_ID = "905987126099836938";
 
 // Events that we want to sub/unsub from
 const SUBSCRIBABLE_EVENTS = [
@@ -30,80 +19,61 @@ class SocketManager {
    */
   constructor({ win, overlayed }) {
     this._win = win;
-    this.tries = 0;
-    this._socket = null;
     this.overlayed = overlayed;
+    this.client = null;
 
     this.connect();
   }
 
   connect() {
-    const port = 6463 + (this.tries % 10);
-    this.tries += 1;
+    this.client = new RPC.Client({ transport: "ipc" });
+  }
 
-    this._socket = new WebSocket(`ws://127.0.0.1:${port}/?v=1&client_id=${CLIENT_ID}`, {
-      headers: {
-        Origin: "https://streamkit.discord.com",
-        Host: `127.0.0.1:${port}`,
-      },
+  setupAuthAndListeners() {
+    this.client.on("ready", async () => {
+
+      // sub to channel changes
+      this.client.subscribe("VOICE_CHANNEL_SELECT", this.onDiscordMessage.bind(this, "VOICE_CHANNEL_SELECT"));
+
+      // handle the event
+      this.client.on("VOICE_CHANNEL_SELECT", event => {
+        this.subscribeAllEvents(event.channel_id);
+        this.onDiscordMessage("VOICE_CHANNEL_SELECT", event);
+      });
+
+      // Sub to channel events
+      SUBSCRIBABLE_EVENTS.forEach(eventName => {
+        this.client.on(eventName, this.onDiscordMessage.bind(this, eventName));
+      });
+
+      // how to get current voice channel
+      const channelData = await this.client.request("GET_SELECTED_VOICE_CHANNEL");
+      this.onDiscordMessage("GET_SELECTED_VOICE_CHANNEL", channelData);
+      this.subscribeAllEvents(channelData.id);
+
+      // tell client we are ready
+      this.sendElectronMessage({
+        event: "READY",
+        data: {
+          profile: this.client.user,
+        },
+      });
     });
 
-    this._socket.on("open", this.open.bind(this));
-    this._socket.on("close", this.close.bind(this));
-    this._socket.on("message", this.onDiscordMessage.bind(this));
+    // Log in to RPC with client id
+    this.client.login({
+      prompt: "none",
+      scopes: ["rpc"],
+      clientId: CLIENT_ID,
+      accessToken: this.overlayed.auth.access_token,
+    });
   }
 
   /**
    * Subscribe to events by channelId defined in getRPCEvents
    */
   subscribeAllEvents(channelId) {
-    SUBSCRIBABLE_EVENTS.map(eventName =>
-      this.sendDiscordMessage({
-        cmd: "SUBSCRIBE",
-        args: { channel_id: channelId },
-        evt: eventName,
-        nonce: uuid(),
-      })
-    );
-  }
-
-  /**
-   * Unsubscribe to events by channelId defined in getRPCEvents
-   */
-  unsubscribeAllEvents(channelId) {
-    SUBSCRIBABLE_EVENTS.map(eventName =>
-      this.sendDiscordMessage({
-        cmd: "UNSUBSCRIBE",
-        args: { channel_id: channelId },
-        evt: eventName,
-        nonce: uuid(),
-      })
-    );
-  }
-
-  /**
-   * When we connect to the discord RPC websocket
-   */
-  open() {
-    console.log("connected");
-  }
-
-  /**
-   * When we disconnect from the discord RPC websocket
-   */
-  close(err) {
-    console.log("disconnected", err);
-  }
-
-  /**
-   * Send an auth request with a valid token to the discord RPC websocket
-   */
-  authenticate(token) {
-    this.sendDiscordMessage({
-      cmd: "AUTHENTICATE",
-      args: { access_token: token },
-      nonce: uuid(),
-    });
+    SUBSCRIBABLE_EVENTS.map(eventName => this.client.subscribe(eventName, { channel_id: channelId }));
   }
 
   /**
@@ -112,185 +82,18 @@ class SocketManager {
    */
   onElectronMessage(message) {
     const { event, data } = JSON.parse(message);
-
-    if (event === "TOGGLE_DEVTOOLS") {
-      this._win.webContents.openDevTools();
-    }
-
-    if (event === "TOGGLE_PIN") {
-      this.overlayed.isPinned = !this.overlayed.isPinned;
-
-      this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
-      this._win.setVisibleOnAllWorkspaces(true);
-      this._win.setFullScreenable(false);
-
-      this.sendElectronMessage({
-        evt: "PINNED_STATUS",
-        value: this.overlayed.isPinned,
-      });
-    }
-
-    // client has setup their IPC connection and is ready to recieve messages
-    if (event === "I_AM_READY") {
-      // get current channel
-      this.requestCurrentChannel();
-
-      // subscribe to channel changes
-      this.sendDiscordMessage({
-        cmd: "SUBSCRIBE",
-        args: {},
-        evt: "VOICE_CHANNEL_SELECT",
-        nonce: uuid(),
-      });
-
-      // tell client about the token we have
-      this.sendElectronMessage({
-        evt: "ACCESS_TOKEN_ACQUIRED",
-        data: {
-          accessToken: this.overlayed.accessToken,
-        },
-      });
-
-      const isAuthed = this.overlayed.accessToken !== null;
-      this.sendElectronMessage({
-        evt: "READY",
-        data: {
-          profile: this.overlayed.userProfile,
-          clientId: this.overlayed.clientId,
-          isAuthed: isAuthed,
-        },
-      });
-    }
-
-    if (event === "DISCORD_RPC") {
-      this.sendDiscordMessage(data);
-    }
-
-    // ask for the current channel from discord
-    if (event === "REQUEST_CURRENT_CHANNEL") {
-      this.requestCurrentChannel();
-    }
-
-    // TODO: why does the client send this event? we shouldnt be sending it on behalf of the client
-    if (event === "SUBSCRIBE_CHANNEL") {
-      const { channelId } = data;
-
-      // request to sub to new channel events
-      this.subscribeAllEvents(channelId);
-
-      // ask for all the users?
-      this.fetchUsers(channelId);
-
-
-    }
+    console.log(event, data);
   }
 
   /**
    * Receieve message from the discord RPC websocket
    * @param {string} message
    */
-  async onDiscordMessage(message) {
-    const packet = JSON.parse(message);
-    const { evt, cmd, data = {} } = packet;
-
-    // we are ready, so send auth token
-    if (evt === "READY") {
-      this.authenticate(ACCESS_TOKEN);
-    }
-
-    // store current channel in electron main
-    if (cmd === "GET_CHANNEL") {
-      // attempt to save last channel id
-      this.overlayed.lastChannelId = this.overlayed.curentChannelId;
-      this.overlayed.curentChannelId = data.id;
-    }
-
-    // we just got an code, get access token with it
-    if (cmd === "AUTHORIZE" && evt !== "ERROR") {
-      const response = await got("https://streamkit.discord.com/overlay/token", {
-        method: "post",
-        json: {
-          code: data.code,
-        },
-      }).json();
-
-      console.log("Just got a token from discord", response.access_token);
-
-      // attempt to auth
-      this.authenticate(response.access_token);
-    }
-
-    // handle auth errors
-    if (cmd === "AUTHENTICATE") {
-      if (evt === "ERROR") {
-        if (data.code === 4002) {
-          console.log("We are already authed");
-        }
-
-        // TELL CLIENT WE AINT GOT NO AUTH :(
-        if (data.code === 4009) {
-          console.log("We tried an auth token that was invalid");
-        }
-      } else {
-        // we are already authed lets get the token
-        console.log("already have auth token that works, so just call commands");
-        this.overlayed.accessToken = data.access_token;
-        this.overlayed.userProfile = data.user;
-      }
-    }
-
-    // when you leave a channel and the id was you make sure to remove all old listeners
-    if (cmd === "DISPATCH" && evt === "VOICE_CHANNEL_SELECT") {
-      if (!data.channel_id) {
-        this.overlayed.curentChannelId = null;
-        // tell electron we have no users for now
-        this.sendElectronMessage({
-          cmd: "GET_CHANNEL",
-          data: {
-            voice_states: [],
-          },
-        });
-        return;
-      }
-
-      // remove old subs if we had a prior id
-      this.unsubscribeAllEvents(this.overlayed.curentChannelId);
-
-      const newChannelId = data.channel_id;
-      this.fetchUsers(newChannelId);     
-      this.overlayed.curentChannelId = newChannelId;
-
-      // subscribe to new channel events
-      this.subscribeAllEvents(newChannelId);
-
-      // send the client the updated channel name 
-      this.requestCurrentChannel();
-    }
+  async onDiscordMessage(event, packet) {
+    console.log(event, packet);
 
     // forward every packet from the socket to the client
-    this.sendElectronMessage(packet);
-  }
-
-  /**
-   * Fetch the current channel by id from discord
-   * @param {string} channelId
-   */
-  fetchUsers(channelId) {
-    this.sendDiscordMessage({
-      cmd: "GET_CHANNEL",
-      args: { channel_id: channelId },
-      nonce: uuid(),
-    });
-  }
-
-  /**
-   * Ask discord for the current channel
-   */
-  requestCurrentChannel() {
-    this.sendDiscordMessage({
-      cmd: "GET_SELECTED_VOICE_CHANNEL",
-      nonce: uuid(),
-    });
+    this.sendElectronMessage({ event, data: packet });
   }
 
   /**
@@ -320,18 +123,20 @@ class SocketManager {
    * When the discord websocket errors
    * @param {Error} event
    */
-  onError(event) {
-    try {
-      this._socket.close();
-    } catch {}
+  onError(event) {}
 
-    if (this.tries > 20) {
-      this.emit("error", event.error);
-    } else {
-      setTimeout(() => {
-        this.connect();
-      }, 250);
-    }
+  /**
+   * When we connect to the discord RPC websocket
+   */
+  open() {
+    console.log("connected");
+  }
+
+  /**
+   * When we disconnect from the discord RPC websocket
+   */
+  close(err) {
+    console.log("disconnected", err);
   }
 }
 

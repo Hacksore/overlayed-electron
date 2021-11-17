@@ -20,7 +20,7 @@ const initialState: AppState = {
   profile: null,
   accessToken: null,
   isReady: false,
-  isPinned: true,
+  isPinned: false,
   isAuthed: false,
   clickThrough: false,
 };

@@ -4,18 +4,17 @@ import { appSlice } from "../reducers/rootReducer";
 import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";
 
 const {
-  setCurrentVoiceChannel,
   updateUser,
   removeUser,
   addUser,
   setAppUsers,
   setUserTalking,
   setReadyState,
-  setAccessToken,
   setIsAuthed,
   setPinned,
   setProfile,
   setClickThrough,
+  setCurrentVoiceChannel,
 } = appSlice.actions;
 
 let instance;
@@ -46,86 +45,56 @@ class IPCSocketService extends EventEmitter {
    */
   onMessage(message: any) {
     const packet = JSON.parse(message);
-    const { cmd, evt } = packet;
+    const { event, data } = packet;
 
     // we get any ready data from main process
-    if (evt === CustomEvents.READY) {
-      if (packet.data.isAuthed) {     
-        store.dispatch(setIsAuthed(true));
-        store.dispatch(setReadyState(true));
-        store.dispatch(setProfile(packet.data.profile));
-      }  
+    if (event === CustomEvents.READY) {
+      store.dispatch(setIsAuthed(true));
+      store.dispatch(setReadyState(true));
+      store.dispatch(setProfile(data.profile));
     }
 
     // electron did the work for us and got a token ;)
-    if (evt === CustomEvents.CLICKTHROUGH_STATUS) {
+    if (event === CustomEvents.CLICKTHROUGH_STATUS) {
       store.dispatch(setClickThrough(packet.value));
     }
 
-    // electron did the work for us and got a token ;)
-    if (evt === CustomEvents.ACCESS_TOKEN_ACQUIRED) {
-      store.dispatch(setAccessToken(packet.data.accessToken));
-    }
-
     // custom pin status from main proc
-    if (evt === CustomEvents.PINNED_STATUS) {
+    if (event === CustomEvents.PINNED_STATUS) {
       store.dispatch(setPinned(packet.value));
     }
 
-    // check for no auth or bad auth
-    if (cmd === RPCCommands.AUTHENTICATE && RPCEvents.ERROR) {
-      if (packet.data.code === 4009) {
-        console.log("We received an authentication error with the token we provided");
-        store.dispatch(setIsAuthed(false));
-        return;
-      }
-    }
-
-    // get a list of the channel voice states
-    if (cmd === RPCCommands.GET_CHANNEL) {
-      store.dispatch(setAppUsers(packet.data.voice_states));
-    }
-
-    // get current channel
-    // TODO: client really shouldnt do this we have electron do it in - VOICE_CHANNEL_SELECT
-    if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL) {
-      store.dispatch(setCurrentVoiceChannel(packet.data));
-      store.dispatch(setAppUsers([]));
-
-      this.send({
-        event: CustomEvents.SUBSCRIBE_CHANNEL,
-        data: {
-          channelId: packet.data.id,
-        },
-      });
+    // get a current channel info and list of voice states
+    if (event === RPCCommands.GET_SELECTED_VOICE_CHANNEL) {
+      store.dispatch(setCurrentVoiceChannel(data));
+      store.dispatch(setAppUsers(data.voice_states));
     }
 
     // start speaking
-    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.SPEAKING_START) {
-      store.dispatch(setUserTalking({ id: packet.data.user_id, value: true }));
+    if (event === RPCEvents.SPEAKING_START) {
+      store.dispatch(setUserTalking({ id: data.user_id, value: true }));
     }
 
     // stop speaking
-    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.SPEAKING_STOP) {
-      store.dispatch(setUserTalking({ id: packet.data.user_id, value: false }));
+    if (event === RPCEvents.SPEAKING_STOP) {
+      store.dispatch(setUserTalking({ id: data.user_id, value: false }));
     }
 
     // join
-    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_CREATE) {
-      store.dispatch(addUser(packet.data));
+    if (event === RPCEvents.VOICE_STATE_CREATE) {
+      store.dispatch(addUser(data));
     }
 
     // leave
-    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_DELETE) {
-      store.dispatch(removeUser(packet.data.user.id));
+    if (event === RPCEvents.VOICE_STATE_DELETE) {
+      store.dispatch(removeUser(data.user.id));
     }
 
-    // FIXME: There is a rate limit on RPC for this to only allow update per 15 seconds
-    if (cmd === RPCCommands.DISPATCH && evt === RPCEvents.VOICE_STATE_UPDATE) {
-      store.dispatch(updateUser(packet.data));
+    if (event === RPCEvents.VOICE_STATE_UPDATE) {
+      store.dispatch(updateUser(data));
     }
 
-    // for any extneral listeners
+    // for any external listeners
     this.emit("message", message);
   }
 

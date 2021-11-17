@@ -2,7 +2,7 @@ import { IconButton } from "@mui/material";
 import { darken } from "@mui/material/styles";
 import IconPin from "@mui/icons-material/PushPinRounded";
 import IconDebug from "@mui/icons-material/BugReport";
-import IconSync from "@mui/icons-material/Refresh";
+import IconSettings from "@mui/icons-material/Settings";
 import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
@@ -67,13 +67,14 @@ const Toolbar = () => {
         style={{
           textTransform: "uppercase",
           fontSize: 18,
-          flex: 1,
-          display: "flex",
-          color: "#fff",
+          flex: 1,           
+          color: "#fff",       
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
-      >
-        {/* TODO: make it css based  */}
-        {getTitle()?.substr(0, 20)}
+      >        
+        {getTitle()}
       </div>
       <div
         style={{
@@ -83,10 +84,10 @@ const Toolbar = () => {
       >
         <IconButton
           onClick={() => {
-            socketService.send({ event: CustomEvents.REQUEST_CURRENT_CHANNEL });
+            
           }}
         >
-          <IconSync style={{ color: "#fff" }} />
+          <IconSettings style={{ color: "#fff" }} />
         </IconButton>
         <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
           <IconDebug style={{ color: "#fff" }} />

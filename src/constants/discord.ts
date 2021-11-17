@@ -43,7 +43,7 @@ export enum RPCCommands {
   CLOSE_ACTIVITY_REQUEST = "CLOSE_ACTIVITY_REQUEST",
 }
 
-
+// TODO: clean up stuff as we now use discord-rpc
 export enum CustomEvents {
   ACCESS_TOKEN_ACQUIRED = "ACCESS_TOKEN_ACQUIRED",
   PINNED_STATUS = "PINNED_STATUS",
