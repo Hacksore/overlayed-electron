@@ -31,25 +31,7 @@ class SocketManager {
 
   setupAuthAndListeners() {
     this.client.on("ready", async () => {
-
-      // sub to channel changes
-      this.client.subscribe("VOICE_CHANNEL_SELECT", this.onDiscordMessage.bind(this, "VOICE_CHANNEL_SELECT"));
-
-      // handle the event
-      this.client.on("VOICE_CHANNEL_SELECT", event => {
-        this.subscribeAllEvents(event.channel_id);
-        this.onDiscordMessage("VOICE_CHANNEL_SELECT", event);
-      });
-
-      // Sub to channel events
-      SUBSCRIBABLE_EVENTS.forEach(eventName => {
-        this.client.on(eventName, this.onDiscordMessage.bind(this, eventName));
-      });
-
-      // how to get current voice channel
-      const channelData = await this.client.request("GET_SELECTED_VOICE_CHANNEL");
-      this.onDiscordMessage("GET_SELECTED_VOICE_CHANNEL", channelData);
-      this.subscribeAllEvents(channelData.id);
+      this.onReady();
 
       // tell client we are ready
       this.sendElectronMessage({
@@ -67,13 +49,60 @@ class SocketManager {
       clientId: CLIENT_ID,
       accessToken: this.overlayed.auth.access_token,
     });
+
+    this.client.on("error", async error => {
+      console.log("error with rpc", error);
+    });
+  }
+
+  async onReady() {
+    // sub to channel changes for the current user
+    this.client.subscribe("VOICE_CHANNEL_SELECT");
+
+    // called when the user joins/switches channels
+    this.client.on("VOICE_CHANNEL_SELECT", async event => {
+
+      console.log("VOICE_CHANNEL_SELECT", event);
+
+      // unsub from old channels first!
+      // TODO: figure out how to unsub from old channels
+      // if (this.overlayed.subscriptions) {
+      //   this.overlayed.subscriptions.map(async subscription => {
+      //     if (subscription) {
+      //       const item = await subscription;
+      //       item.unsubscribe();
+      //     }
+      //   });
+      // }
+
+      // Get the users currently joined channel and send info
+      const channelData = await this.client.request("GET_CHANNEL", { channel_id: event.channel_id });
+      console.log(channelData);
+      this.sendElectronMessage({ event: "GET_CHANNEL", data: channelData });
+
+      this.overlayed.subscriptions = this.subscribeAllEvents(event.channel_id);
+      this.onDiscordMessage("VOICE_CHANNEL_SELECT", event);
+
+      // Sub to channel events
+      SUBSCRIBABLE_EVENTS.forEach(eventName => {
+        this.client.on(eventName, this.onDiscordMessage.bind(this, eventName));
+      });
+    });
+
+    // Get the users currently joined channel
+    const channelData = await this.client.request("GET_SELECTED_VOICE_CHANNEL");
+    if (channelData.id) {
+      this.onDiscordMessage("GET_SELECTED_VOICE_CHANNEL", channelData);
+      // this.overlayed.subscriptions = this.subscribeAllEvents(channelData.id);
+    }
   }
 
   /**
    * Subscribe to events by channelId defined in getRPCEvents
+   * @returns {Array} - an array of subscribed events
    */
   subscribeAllEvents(channelId) {
-    SUBSCRIBABLE_EVENTS.map(eventName => this.client.subscribe(eventName, { channel_id: channelId }));
+    return SUBSCRIBABLE_EVENTS.map(eventName => this.client.subscribe(eventName, { channel_id: channelId }));
   }
 
   /**
@@ -82,7 +111,7 @@ class SocketManager {
    */
   onElectronMessage(message) {
     const { event, data } = JSON.parse(message);
-    console.log(event, data);
+    // console.log(event, data);
   }
 
   /**
@@ -90,7 +119,7 @@ class SocketManager {
    * @param {string} message
    */
   async onDiscordMessage(event, packet) {
-    console.log(event, packet);
+    console.log(event);
 
     // forward every packet from the socket to the client
     this.sendElectronMessage({ event, data: packet });

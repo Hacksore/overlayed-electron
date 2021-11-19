@@ -21,6 +21,7 @@ const overlayed = {
     expiresIn: null,
     type: null,
   },
+  subscriptions: null,
   userProfile: null,
   curentChannelId: null,
   lastChannelId: null,

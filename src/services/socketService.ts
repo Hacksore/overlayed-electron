@@ -70,6 +70,12 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(setAppUsers(data.voice_states));
     }
 
+    // get a list of the channel voice states
+    if (event === RPCCommands.GET_CHANNEL) {
+      store.dispatch(setAppUsers(data.voice_states));
+      store.dispatch(setCurrentVoiceChannel(data));
+    }
+
     // start speaking
     if (event === RPCEvents.SPEAKING_START) {
       store.dispatch(setUserTalking({ id: data.user_id, value: true }));

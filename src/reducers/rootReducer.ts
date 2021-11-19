@@ -84,6 +84,11 @@ export const appSlice = createSlice({
     addUser: (state, action: PayloadAction<IDiscordUser>) => {
       // TODO: this can't be the right place in the array?
       const item = action.payload;
+      // dont any anyone already in the state?
+      if (state.users.find((user) => user.id === item.user.id)) {
+        return;
+      };
+
       state.users.push(createUserStateItem(item));
     },
     removeUser: (state, action: PayloadAction<string>) => {
