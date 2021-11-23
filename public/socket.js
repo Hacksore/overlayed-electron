@@ -101,10 +101,25 @@ class SocketManager {
    * @param {string} message
    */
   onElectronMessage(message) {
-    const { event, data } = JSON.parse(message);
-    // console.log(event, data);
+    const { event } = JSON.parse(message);
+    
+    if (event === "TOGGLE_DEVTOOLS") {
+      this._win.webContents.openDevTools();
+    }
 
-    // TODO: add back events
+    if (event === "TOGGLE_PIN") {
+      this.overlayed.isPinned = !this.overlayed.isPinned;
+
+      this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
+      this._win.setVisibleOnAllWorkspaces(true);
+      this._win.setFullScreenable(false);
+
+      this.sendElectronMessage({
+        evt: "PINNED_STATUS",
+        value: this.overlayed.isPinned,
+      });
+    }
+
   }
 
   /**
