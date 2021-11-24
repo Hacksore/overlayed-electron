@@ -127,7 +127,7 @@ function createAuthWindow() {
       authWin.close();
       authWin = null;
 
-      socketManager.setupAuthAndListeners();
+      socketManager.setupListeners();
 
       // tell client auth is done
       socketManager.sendElectronMessage({
