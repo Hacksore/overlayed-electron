@@ -28,14 +28,10 @@ class SocketManager {
   constructor({ win, overlayed }) {
     this._win = win;
     this.overlayed = overlayed;
-    this.client = null;
-
     this.client = new RPC.Client({ transport: "ipc" });
-
   }
 
-
-  setupAuthAndListeners() {
+  setupListeners() {
     this.client.on("ready", async () => {
       // sub to voice channel changes
       this.client.subscribe("VOICE_CHANNEL_SELECT");
@@ -102,7 +98,7 @@ class SocketManager {
    */
   onElectronMessage(message) {
     const { event } = JSON.parse(message);
-    
+
     if (event === "TOGGLE_DEVTOOLS") {
       this._win.webContents.openDevTools();
     }
@@ -119,7 +115,6 @@ class SocketManager {
         value: this.overlayed.isPinned,
       });
     }
-
   }
 
   /**
@@ -142,7 +137,7 @@ class SocketManager {
     }
 
     // sub to channel events
-    if (cmd === "GET_SELECTED_VOICE_CHANNEL") {
+    if (cmd === "GET_SELECTED_VOICE_CHANNEL" && data) {
       this.subscribeAllEvents(data.id);
     }
 
@@ -157,7 +152,6 @@ class SocketManager {
   sendElectronMessage(message) {
     this._win.webContents.send("fromMain", JSON.stringify(message));
   }
-
 }
 
 module.exports = SocketManager;

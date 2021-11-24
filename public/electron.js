@@ -3,6 +3,8 @@ const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const PORT = process.env.PORT || 3000;
+const ElectronStore = require("electron-store");
+const store = new ElectronStore();
 
 require("./socket");
 
@@ -54,6 +56,19 @@ function createWindow() {
     overlayed,
   });
 
+  const auth = store.get("auth");
+  if (auth) {
+    overlayed.auth = JSON.parse(JSON.stringify(auth));
+
+    socketManager.setupListeners();
+
+    // tell client auth is done
+    socketManager.sendElectronMessage({
+      event: "OAUTH_DANCE_COMPLETED",
+      data: overlayed.auth,
+    });
+  }
+
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", (_, msg) => {
     const payload = JSON.parse(msg);
@@ -63,7 +78,6 @@ function createWindow() {
     if (payload.event === "LOGIN") {
       if (!authWin) {
         createAuthWindow();
-
         authWin.show();
       }
     }
@@ -79,7 +93,7 @@ function createAuthWindow() {
     height: 800,
     frame: true,
     icon: `${__dirname}/img/${icon}`,
-    show: true,        
+    show: true,
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, "./preload.js"),
@@ -108,18 +122,21 @@ function createAuthWindow() {
   ipcMain.on("toMain", (_, msg) => {
     const payload = JSON.parse(msg);
 
-    if (payload.event === "AUTH") {      
+    if (payload.event === "AUTH") {
       overlayed.auth = JSON.parse(payload.data);
       authWin.close();
       authWin = null;
 
       socketManager.setupAuthAndListeners();
-      
+
       // tell client auth is done
       socketManager.sendElectronMessage({
         event: "OAUTH_DANCE_COMPLETED",
         data: overlayed.auth, // TODO: we probably don't need this
       });
+
+      // save token to store
+      store.set("auth", overlayed.auth);
     }
   });
 }
@@ -140,13 +157,8 @@ app
     });
   })
   .then(() => {
-
-    // // TODO: check if we have a token first and we don't create this
-    // // if we don't have a token, create the auth window hidden and wait for client to tell us to start auth
-    // createAuthWindow();
-
     // create the main window no matter what
-    createWindow();    
+    createWindow();
   });
 
 // TODO: if we turn this off we need a global hotkey to refocus it
