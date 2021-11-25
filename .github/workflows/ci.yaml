@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - "*"
-    tags:
-      - 'v*'
+  release:
+    types: [released]
 
 env:
   NODE_VERSION: "16"
@@ -17,7 +17,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
