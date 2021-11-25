@@ -5,7 +5,7 @@ on: [push]
 env:
   NODE_VERSION: "16"
 
-jobs:    
+jobs:
   build:
     runs-on: "${{ matrix.os }}"
     strategy:
@@ -26,3 +26,7 @@ jobs:
         with:
           name: "overlayed-unstable-${{ matrix.os }}"
           path: "dist/**/*.zip"
+      # see if we can just do this here since the bin is already getting built
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
