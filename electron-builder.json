@@ -12,31 +12,19 @@
   "mac": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon.icns"
+    "icon": "build/img/icon.icns",
+    "publish" : []
   },
   "win": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon.png"
+    "icon": "build/img/icon.png",
+    "publish" : []
   },
   "linux": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon.png"
-  },
-  "dmg": {
-    "title": "${productName}-${version}",
-    "contents": [
-      {
-        "x": 100,
-        "y": 160
-      },
-      {
-        "x": 190,
-        "y": 260,
-        "type": "link",
-        "path": "/Applications"
-      }
-    ]
+    "icon": "build/img/icon.png",
+    "publish" : []
   }
 }
