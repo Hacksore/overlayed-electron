@@ -5,9 +5,13 @@ on: [push]
 env:
   NODE_VERSION: "16"
 
-jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+jobs:    
+  build:
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -18,42 +22,7 @@ jobs:
           npm ci
           npm run build
           npm run pack
-          ls -hal dist/
       - uses: actions/upload-artifact@v2
         with:
-          name: overlayed-unstable-linux
-          path: "dist/**/*.zip"
-  build-mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "${{env.NODE_VERSION}}"
-      - name: package
-        run: |
-          npm ci
-          npm run build
-          npm run pack
-          ls -hal dist/
-      - uses: actions/upload-artifact@v2
-        with:
-          name: overlayed-unstable-mac
-          path: "dist/**/*.zip"
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "${{env.NODE_VERSION}}"
-      - name: package
-        run: |
-          npm ci
-          npm run build
-          npm run pack
-          dir dist/
-      - uses: actions/upload-artifact@v2
-        with:
-          name: overlayed-unstable-windows
+          name: overlayed-unstable-${matrix.os}
           path: "dist/**/*.zip"
