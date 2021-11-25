@@ -1,12 +1,6 @@
 name: CI
 
-on: 
-  workflow_dispatch:
-  push:
-    branches:
-      - "*"
-  release:
-    types: [released]
+on: "push"
 
 env:
   NODE_VERSION: "16"
@@ -31,7 +25,3 @@ jobs:
         with:
           name: "overlayed-unstable-${{ matrix.os }}"
           path: "dist/**/*.zip"
-      # see if we can just do this here since the bin is already getting built
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
