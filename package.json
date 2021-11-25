@@ -1,7 +1,7 @@
 {
   "name": "overlayed",
   "description": "A discord overlay",
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha2",
   "author": "Hacksore",
   "private": true,
   "dependencies": {
