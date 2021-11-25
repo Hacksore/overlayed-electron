@@ -3,6 +3,8 @@ name: CI
 on: 
   workflow_dispatch:
   push:
+    tags:
+      - 'v*'
 
 env:
   NODE_VERSION: "16"
