@@ -56,29 +56,33 @@ function createWindow() {
     overlayed,
   });
 
-  const auth = store.get("auth");
-  if (auth) {
-    overlayed.auth = JSON.parse(JSON.stringify(auth));
-
-    socketManager.setupListeners();
-
-    // tell client auth is done
-    socketManager.sendElectronMessage({
-      event: "OAUTH_DANCE_COMPLETED",
-      data: overlayed.auth,
-    });
-  }
-
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", (_, msg) => {
     const payload = JSON.parse(msg);
     socketManager.onElectronMessage(msg);
 
     // check if we got told to open auth window
-    if (payload.event === "LOGIN") {
+    if (payload.evt === "LOGIN") {
       if (!authWin) {
         createAuthWindow();
         authWin.show();
+      }
+    }
+
+    if (payload.evt === "I_AM_READY") {
+      console.log("Got ready event");
+
+      const auth = store.get("auth");
+      if (auth) {
+        overlayed.auth = JSON.parse(JSON.stringify(auth));
+
+        socketManager.setupListeners();
+
+        // tell client auth is done
+        socketManager.sendElectronMessage({
+          evt: "OAUTH_DANCE_COMPLETED",
+          data: overlayed.auth,
+        });
       }
     }
   });
@@ -131,7 +135,7 @@ function createAuthWindow() {
 
       // tell client auth is done
       socketManager.sendElectronMessage({
-        event: "OAUTH_DANCE_COMPLETED",
+        evt: "OAUTH_DANCE_COMPLETED",
         data: overlayed.auth, // TODO: we probably don't need this
       });
 

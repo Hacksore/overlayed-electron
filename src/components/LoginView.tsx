@@ -41,7 +41,7 @@ const LoginView = () => {
         variant="contained"
         onClick={() => {
           socketService.send({
-            event: "LOGIN",
+            evt: "LOGIN",
           })
         }}
       >
