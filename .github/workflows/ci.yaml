@@ -1,6 +1,11 @@
 name: CI
 
-on: [push]
+on: 
+  workflow_dispatch:
+  push:
+  create:
+    tags:
+      - v*
 
 env:
   NODE_VERSION: "16"
