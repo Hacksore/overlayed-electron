@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Debug Main Process",
+        "name": "Debug Electron",
         "type": "node",
         "request": "launch",
         "cwd": "${workspaceFolder}",
@@ -11,6 +11,7 @@
           "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
         },
         "args" : ["."],
+        "preLaunchTask": "develop",
         "stopAtEntry": false,        
         "outputCapture": "std"
       }

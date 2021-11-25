@@ -18,9 +18,4 @@ With this app you can view who talking in your current channel.
 
 ### Running locally
 
-Make sure you `npm install` all the dependencies then just run `npm start`.
-
-
-### Debug
-
-Better to run `npm run react` then f5 in VSCode to run electron in debug mode.
+Make sure you `npm install` all the dependencies then just run `npm start` or run the `Debug Electron` in VSCode.

@@ -1,3 +1,5 @@
+// TODO: add typescript support but searching the web it seems this is way more involed
+
 const path = require("path");
 const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const isDev = require("electron-is-dev");
@@ -16,14 +18,12 @@ let socketManager;
 
 // use this namespace to be able to pass by ref to other files
 const overlayed = {
-  accessToken: null, // TODO: remove
   auth: {
     accessToken: null,
     refreshToken: null,
     expiresIn: null,
     type: null,
   },
-  subscriptions: null,
   userProfile: null,
   curentChannelId: null,
   lastChannelId: null,
