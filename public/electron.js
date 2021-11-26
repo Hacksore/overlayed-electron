@@ -95,7 +95,7 @@ function createAuthWindow() {
     width: 550,
     height: 800,
     frame: true,
-    icon: `${__dirname}/img/${icon}`,
+    icon: iconPath,
     show: true,
     webPreferences: {
       nodeIntegration: true,
@@ -103,20 +103,27 @@ function createAuthWindow() {
     },
   });
 
+  authWin.on("close", () => {
+    authWin = null;
+  });
+
   // load the auth url
   const authUrl =
     "https://discord.com/api/oauth2/authorize?client_id=905987126099836938&redirect_uri=https%3A%2F%2Fauth.overlayed.dev%2Foauth%2Fcallback&response_type=code&scope=rpc";
   authWin.loadURL(authUrl);
 
+  // TODO: this is rather insecure as the window can be seen for a split second with your token
   authWin.webContents.on("will-navigate", function (event, newUrl) {
     // More complex code to handle tokens goes here
     authWin.webContents.session.webRequest.onCompleted({ urls: [newUrl] }, details => {
-      // TODO: make better?
       if (details.url.includes("code=")) {
         authWin.webContents.executeJavaScript(`
           const payload = { event: 'AUTH', data: document.getElementsByTagName('pre')[0].innerHTML };
           window.electron.send('toMain', payload)
         `);
+      } else {
+        authWin.close();
+        authWin = null;
       }
     });
   });
@@ -127,8 +134,11 @@ function createAuthWindow() {
 
     if (payload.event === "AUTH") {
       overlayed.auth = JSON.parse(payload.data);
-      authWin.close();
-      authWin = null;
+
+      if (authWin) {
+        authWin.close();
+        authWin = null;
+      }
 
       socketManager.setupListeners();
 

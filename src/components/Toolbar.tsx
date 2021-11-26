@@ -34,9 +34,9 @@ const Root = styled("div", {
   appRegion: "drag",
   // HACK: maybe this works for the drag bug?
   "&:hover": {
-    background: darken(theme.palette.primary.main, 0.2),
+    background: darken(theme.palette.primary.main, 0.1),
   },
-  backgroundColor: "#495bfc",
+  backgroundColor: theme.palette.primary.main,
   [`&.${classes.root}`]: {
     overflowY: "auto",
   },

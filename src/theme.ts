@@ -7,13 +7,13 @@ const theme = createTheme({
   spacing: 0,
   palette: {
     background: {
-      default: "rgba(40,40,40,1)",
+      default: "#2C2F33",
     },
     error: {
       main: "#f44336"
     },
     primary: {      
-      main: "#495bfc",
+      main: "#5A65EA",
       contrastText: "#fff",
     },
     text: {

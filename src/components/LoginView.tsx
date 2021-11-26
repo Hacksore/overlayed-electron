@@ -1,29 +1,50 @@
 import { Button, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, lighten } from "@mui/system";
 import socketService from "../services/socketService";
 
 const PREFIX = "LoginView";
 const classes = {
   root: `${PREFIX}-root`,
   instructions: `${PREFIX}-instructions`,
+  discordIcon: `${PREFIX}-discordIcon`,
+  buttonRoot: `${PREFIX}-buttonRoot`,
+  item: `${PREFIX}-item`,
 };
 
 export const Root = styled("div")(({ theme }) => ({
   padding: 16,
-  background: "#000",
+  background: theme.palette.background.default,
   color: theme.palette.primary.contrastText,
   height: "100vh",
   display: "flex",
+  alignItems: "center",
   flexDirection: "column",
 
   [`& .${classes.instructions}`]: {
     [`& div`]: {
-      textAlign: "center",
       margin: "10px 0 10px 0",
       padding: "10px 12px 10px 12px",
       background: "#1c1c1c",
-      borderRadius: 4
+      borderRadius: 4,
     },
+  },
+  [`& .${classes.discordIcon}`]: {
+    width: 32,
+    marginRight: 10,
+  },
+  [`& .${classes.buttonRoot}`]: {
+    alignItems: "center",
+    display: "flex",
+    marginTop: 24,
+  },
+  [`& .${classes.item}`]: {
+    alignItems: "center",
+    display: "flex",
+    flexGrow: 1,
+  },
+
+  [`& a`]: {
+    color: lighten(theme.palette.primary.main, 0.2),
   },
 }));
 
@@ -31,22 +52,53 @@ const LoginView = () => {
   return (
     <Root>
       <Typography gutterBottom variant="h4" color="textPrimary">
-        Login Required
+        Authorize
       </Typography>
-      <Typography variant="subtitle1" color="textPrimary">
-        Overlayed needs access tothe Discord client, please click the button below to authenticate at auth.overlayed.dev
+      <Typography variant="body2" color="textPrimary">
+        Please sign in with Discord to allow Overlayed to interact with your Discord client. As of now Overlayed will
+        only read data from your Discord client.
       </Typography>
 
-      <Button
-        variant="contained"
-        onClick={() => {
-          socketService.send({
-            evt: "LOGIN",
-          })
-        }}
-      >
-        Login with Discord
-      </Button>
+      <div className={classes.item}>
+        <Button
+          variant="contained"
+          classes={{ root: classes.buttonRoot }}
+          onClick={() => {
+            socketService.send({
+              evt: "LOGIN",
+            });
+          }}
+        >
+          <img className={classes.discordIcon} alt="Discord" src="img/discord-logo-small.svg" />
+          Sign In with Discord
+        </Button>
+      </div>
+
+      <div className={classes.item}>
+        <Typography variant="body2" color="textPrimary">
+          Click “Sign In” to agree to Overlayed{" "}
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              window.electron.openInBrowser("https://overlayed.dev");
+            }}
+            href="https://overlayed.dev"
+          >
+            Terms of Service
+          </a>{" "}
+          and acknowledge that Overlayed{" "}
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              window.electron.openInBrowser("https://overlayed.dev");
+            }}
+            href="https://overlayed.dev"
+          >
+            Privacy Policy
+          </a>{" "}
+          applies to you.
+        </Typography>
+      </div>
     </Root>
   );
 };
