@@ -3,7 +3,7 @@
 [![CI](https://img.shields.io/github/workflow/status/Hacksore/overlayed/CI)](https://github.com/Hacksore/overlayed/actions?query=workflow%3ACI)
 [![Discord](https://img.shields.io/discord/906349283358408704)](https://discord.gg/pgsnx5kWen)
 
-This is an electron based overlay application for Discord that leverages the local [RPC protcol](https://discord.com/developers/docs/topics/rpc) via an IPC socket.
+This is an electron based overlay application for Discord that leverages the local [RPC protocol](https://discord.com/developers/docs/topics/rpc) via an IPC socket.
 
 Currently using a fork of [discord-rpc](https://github.com/discordjs/RPC) to handle connecting ot the client.
 
