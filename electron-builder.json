@@ -12,7 +12,7 @@
   "mac": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon.icns",
+    "icon": "build/img/icon-mac.icns",
     "publish" : []
   },
   "win": {

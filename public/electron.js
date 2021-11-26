@@ -1,16 +1,15 @@
 // TODO: add typescript support but searching the web it seems this is way more involed
 
 const path = require("path");
-const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut, nativeImage } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const PORT = process.env.PORT || 3000;
 const ElectronStore = require("electron-store");
 const store = new ElectronStore();
 
-require("./socket");
-
-const icon = process.platform !== "darwin" ? "logo.png" : "logo.icns";
+const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
+const iconPath = `${__dirname}/img/${iconFile}`;
 
 let win;
 let authWin;
@@ -39,7 +38,7 @@ function createWindow() {
     height: 590,
     transparent: true,
     frame: false,
-    icon: `${__dirname}/img/${icon}`,
+    icon: iconPath,
     hasShadow: false,
     show: true,
     webPreferences: {
