@@ -1,11 +1,12 @@
 // TODO: add typescript support but searching the web it seems this is way more involed
 
 const path = require("path");
-const { app, BrowserWindow, ipcMain, globalShortcut, nativeImage } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const PORT = process.env.PORT || 3000;
 const ElectronStore = require("electron-store");
+const { LOGIN_URL } = require("./constants");
 const store = new ElectronStore();
 
 const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
@@ -108,9 +109,7 @@ function createAuthWindow() {
   });
 
   // load the auth url
-  const authUrl =
-    "https://discord.com/api/oauth2/authorize?client_id=905987126099836938&redirect_uri=https%3A%2F%2Fauth.overlayed.dev%2Foauth%2Fcallback&response_type=code&scope=rpc";
-  authWin.loadURL(authUrl);
+  authWin.loadURL(LOGIN_URL);
 
   // TODO: this is rather insecure as the window can be seen for a split second with your token
   authWin.webContents.on("will-navigate", function (event, newUrl) {
