@@ -1,6 +1,6 @@
 // TODO: add typescript support but searching the web it seems this is way more involed
 const path = require("path");
-const { app, BrowserWindow, ipcMain, globalShortcut, dialog, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut, dialog, shell, Tray, Menu, nativeTheme } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const ElectronStore = require("electron-store");
@@ -14,6 +14,7 @@ const iconPath = `${__dirname}/img/${iconFile}`;
 let win;
 let authWin;
 let socketManager;
+let tray = null;
 
 // use this namespace to be able to pass by ref to other files
 const overlayed = {
@@ -69,12 +70,11 @@ function createWindow() {
     }
 
     if (payload.evt === "I_AM_READY") {
-      console.log("Got ready event");
+      console.log("Got ready event from renderer process");
 
       const auth = store.get("auth");
       if (auth) {
         overlayed.auth = JSON.parse(JSON.stringify(auth));
-
         socketManager.setupListeners();
 
         // tell client auth is done
@@ -84,9 +84,13 @@ function createWindow() {
         });
       }
     }
+
+    if (payload.event === "TOGGLE_CLICKTHROUGH") {
+      toggleClickthrough();
+    }
   });
 
-  win.loadURL(isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../build/index.html")}`);
+  win.loadURL(isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../index.html")}`);
 }
 
 function createAuthWindow() {
@@ -121,7 +125,7 @@ function createAuthWindow() {
         `);
       } else {
         dialog.showMessageBox(win, {
-          message: "Something went wrong authenticating, you might not have access!"
+          message: "Something went wrong authenticating, you might not have access!",
         });
 
         shell.openExternal("https://github.com/Hacksore/overlayed/issues/2");
@@ -158,20 +162,56 @@ function createAuthWindow() {
   });
 }
 
+function toggleClickthrough() {
+  overlayed.clickThrough = !overlayed.clickThrough;
+  // inform the UI to toggle the overlay
+  socketManager.sendElectronMessage({
+    evt: "CLICKTHROUGH_STATUS",
+    value: overlayed.clickThrough,
+  });
+
+  // enableing click through
+  win.setIgnoreMouseEvents(overlayed.clickThrough);
+}
+
 app
   .whenReady()
   .then(() => {
-    // TODO: allow custom keybindings
-    globalShortcut.register("Control+Shift+Space", () => {
-      overlayed.clickThrough = !overlayed.clickThrough;
-      // inform the UI to toggle the overlay
-      socketManager.sendElectronMessage({
-        evt: "CLICKTHROUGH_STATUS",
-        value: overlayed.clickThrough,
-      });
-      // enableing click through
-      win.setIgnoreMouseEvents(overlayed.clickThrough);
+    // add tray icon
+    tray = new Tray(`${__dirname}/../img/trayicon-${nativeTheme.shouldUseDarkColors ? "light" : "dark"}.png`);
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Always on top",
+        click: () => {
+          // TODO: Code this is duplicated from socket.js - needs some DRYing up
+          overlayed.isPinned = !overlayed.isPinned;
+
+          win.setAlwaysOnTop(overlayed.isPinned, "floating");
+          win.setVisibleOnAllWorkspaces(true);
+          win.setFullScreenable(false);
+
+          socketManager.sendElectronMessage({
+            evt: "PINNED_STATUS",
+            value: overlayed.isPinned,
+          });
+        },
+      },
+      {
+        label: "Quit",
+        click: function () {
+          app.isQuiting = true;
+          app.quit();
+        },
+      },
+    ]);
+    tray.setToolTip("Overlayed");
+    tray.setContextMenu(contextMenu);
+
+    tray.on("click", function (event) {
     });
+
+    // TODO: allow custom keybindings
+    globalShortcut.register("Control+Shift+Space", toggleClickthrough);
   })
   .then(() => {
     // create the main window no matter what

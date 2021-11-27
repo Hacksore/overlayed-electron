@@ -15,7 +15,6 @@ export const Root = styled("div")(({ theme }) => ({
   padding: 16,
   background: theme.palette.background.default,
   color: theme.palette.primary.contrastText,
-  height: "100vh",
   display: "flex",
   alignItems: "center",
   flexDirection: "column",
@@ -36,6 +35,7 @@ export const Root = styled("div")(({ theme }) => ({
     alignItems: "center",
     display: "flex",
     marginTop: 24,
+    marginBottom: 24,
   },
   [`& .${classes.item}`]: {
     alignItems: "center",

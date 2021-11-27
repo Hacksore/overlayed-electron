@@ -1,8 +1,8 @@
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { darken } from "@mui/material/styles";
-import IconPin from "@mui/icons-material/PushPinRounded";
-import IconDebug from "@mui/icons-material/BugReport";
+import IconConsole from "@mui/icons-material/Code";
 import IconSettings from "@mui/icons-material/Settings";
+import IconHide from "@mui/icons-material/VisibilityOff";
 import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
@@ -43,9 +43,7 @@ const Root = styled("div", {
 }));
 
 const Toolbar = () => {
-
   // TODO: Should this be once selecter pull?
-  const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
@@ -67,13 +65,13 @@ const Toolbar = () => {
         style={{
           textTransform: "uppercase",
           fontSize: 18,
-          flex: 1,           
-          color: "#fff",       
+          flex: 1,
+          color: "#fff",
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
         }}
-      >        
+      >
         {getTitle()}
       </div>
       <div
@@ -82,19 +80,25 @@ const Toolbar = () => {
           appRegion: "no-drag",
         }}
       >
-        <IconButton
-          onClick={() => {
-            
-          }}
-        >
-          <IconSettings style={{ color: "#fff" }} />
-        </IconButton>
-        <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
-          <IconDebug style={{ color: "#fff" }} />
-        </IconButton>
-        <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_PIN })}>
-          <IconPin style={{ color: isPinned ? "#73ef5b" : "#fff" }} />
-        </IconButton>
+        {isAuthed && (
+          <Tooltip title="Enable clickthrough">
+            <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_CLICKTHROUGH })}>
+              <IconHide color="secondary" />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        <Tooltip title="Console">
+          <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
+            <IconConsole color="secondary" />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Settings">
+          <IconButton onClick={() => {}}>
+            <IconSettings color="secondary" />
+          </IconButton>
+        </Tooltip>
       </div>
     </Root>
   );

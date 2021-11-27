@@ -101,8 +101,8 @@ const UserItem = React.memo((props: IUser) => {
   };
 
   // discord avatar hash can be null so we fix this
+  // TODO: since i moved the build shit it's one level up :)
   const avatarUrl = avatarHash ? `https://cdn.discordapp.com/avatars/${id}/${avatarHash}.jpg` : "./img/default.png";
-
   const shouldShowIcons = selfDeafened || selfMuted || muted || deafened;
 
   return (
@@ -119,7 +119,7 @@ const UserItem = React.memo((props: IUser) => {
             // @ts-ignore
             e.target.onerror = null;
             // @ts-ignore
-            e.target.src = "/img/default.png";
+            e.target.src = "./img/default.png";
           }}
           className={classes.avatar}
           // TODO: how to pass props

@@ -2,8 +2,11 @@
   "productName": "overlayed",
   "appId": "com.hacksore.overlayed",
   "directories": {
-    "buildResources": "buildResources",
-    "output": "dist"
+    "buildResources": "public"
+  },
+  "extends": null,
+  "extraMetadata": {
+    "main": "build/electron/main.js"
   },
   "files": [
     "build/**/*",
@@ -12,19 +15,16 @@
   "mac": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon-mac.icns",
-    "publish" : []
+    "icon": "build/img/icon-mac.icns"
   },
   "win": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon.png",
-    "publish" : []
+    "icon": "build/img/icon.png"
   },
   "linux": {
     "target": ["zip"],
     "artifactName": "${productName}-${version}-${os}.${ext}",
-    "icon": "build/img/icon.png",
-    "publish" : []
+    "icon": "build/img/icon.png"
   }
 }

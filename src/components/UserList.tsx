@@ -12,9 +12,10 @@ const classes = {
 
 const Root = styled("div")(({ theme }) => ({
   [`&.${classes.root}`]: {
-    overflowY: "auto",
-    height: "100vh",
-    marginTop: 8
+    padding: "6px 12px 6px 12px",
+    marginTop: 8,
+    maxHeight: 600,
+    overflowY: "scroll",
   },
 }));
 

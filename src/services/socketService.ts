@@ -46,7 +46,6 @@ class IPCSocketService extends EventEmitter {
   onMessage(message: any) {
     const packet = JSON.parse(message);
     const { evt, cmd = null, data } = packet;
-    console.log(packet);
 
     // we get any ready data from main process
     if (evt === CustomEvents.READY) {
