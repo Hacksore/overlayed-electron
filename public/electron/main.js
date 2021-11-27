@@ -89,8 +89,7 @@ function createWindow() {
       toggleClickthrough();
     }
 
-    if (payload.evt === "WINDOW_RESIZE") {     
-      console.log(payload.data);      
+    if (payload.evt === "WINDOW_RESIZE") {
       win.setSize(400, payload.data.height);
     }
   });
