@@ -88,6 +88,11 @@ function createWindow() {
     if (payload.event === "TOGGLE_CLICKTHROUGH") {
       toggleClickthrough();
     }
+
+    if (payload.evt === "WINDOW_RESIZE") {     
+      console.log(payload.data);      
+      win.setSize(400, payload.data.height);
+    }
   });
 
   win.loadURL(isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../index.html")}`);

@@ -6,7 +6,7 @@ import LoginView from "./components/LoginView";
 import { RootState } from "./store";
 
 import socketSerivce from "./services/socketService";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Put this somewhere else?
 declare global {
@@ -21,10 +21,21 @@ declare global {
 
 function App() {
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
-  
-  useEffect(() => {    
-    socketSerivce.init();    
+  const users = useAppSelector((state: RootState) => state.root.users);
+  const [divHeight, setDivHeight] = useState<number>(0);
+  const [userCount, setUserCount] = useState<number>(0);
+
+  useEffect(() => {
+    socketSerivce.init();
   }, []);
+
+  useEffect(() => {
+    setUserCount(users.length);
+  }, [users, divHeight]);
+
+  useEffect(() => {
+    socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height: divHeight + 50 } });
+  }, [userCount, divHeight]);
 
   return (
     <Root>
@@ -33,7 +44,7 @@ function App() {
         <LoginView />
       ) : (
         <>
-          <UserList />
+          <UserList setDivHeight={setDivHeight} />
         </>
       )}
     </Root>

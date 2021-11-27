@@ -8,12 +8,10 @@ import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import { IUser } from "../types/user";
 import IconDeafend from "@mui/icons-material/HeadsetOff";
 import IconMuted from "@mui/icons-material/MicOff";
-import IconNitro from "./IconNitro";
 
 const PREFIX = "UserItem";
 const classes = {
   root: `${PREFIX}-root`,
-  iconNitro: `${PREFIX}-iconNitro`,
   name: `${PREFIX}-name`,
   avatar: `${PREFIX}-avatar`,
 };
@@ -37,17 +35,7 @@ const Root = styled("div")(({ theme }) => ({
     display: "flex",
     alignItems: "flex-start",
     margin: "0 0 0 5px",
-  },
-  [`& .${classes.iconNitro}`]: {
-    display: "flex",
-    padding: 2,
-    position: "absolute",
-    left: 0,
-    bottom: 0,
-    background: "rgba(0,0,0,0.6)",
-    border: "1px solid #000",
-    borderRadius: 15,
-  },
+  }
 }));
 
 // note to self, this probably belongs on a cringe list somewhere
@@ -80,7 +68,7 @@ const RichToolTip = (props: IUser) => {
 };
 
 const UserItem = React.memo((props: IUser) => {
-  const { id, deafened, username, avatarHash, talking, muted, selfDeafened, selfMuted, premium } = props;
+  const { id, deafened, username, avatarHash, talking, muted, selfDeafened, selfMuted } = props;
 
   const getIconColor = () => {
     if (talking) {
@@ -101,19 +89,12 @@ const UserItem = React.memo((props: IUser) => {
   };
 
   // discord avatar hash can be null so we fix this
-  // TODO: since i moved the build shit it's one level up :)
   const avatarUrl = avatarHash ? `https://cdn.discordapp.com/avatars/${id}/${avatarHash}.jpg` : "./img/default.png";
   const shouldShowIcons = selfDeafened || selfMuted || muted || deafened;
 
   return (
     <Root className={classes.root}>
       <div style={{ position: "relative" }}>
-        {premium > 0 && (
-          <div className={classes.iconNitro}>
-            <IconNitro color="#f577ff" size="16" />
-          </div>
-        )}
-
         <img
           onError={e => {
             // @ts-ignore
