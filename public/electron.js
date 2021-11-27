@@ -1,14 +1,13 @@
 // TODO: add typescript support but searching the web it seems this is way more involed
-
 const path = require("path");
-const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut, dialog, shell } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
-const PORT = process.env.PORT || 3000;
 const ElectronStore = require("electron-store");
 const { LOGIN_URL } = require("./constants");
 const store = new ElectronStore();
 
+const PORT = process.env.PORT || 3000;
 const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
 const iconPath = `${__dirname}/img/${iconFile}`;
 
@@ -121,6 +120,12 @@ function createAuthWindow() {
           window.electron.send('toMain', payload)
         `);
       } else {
+        dialog.showMessageBox(win, {
+          message: "Something went wrong authenticating, you might not have access!"
+        });
+
+        shell.openExternal("https://github.com/Hacksore/overlayed/issues/2");
+
         authWin.close();
         authWin = null;
       }
