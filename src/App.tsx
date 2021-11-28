@@ -34,7 +34,9 @@ function App() {
   }, [users, divHeight]);
 
   useEffect(() => {
-    socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height: divHeight + 50 } });
+    if (userCount > 0) {
+      socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height: divHeight + 50 } });
+    }
   }, [userCount, divHeight]);
 
   return (
