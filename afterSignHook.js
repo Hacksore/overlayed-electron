@@ -9,8 +9,7 @@ module.exports = async function (params) {
   if (process.platform !== "darwin") {
     return;
   }
-  console.log("afterSign hook triggered", params);
-
+  
   const appId = "com.hacksore.overlayed";
 
   const appPath = path.join(params.appOutDir, `${params.packager.appInfo.productFilename}.app`);
