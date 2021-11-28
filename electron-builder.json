@@ -14,17 +14,14 @@
   ],
   "mac": {
     "target": ["zip"],
-    "artifactName": "${productName}-${version}-${os}.${ext}",
     "icon": "build/img/icon-mac.icns"
   },
   "win": {
     "target": ["zip"],
-    "artifactName": "${productName}-${version}-${os}.${ext}",
     "icon": "build/img/icon.png"
   },
   "linux": {
     "target": ["zip"],
-    "artifactName": "${productName}-${version}-${os}.${ext}",
     "icon": "build/img/icon.png"
   }
 }
