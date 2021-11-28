@@ -3,11 +3,13 @@ import { darken } from "@mui/material/styles";
 import IconConsole from "@mui/icons-material/Code";
 import IconSettings from "@mui/icons-material/Settings";
 import IconHide from "@mui/icons-material/VisibilityOff";
+import IconBack from "@mui/icons-material/ArrowBack";
 import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
 import socketService from "../services/socketService";
 import { CustomEvents } from "../constants/discord";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PREFIX = "Toolbar";
 const classes = {
@@ -47,6 +49,8 @@ const Toolbar = () => {
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const getTitle = () => {
     if (channel && channel.name) {
@@ -91,9 +95,15 @@ const Toolbar = () => {
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Settings">
-          <IconButton onClick={() => {}}>
-            <IconSettings color="secondary" />
+        <Tooltip title={location.pathname === "/list" ? "Settings" : "Go Back"}>
+          <IconButton onClick={() => {
+            if (location.pathname === "/list") {
+              navigate("settings");
+            } else {
+              navigate("list");
+            }
+          }}>
+            { location.pathname === "/list" ? <IconSettings color="secondary" /> : <IconBack color="secondary" /> }
           </IconButton>
         </Tooltip>
       </div>
