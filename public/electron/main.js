@@ -182,7 +182,9 @@ app
   .whenReady()
   .then(() => {
     // add tray icon
-    tray = new Tray(`${__dirname}/../img/trayicon-${nativeTheme.shouldUseDarkColors ? "light" : "dark"}.png`);
+    const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
+    const trayIconPath = path.resolve(`${__dirname}/../img/trayicon-${trayIconTheme}.png`);
+    tray = new Tray(trayIconPath);
     const contextMenu = Menu.buildFromTemplate([
       {
         label: "Always on top",
