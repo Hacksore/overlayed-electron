@@ -20,13 +20,15 @@
   "win": {
     "target": ["msi"],
     "icon": "build/img/icon.png",
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "entitlements": "./entitlements.mac.inherit.plist"
   },
   "linux": {
     "target": ["zip"],
     "icon": "build/img/icon.png",
     "artifactName": "${productName}-${version}-${os}.${ext}"
   },
+  "afterSign": "./afterSignHook.js",
   "dmg": {
     "title": "${productName}-${version}",
     "contents": [
