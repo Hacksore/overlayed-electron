@@ -21,7 +21,8 @@
     "eject": "react-scripts eject",
     "start": "concurrently -k npm:react npm:electron",
     "electron": "wait-on http://localhost:3000 && electronmon .",
-    "pack": "electron-builder --x64 --arm64 -p never -c electron-builder.json"
+    "pack": "electron-builder --x64 -p never -c electron-builder.json",
+    "pack:macos": "electron-builder --x64 --arm64 -p never -c electron-builder.json"
   },
   "homepage": "./",
   "eslintConfig": {

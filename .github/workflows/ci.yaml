@@ -6,13 +6,29 @@ on:
 
 env:
   NODE_VERSION: "16"
+  CSC_LINK: "${{ secrets.CSC_LINK }}"
+  CSC_KEY_PASSWORD: "${{ secrets.CSC_KEY_PASSWORD }}"
 
 jobs:
-  build:
-    runs-on: "${{ matrix.os }}"
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+  build-mac:
+    runs-on: "macos-latest"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+      - name: Install deps
+        run: npm ci
+      - name: Build react
+        run: npm run build
+      - name: Package
+        run: npm run pack:macos
+      - uses: actions/upload-artifact@v2
+        with:
+          name: "overlayed-unstable-mac"
+          path: "dist/**/*.dmg"
+  build-windows:
+    runs-on: "windows-latest"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -24,3 +40,24 @@ jobs:
         run: npm run build
       - name: Package
         run: npm run pack
+      - uses: actions/upload-artifact@v2
+        with:
+          name: "overlayed-unstable-mac"
+          path: "dist/**/*.msi"
+  build-linux:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+      - name: Install deps
+        run: npm ci
+      - name: Build react
+        run: npm run build
+      - name: Package
+        run: npm run pack
+      - uses: actions/upload-artifact@v2
+        with:
+          name: "overlayed-unstable-mac"
+          path: "dist/**/*.zip"

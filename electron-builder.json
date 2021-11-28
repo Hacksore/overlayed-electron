@@ -13,11 +13,11 @@
     "node_modules/**/*"
   ],
   "mac": {
-    "target": ["zip", "dmg"],
+    "target": ["dmg"],
     "icon": "build/img/icon-mac.icns"
   },
   "win": {
-    "target": ["zip", "msi"],
+    "target": ["msi"],
     "icon": "build/img/icon.png"
   },
   "linux": {
