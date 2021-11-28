@@ -10,10 +10,11 @@ module.exports = async function (params) {
     return;
   }
 
-  if (process.env.CSC_LINK) {
+  if (!process.env.CSC_LINK) {
+    console.log("Skipping notarize since CSC_LINK is not set");
     return;
   }
-  
+
   const appId = "com.hacksore.overlayed";
 
   const appPath = path.join(params.appOutDir, `${params.packager.appInfo.productFilename}.app`);

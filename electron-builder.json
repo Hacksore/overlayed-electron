@@ -33,11 +33,11 @@
     "title": "${productName}-${version}",
     "contents": [
       {
-        "x": 200,
+        "x": 168,
         "y": 100
       },
       {
-        "x": 400,
+        "x": 360,
         "y": 100,
         "type": "link",
         "path": "/Applications"
