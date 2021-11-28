@@ -15,13 +15,13 @@
   "mac": {
     "target": ["dmg"],
     "icon": "build/img/icon-mac.icns",
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "entitlements": "./entitlements.mac.inherit.plist"
   },
   "win": {
     "target": ["msi"],
     "icon": "build/img/icon.png",
-    "artifactName": "${productName}-${version}-${os}.${ext}",
-    "entitlements": "./entitlements.mac.inherit.plist"
+    "artifactName": "${productName}-${version}-${os}.${ext}"
   },
   "linux": {
     "target": ["zip"],
