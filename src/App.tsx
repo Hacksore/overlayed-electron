@@ -30,22 +30,16 @@ function App() {
   const userId = useAppSelector((state: RootState) => state.root.profile?.id);
 
   const [divHeight, setDivHeight] = useState<number>(0);
-  const [userCount, setUserCount] = useState<number>(0);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // side effect to store the user count for comparison in another hook
-  useEffect(() => {
-    setUserCount(users.length);
-  }, [users, divHeight]);
 
   // side effect to only start sending resize events when there are users
   // stops it from happening on the auth window
   useEffect(() => {
-    if (userCount > 0 && location.pathname !== "/settings") {
-      socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height: divHeight + 50 } });
+    if (users.length > 0 && location.pathname !== "/settings") {
+      socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height: divHeight + 68 } });
     }
-  }, [userCount, divHeight, location]);
+  }, [users.length, divHeight, location]);
 
   // side effect to route them to the list when authed
   useEffect(() => {

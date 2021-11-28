@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material";
+import { Typography, Button } from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect } from "react";
-import socketSerivce from "../services/socketService";
+import { CustomEvents } from "../constants/discord";
+import IconConsole from "@mui/icons-material/Code";
+import socketService from "../services/socketService";
 
 const PREFIX = "Settings";
 const classes = {
@@ -16,15 +18,15 @@ export const Root = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   flexDirection: "column",
-  height: "100vh",
+  height: 400,
   [`& .${classes.soonTM}`]: {
     color: "lime",
-  }
+  },
 }));
 
 const SettingsView = () => {
   useEffect(() => {
-    socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height:  400 } });
+    socketService.send({ evt: "WINDOW_RESIZE", data: { height: 500 } });
   }, []);
 
   return (
@@ -32,9 +34,15 @@ const SettingsView = () => {
       <Typography gutterBottom variant="h5" color="textPrimary">
         Settings
       </Typography>
+      <Typography gutterBottom variant="subtitle2" color="textPrimary">
+        Configure various settings for overlayed
+      </Typography>
 
-      <p className={classes.soonTM}>Coming soonTM</p>
-     
+      <div style={{ marginTop: "auto" }}>
+        <Button variant="contained" onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
+          <IconConsole color="secondary" /> Toggle Dev Tools
+        </Button>
+      </div>
     </Root>
   );
 };

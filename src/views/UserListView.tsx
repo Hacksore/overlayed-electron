@@ -28,7 +28,7 @@ const UserList = ({ setDivHeight }: { setDivHeight: Function }) => {
   useEffect(() => {
     const height: number = listRef?.current?.offsetHeight || 0;
     setDivHeight(height);
-  }, [users, setDivHeight]);
+  }, [users.length, setDivHeight]);
 
   return (
     <Root ref={listRef} className={classes.root}>

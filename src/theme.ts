@@ -1,7 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 
-const theme = createTheme({
-  spacing: 0,
+let theme = createTheme({
   palette: {
     background: {
       default: "#2C2F33",
@@ -22,6 +21,31 @@ const theme = createTheme({
       contrastText: "#000",
     },
   },
+});
+
+// overrides with access to the theme here  
+theme = createTheme(theme, {
+  spacing: 0,
+  components: {
+    MuiTooltip: {
+      styleOverrides: {
+        arrow: {
+          color: theme.palette.background.default,
+          "&::before": {
+            // apply to the border of the arrow
+            border: `1px solid #3a3a3a`,
+            backgroundColor: theme.palette.background.default,
+            boxSizing: "border-box",
+          },
+        },
+        tooltip: {
+          backgroundColor: theme.palette.background.default,
+          border: `1px solid #3a3a3a`,
+          fontSize: 20,
+        },
+      },
+    }
+  }, 
 });
 
 export { theme };

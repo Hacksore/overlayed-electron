@@ -1,6 +1,5 @@
 import { IconButton, Tooltip } from "@mui/material";
 import { darken } from "@mui/material/styles";
-import IconConsole from "@mui/icons-material/Code";
 import IconSettings from "@mui/icons-material/Settings";
 import IconHide from "@mui/icons-material/VisibilityOff";
 import IconBack from "@mui/icons-material/ArrowBack";
@@ -55,10 +54,14 @@ const Toolbar = () => {
   const getTitle = () => {
     if (channel && channel.name) {
       return channel.name;
+    } else if (!channel?.guild_id) {
+      return "Private Call"
     } else {
       return "Overlayed";
     }
   };
+
+  const isSettingsPage = location.pathname === "/settings";
 
   return (
     <Root clickThrough={clickThrough}>
@@ -71,6 +74,9 @@ const Toolbar = () => {
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          fontWeight: "bold",
+          // @ts-ignore
+          appRegion: "drag",
         }}
       >
         {getTitle()}
@@ -81,21 +87,15 @@ const Toolbar = () => {
           appRegion: "no-drag",
         }}
       >
-        {isAuthed && (
-          <Tooltip title="Enable clickthrough">
+        {(isAuthed && !isSettingsPage) && (
+          <Tooltip arrow title="Enable clickthrough">
             <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_CLICKTHROUGH })}>
               <IconHide color="secondary" />
             </IconButton>
           </Tooltip>
         )}
 
-        <Tooltip title="Console">
-          <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
-            <IconConsole color="secondary" />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title={location.pathname === "/list" ? "Settings" : "Go Back"}>
+        <Tooltip arrow title={location.pathname === "/list" ? "Settings" : "Go Back"}>
           <IconButton onClick={() => {
             if (location.pathname === "/list") {
               navigate("settings");

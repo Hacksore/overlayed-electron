@@ -1,9 +1,6 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { TooltipProps } from "@mui/material";
-
-///               V wat.jpg
-import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import Tooltip from "@mui/material/Tooltip";
 
 import { IUser } from "../types/user";
 import IconDeafend from "@mui/icons-material/HeadsetOff";
@@ -36,26 +33,6 @@ const Root = styled("div")(({ theme }) => ({
     alignItems: "flex-start",
     margin: "0 0 0 5px",
   }
-}));
-
-// note to self, this probably belongs on a cringe list somewhere
-const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.arrow}`]: {
-    color: theme.palette.background.default,
-    "&::before": {
-      // apply to the border of the arrow
-      border: `1px solid #3a3a3a`,
-      backgroundColor: theme.palette.background.default,
-      boxSizing: "border-box",
-    },
-  },
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.background.default,
-    border: `1px solid #3a3a3a`,
-    fontSize: 20,
-  },
 }));
 
 const RichToolTip = (props: IUser) => {
@@ -119,7 +96,7 @@ const UserItem = React.memo((props: IUser) => {
           color: getNameColor(),
         }}
       >
-        <StyledTooltip arrow title={<RichToolTip {...props} />}>
+        <Tooltip arrow title={<RichToolTip {...props} />}>
           <div
             style={{
               minWidth: "auto",
@@ -131,7 +108,8 @@ const UserItem = React.memo((props: IUser) => {
           >
             {username}
           </div>
-        </StyledTooltip>
+        </Tooltip>
+
         {shouldShowIcons && (
           <div style={{ marginLeft: 10, display: "flex", alignSelf: "self-end" }}>
             {(selfDeafened || deafened) && <IconDeafend style={{ color: muted || deafened ? "red" : "inherit" }} />}
