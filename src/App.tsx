@@ -20,6 +20,9 @@ declare global {
       send: Function;
       receive: Function;
       openInBrowser: Function;
+      openDirectory: Function;
+      platform: string;
+      home: string;
     };
   }
 }
@@ -37,7 +40,7 @@ function App() {
   // stops it from happening on the auth window
   useEffect(() => {
     if (users.length > 0 && location.pathname !== "/settings") {
-      socketSerivce.send({ evt: "WINDOW_RESIZE", data: { height: divHeight + 68 } });
+      socketSerivce.send({ event: "WINDOW_RESIZE", data: { height: divHeight + 68 } });
     }
   }, [users.length, divHeight, location]);
 

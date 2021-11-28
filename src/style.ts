@@ -6,4 +6,5 @@ export const Root = styled("div")(({ theme }) => ({
   fontFamily: "'Roboto', sans-serif",
   borderRadius: 8,
   userSelect: "none",
+  appRegion: "no-drag" 
 }));

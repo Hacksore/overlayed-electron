@@ -5,6 +5,7 @@ const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const ElectronStore = require("electron-store");
 const { LOGIN_URL } = require("./constants");
+const fs = require("fs");
 
 const PORT = 3000;
 
@@ -134,8 +135,15 @@ function createWindow() {
       toggleClickthrough();
     }
 
-    if (payload.evt === "WINDOW_RESIZE") {
+    if (payload.event === "WINDOW_RESIZE") {
       win.setSize(400, payload.data.height);
+    }
+
+    // Crude but works for now
+    if (payload.event === "LOGOUT") {
+      const appDir = app.getPath("userData");      
+      fs.writeFileSync(`${appDir}/config.json`, "{}");
+      app.quit();
     }
   });
 

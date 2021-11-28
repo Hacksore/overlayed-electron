@@ -17,4 +17,9 @@ contextBridge.exposeInMainWorld("electron", {
   openInBrowser: url => {
     shell.openExternal(url);
   },
+  openDirectory: url => {
+    shell.openPath(url);
+  },
+  platform: process.platform,
+  home: process.env.HOME
 });
