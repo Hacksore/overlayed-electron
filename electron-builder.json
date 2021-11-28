@@ -13,15 +13,30 @@
     "node_modules/**/*"
   ],
   "mac": {
-    "target": ["zip"],
+    "target": ["zip", "dmg"],
     "icon": "build/img/icon-mac.icns"
   },
   "win": {
-    "target": ["zip"],
+    "target": ["zip", "msi"],
     "icon": "build/img/icon.png"
   },
   "linux": {
     "target": ["zip"],
     "icon": "build/img/icon.png"
+  },
+  "dmg": {
+    "title": "${productName}-${version}",
+    "contents": [
+      {
+        "x": 100,
+        "y": 100
+      },
+      {
+        "x": 300,
+        "y": 100,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ]
   }
 }
