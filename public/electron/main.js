@@ -5,15 +5,16 @@ const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const ElectronStore = require("electron-store");
 const { LOGIN_URL } = require("./constants");
-const store = new ElectronStore();
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
+
+const store = new ElectronStore();
 const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
 const iconPath = `${__dirname}/img/${iconFile}`;
 
-let win;
-let authWin;
-let socketManager;
+let win = null;
+let authWin = null;
+let socketManager = null;
 let tray = null;
 
 // use this namespace to be able to pass by ref to other files
@@ -187,7 +188,7 @@ app
     tray = new Tray(trayIconPath);
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: "Always on top",
+        label: "Always on Top",
         click: () => {
           // TODO: Code this is duplicated from socket.js - needs some DRYing up
           overlayed.isPinned = !overlayed.isPinned;
@@ -201,6 +202,23 @@ app
             value: overlayed.isPinned,
           });
         },
+        type: "checkbox",
+      },
+      {
+        label: "Clickthrough",
+        type: "checkbox",
+        click: function () {
+          toggleClickthrough();
+        },
+      },
+      {
+        type: "separator",
+      },
+      {
+        label: "Help",
+        click: () => {
+          shell.openExternal("https://github.com/Hacksore/overlayed/issues");
+        },
       },
       {
         label: "Quit",
@@ -213,8 +231,7 @@ app
     tray.setToolTip("Overlayed");
     tray.setContextMenu(contextMenu);
 
-    tray.on("click", function (event) {
-    });
+    tray.on("click", function (event) {});
 
     // TODO: allow custom keybindings
     globalShortcut.register("Control+Shift+Space", toggleClickthrough);
