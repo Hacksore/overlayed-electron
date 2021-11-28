@@ -37,7 +37,7 @@ const UserList = ({ setDivHeight }: { setDivHeight: Function }) => {
           color="textPrimary"
           variant="h5"
         >
-          No users in channel
+          Join a voice channel
         </Typography>
       )}
 

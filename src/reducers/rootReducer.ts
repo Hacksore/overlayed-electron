@@ -95,13 +95,9 @@ export const appSlice = createSlice({
       // check for myself leaving a channel so that I can unsubscribe from the old channel      
       if (action.payload === state.profile?.id) {
         // unset channel
+        state.users = [];
         state.currentChannel = null;
-
-        // unsub old channel events
-        // TODO: do this on electron side
-        // socketSerivce.send({
-        //   evt: "UNSBUSCRIBE"
-        // })
+        return;
       }
 
       state.users = state.users.filter((item: IUser) => item.id !== action.payload);

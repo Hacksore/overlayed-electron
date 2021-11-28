@@ -51,11 +51,8 @@ const Toolbar = () => {
   const getTitle = () => {
     if (channel && channel.name) {
       return channel.name;
-    } else if (!channel && !isAuthed) {
+    } else {
       return "Overlayed";
-    } else if (!channel && isAuthed) {
-      // if they are authed but don't have a channel, then they are a private call
-      return "Private call";
     }
   };
 

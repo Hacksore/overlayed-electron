@@ -15,29 +15,29 @@
   "mac": {
     "target": ["dmg"],
     "icon": "build/img/icon-mac.icns",
-    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "entitlements": "./entitlements.mac.inherit.plist"
   },
   "win": {
     "target": ["msi"],
     "icon": "build/img/icon.png",
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
   },
   "linux": {
     "target": ["zip"],
     "icon": "build/img/icon.png",
-    "artifactName": "${productName}-${version}-${os}.${ext}"
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
   },
   "afterSign": "./afterSignHook.js",
   "dmg": {
     "title": "${productName}-${version}",
     "contents": [
       {
-        "x": 100,
+        "x": 200,
         "y": 100
       },
       {
-        "x": 300,
+        "x": 400,
         "y": 100,
         "type": "link",
         "path": "/Applications"

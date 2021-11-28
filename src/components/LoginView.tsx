@@ -44,7 +44,7 @@ export const Root = styled("div")(({ theme }) => ({
   },
 
   [`& a`]: {
-    color: lighten(theme.palette.primary.main, 0.2),
+    color: lighten(theme.palette.primary.main, 0.35),
   },
 }));
 
@@ -80,9 +80,9 @@ const LoginView = () => {
           <a
             onClick={(e) => {
               e.preventDefault();
-              window.electron.openInBrowser("https://overlayed.dev");
+              window.electron.openInBrowser("https://overlayed.dev/tos");
             }}
-            href="https://overlayed.dev"
+            href="https://overlayed.dev/tos"
           >
             Terms of Service
           </a>{" "}
@@ -90,9 +90,9 @@ const LoginView = () => {
           <a
             onClick={(e) => {
               e.preventDefault();
-              window.electron.openInBrowser("https://overlayed.dev");
+              window.electron.openInBrowser("https://overlayed.dev/privacy");
             }}
-            href="https://overlayed.dev"
+            href="https://overlayed.dev/privacy"
           >
             Privacy Policy
           </a>{" "}
