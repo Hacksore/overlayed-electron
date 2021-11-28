@@ -2,7 +2,7 @@ import { Dialog, Typography, Button, TextField, DialogContent, DialogActions, Di
 import { styled } from "@mui/system";
 import { useEffect, useState } from "react";
 import { CustomEvents } from "../constants/discord";
-import IconTrash from "@mui/icons-material/Delete";
+import IconLogout from "@mui/icons-material/Logout";
 import IconFolder from "@mui/icons-material/Folder";
 import socketService from "../services/socketService";
 import { useNavigate } from "react-router-dom";
@@ -86,7 +86,7 @@ const SettingsView = () => {
             setIsLogoutDialogOpen(true);
           }}
         >
-          <IconTrash classes={{ root: classes.buttonIcon }} /> Disconnect Discord Account
+          <IconLogout classes={{ root: classes.buttonIcon }} /> Disconnect Discord Account
         </Button>
       </div>
       <div className={classes.item}>
@@ -136,7 +136,7 @@ const SettingsView = () => {
             Cancel
           </Button>
           <Button variant="contained" color="error" onClick={() => socketService.send({ event: CustomEvents.LOGOUT })}>
-            Logout
+            Disconnect
           </Button>
         </DialogActions>
       </Dialog>
