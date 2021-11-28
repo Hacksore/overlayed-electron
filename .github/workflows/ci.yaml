@@ -24,4 +24,5 @@ jobs:
         run: npm run pack
       - uses: actions/upload-artifact@v2
         with:
+          name: "overlayed-unstable-${{ matrix.os }}"
           path: "dist/**/*.zip"

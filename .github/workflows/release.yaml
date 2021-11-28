@@ -19,11 +19,12 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "${{ env.NODE_VERSION }}"
-      - name: package
-        run: |
-          npm ci
-          npm run build
-          npm run pack
+      - name: Install deps
+        run: npm ci
+      - name: Build react
+        run: npm run build
+      - name: Package
+        run: npm run pack
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
