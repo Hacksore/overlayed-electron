@@ -131,7 +131,7 @@ class SocketManager {
     if (evt === "VOICE_CHANNEL_SELECT") {
       // attempt to unsub prior channel if found
       if (this.overlayed.lastChannelId) {
-        this.unsubscribeAllEvents(data.channel_id);
+        this.unsubscribeAllEvents(this.overlayed.lastChannelId);
       }
 
       this.client.send({ cmd: "GET_SELECTED_VOICE_CHANNEL", nonce: uuid() });
@@ -143,6 +143,11 @@ class SocketManager {
     // sub to channel events
     if (cmd === "GET_SELECTED_VOICE_CHANNEL" && data) {
       this.subscribeAllEvents(data.id);
+    } else if (cmd === "GET_SELECTED_VOICE_CHANNEL" && !data) {
+      // we dont have a channel so we must have left vc?
+      this.unsubscribeAllEvents(this.overlayed.lastChannelId);
+      this.overlayed.lastChannelId = null;
+      this.overlayed.curentChannelId = null;
     }
 
     // forward every packet from the socket to the client
