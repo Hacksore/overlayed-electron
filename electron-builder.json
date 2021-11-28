@@ -14,15 +14,18 @@
   ],
   "mac": {
     "target": ["dmg"],
-    "icon": "build/img/icon-mac.icns"
+    "icon": "build/img/icon-mac.icns",
+    "artifactName": "${productName}-${version}-${os}.${ext}"
   },
   "win": {
     "target": ["msi"],
-    "icon": "build/img/icon.png"
+    "icon": "build/img/icon.png",
+    "artifactName": "${productName}-${version}-${os}.${ext}"
   },
   "linux": {
     "target": ["zip"],
-    "icon": "build/img/icon.png"
+    "icon": "build/img/icon.png",
+    "artifactName": "${productName}-${version}-${os}.${ext}"
   },
   "dmg": {
     "title": "${productName}-${version}",
