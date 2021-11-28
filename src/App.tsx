@@ -47,7 +47,7 @@ function App() {
   // side effect to route them to the list when authed
   useEffect(() => {
     if (isAuthed && !userId) {
-      navigate("list");
+      navigate("/list");
     }
   }, [isAuthed, userId, navigate]);
 
@@ -55,7 +55,7 @@ function App() {
     <Root>
       <Toolbar />
       <Routes>
-        <Route path="/" element={<LoginView />} />
+        <Route path="/login" element={<LoginView />} />
         <Route path="/list" element={<UserListView setDivHeight={setDivHeight} />} />
         <Route path="/settings" element={<SettingsView />} />
       </Routes>

@@ -2,9 +2,13 @@ import { styled } from "@mui/material/styles";
 
 export const Root = styled("div")(({ theme }) => ({
   height: "100%",
-  boxSizing: "border-box",
+  // border: "4px solid rgba(0, 0, 0, 0)",
   fontFamily: "'Roboto', sans-serif",
-  borderRadius: 8,
   userSelect: "none",
-  appRegion: "no-drag" 
+  borderRadius: 10,
+  appRegion: "no-drag",
+  // "&:hover": {
+  //   borderColor: "#60d67d",
+  //   background: darken(theme.palette.secondary.main, 0.6)
+  // }
 }));

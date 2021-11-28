@@ -54,14 +54,30 @@ const Toolbar = () => {
   const getTitle = () => {
     if (channel && channel.name) {
       return channel.name;
-    } else if (!channel?.guild_id) {
-      return "Private Call"
+    } else if (!channel?.guild_id && isAuthed) {
+      return "Private Call";
     } else {
       return "Overlayed";
     }
   };
 
+  const isLoginPage = location.pathname === "/login";
   const isSettingsPage = location.pathname === "/settings";
+  const isListPage = location.pathname === "/list";
+
+  const getSettingsText = () => {
+    if (!isAuthed && isLoginPage) {
+      return "Settings";
+    } else if (!isAuthed && isSettingsPage) {
+      return "Go Back";
+    } else if (isAuthed && isListPage) {
+      return "Settings";
+    } else if (isAuthed && isSettingsPage) {
+      return "Go back";
+    }
+
+    return "Unknown";
+  };
 
   return (
     <Root clickThrough={clickThrough}>
@@ -87,23 +103,33 @@ const Toolbar = () => {
           appRegion: "no-drag",
         }}
       >
-        {(isAuthed && !isSettingsPage) && (
+        {!isSettingsPage && !isLoginPage && (
           <Tooltip arrow title="Enable clickthrough">
             <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_CLICKTHROUGH })}>
-              <IconHide color="secondary" />
+              <IconHide sx={{ color: "text.primary" }} />
             </IconButton>
           </Tooltip>
         )}
 
-        <Tooltip arrow title={location.pathname === "/list" ? "Settings" : "Go Back"}>
-          <IconButton onClick={() => {
-            if (location.pathname === "/list") {
-              navigate("settings");
-            } else {
-              navigate("list");
-            }
-          }}>
-            { location.pathname === "/list" ? <IconSettings color="secondary" /> : <IconBack color="secondary" /> }
+        <Tooltip arrow title={getSettingsText()}>
+          <IconButton
+            onClick={() => {
+              if (!isAuthed && isLoginPage) {
+                navigate("/settings");
+              } else if (!isAuthed && isSettingsPage) {
+                navigate("/login");
+              } else if (isAuthed && isListPage) {
+                navigate("/settings");
+              } else if (isAuthed && isSettingsPage) {
+                navigate("/list");
+              }
+            }}
+          >
+            {isListPage || isLoginPage ? (
+              <IconSettings sx={{ color: "text.primary" }} />
+            ) : (
+              <IconBack sx={{ color: "text.primary" }} />
+            )}
           </IconButton>
         </Tooltip>
       </div>

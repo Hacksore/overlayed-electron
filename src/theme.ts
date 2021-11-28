@@ -1,12 +1,13 @@
-import { createTheme } from "@mui/material/styles";
+import { darken, createTheme } from "@mui/material/styles";
 
 let theme = createTheme({
   palette: {
     background: {
       default: "#2C2F33",
+      paper: "#2C2F33",
     },
     error: {
-      main: "#f44336",
+      main: "#db5151",
     },
     primary: {
       main: "#5A65EA",
@@ -16,9 +17,12 @@ let theme = createTheme({
       primary: "#fff",
     },
     secondary: {
-      light: "#fff",
-      main: "#fff",
-      contrastText: "#000",
+      main: "#747474",
+      contrastText: "#fff",
+    },
+    action: {
+      disabled: "rgb(150, 150, 150)",
+      disabledBackground: darken("#5A65EA", 0.2),
     },
   },
 });

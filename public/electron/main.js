@@ -33,6 +33,9 @@ const overlayed = {
   isPinned: false,
 };
 
+// util method
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
 // make global
 const contextMenu = Menu.buildFromTemplate([
   {
@@ -136,7 +139,7 @@ function createWindow() {
     }
 
     if (payload.event === "WINDOW_RESIZE") {
-      win.setSize(400, payload.data.height);
+      win.setSize(400, clamp(payload.data.height, 100, 1400));
     }
 
     // Crude but works for now
@@ -147,7 +150,7 @@ function createWindow() {
     }
   });
 
-  win.loadURL(isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../index.html")}`);
+  win.loadURL(isDev ? `http://localhost:${PORT}#/login` : `file://${path.join(__dirname, "../index.html#/login")}`);
 }
 
 function createAuthWindow() {

@@ -1,11 +1,13 @@
-import { Typography, Button } from "@mui/material";
+import { Dialog, Typography, Button, TextField, DialogContent, DialogActions, DialogTitle } from "@mui/material";
 import { styled } from "@mui/system";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CustomEvents } from "../constants/discord";
-import IconConsole from "@mui/icons-material/Code";
 import IconTrash from "@mui/icons-material/Delete";
 import IconFolder from "@mui/icons-material/Folder";
 import socketService from "../services/socketService";
+import { useNavigate } from "react-router-dom";
+import { RootState } from "../store";
+import { useAppSelector } from "../hooks/redux";
 
 const PREFIX = "Settings";
 const classes = {
@@ -27,7 +29,7 @@ export const Root = styled("div")(({ theme }) => ({
     color: "lime",
   },
   [`& .${classes.item}`]: {
-    marginBottom: 10,
+    marginBottom: 16,
   },
   [`& .${classes.buttonIcon}`]: {
     marginRight: 10,
@@ -35,6 +37,11 @@ export const Root = styled("div")(({ theme }) => ({
 }));
 
 const SettingsView = () => {
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     socketService.send({ event: "WINDOW_RESIZE", data: { height: 500 } });
   }, []);
@@ -56,8 +63,8 @@ const SettingsView = () => {
 
             if (platform === "darwin") {
               appDir = `${home}/Library/Application Support/overlayed`;
-            } else if (platform === "win32") {              
-              appDir = `${home}/AppData/Local/overlayed`;            
+            } else if (platform === "win32") {
+              appDir = `${home}/AppData/Local/overlayed`;
             } else if (platform === "linux") {
               appDir = `${home}/.config`;
             }
@@ -65,28 +72,74 @@ const SettingsView = () => {
             window.electron.openDirectory(appDir);
           }}
         >
-          <IconFolder classes={{ root: classes.buttonIcon }} color="secondary" /> Open Config
+          <IconFolder classes={{ root: classes.buttonIcon }} /> Open Config
         </Button>
       </div>
       <div className={classes.item}>
         <Typography gutterBottom variant="body2" color="textPrimary">
-          Clear your logged into discord account
+          Disconnect the account you have authorized
         </Typography>
         <Button
+          disabled={!isAuthed}
           variant="contained"
           onClick={() => {
-            socketService.send({ event: CustomEvents.LOGOUT })
+            setIsLogoutDialogOpen(true);
           }}
         >
-          <IconTrash classes={{ root: classes.buttonIcon }} color="secondary" /> Logout of Discord
+          <IconTrash classes={{ root: classes.buttonIcon }} /> Disconnect Discord Account
         </Button>
+      </div>
+      <div className={classes.item}>
+        <Typography gutterBottom variant="body2" color="textPrimary">
+          Clickthrough Hotkey
+        </Typography>
+        <TextField variant="standard" color="info" focused value="Control+Shift+Space" />
+      </div>
+      <div className={classes.item}>
+        <Typography gutterBottom variant="body2" color="textPrimary">
+          Focus Hotkey
+        </Typography>
+        <TextField variant="standard" color="info" focused value="TBD" />
       </div>
 
       <div style={{ marginTop: "auto", marginLeft: "auto" }}>
-        <Button variant="contained" onClick={() => socketService.send({ event: CustomEvents.TOGGLE_DEVTOOLS })}>
-          <IconConsole classes={{ root: classes.buttonIcon }} color="secondary" /> Toggle Dev Tools
+        <Button style={{ marginRight: 6 }} color="secondary" variant="contained" onClick={() =>  {
+          !isAuthed ? navigate("/login") : navigate("/list");
+        }}>
+          Cancel
+        </Button>
+        <Button
+          color="primary"
+          variant="contained"
+          disabled
+          onClick={() => {
+            // TODO: save config to file
+          }}
+        >
+          Save
         </Button>
       </div>
+
+      <Dialog open={isLogoutDialogOpen}>
+        <DialogTitle>Disconnect Discord Account</DialogTitle>
+        <DialogContent>
+          <Typography gutterBottom variant="subtitle2" color="textPrimary">
+            Are you sure you want to disconnect your Discord account? This will quit Overlayed and you must restart it.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setIsLogoutDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="contained" color="error" onClick={() => socketService.send({ event: CustomEvents.LOGOUT })}>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Root>
   );
 };

@@ -4,7 +4,7 @@ import { IUser } from "../types/user";
 import { RootState } from "../store";
 import { useAppSelector } from "../hooks/redux";
 import { Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, darken } from "@mui/system";
 
 const PREFIX = "UserList";
 const classes = {
@@ -13,11 +13,22 @@ const classes = {
 
 const Root = styled("div")(({ theme }) => ({
   [`&.${classes.root}`]: {
-    padding: "6px 12px 6px 12px",
-    marginTop: 8,
-    // maxHeight: 600,
-    // overflowY: "auto",
-    // TODO: figure out how to make this a bit more dynamic
+    padding: "0 12px 6px 12px",
+    maxHeight: 980,
+    overflowY: "auto",
+    "::-webkit-scrollbar": {
+      width: 10,
+    },
+    "::-webkit-scrollbar-track": {
+      background: "rgba(0, 0, 0, 0.3)"
+    },
+    "::-webkit-scrollbar-thumb": {
+      background: darken(theme.palette.secondary.main, 0.6),
+      borderRadius: 10  
+    },
+    "::-webkit-scrollbar-thumb:hover": {
+      background: darken(theme.palette.secondary.main, 0.4)
+    }
   },
 }));
 
