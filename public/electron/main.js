@@ -32,6 +32,50 @@ const overlayed = {
   isPinned: false,
 };
 
+// make global
+const contextMenu = Menu.buildFromTemplate([
+  {
+    label: "Always on Top",
+    click: () => {
+      // TODO: Code this is duplicated from socket.js - needs some DRYing up
+      overlayed.isPinned = !overlayed.isPinned;
+
+      win.setAlwaysOnTop(overlayed.isPinned, "floating");
+      win.setVisibleOnAllWorkspaces(true);
+      win.setFullScreenable(false);
+
+      socketManager.sendElectronMessage({
+        evt: "PINNED_STATUS",
+        value: overlayed.isPinned,
+      });
+    },
+    type: "checkbox",
+  },
+  {
+    label: "Clickthrough",
+    type: "checkbox",
+    click: function () {
+      toggleClickthrough();
+    },
+  },
+  {
+    type: "separator",
+  },
+  {
+    label: "Help",
+    click: () => {
+      shell.openExternal("https://github.com/Hacksore/overlayed/issues");
+    },
+  },
+  {
+    label: "Quit",
+    click: function () {
+      app.isQuiting = true;
+      app.quit();
+    },
+  },
+]);
+
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
@@ -177,6 +221,9 @@ function toggleClickthrough() {
 
   // enableing click through
   win.setIgnoreMouseEvents(overlayed.clickThrough);
+
+  // update the state for the menu item
+  contextMenu.items[1].checked = overlayed.clickThrough;
 }
 
 app
@@ -186,48 +233,7 @@ app
     const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
     const trayIconPath = path.resolve(`${__dirname}/../img/trayicon-${trayIconTheme}.png`);
     tray = new Tray(trayIconPath);
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Always on Top",
-        click: () => {
-          // TODO: Code this is duplicated from socket.js - needs some DRYing up
-          overlayed.isPinned = !overlayed.isPinned;
 
-          win.setAlwaysOnTop(overlayed.isPinned, "floating");
-          win.setVisibleOnAllWorkspaces(true);
-          win.setFullScreenable(false);
-
-          socketManager.sendElectronMessage({
-            evt: "PINNED_STATUS",
-            value: overlayed.isPinned,
-          });
-        },
-        type: "checkbox",
-      },
-      {
-        label: "Clickthrough",
-        type: "checkbox",
-        click: function () {
-          toggleClickthrough();
-        },
-      },
-      {
-        type: "separator",
-      },
-      {
-        label: "Help",
-        click: () => {
-          shell.openExternal("https://github.com/Hacksore/overlayed/issues");
-        },
-      },
-      {
-        label: "Quit",
-        click: function () {
-          app.isQuiting = true;
-          app.quit();
-        },
-      },
-    ]);
     tray.setToolTip("Overlayed");
     tray.setContextMenu(contextMenu);
 
