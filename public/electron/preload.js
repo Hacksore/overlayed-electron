@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld("electron", {
       ipcRenderer.on(channel, (_, ...args) => func(...args));
     }
   },
-  openInBrowser: (url) => {
+  openInBrowser: url => {
     shell.openExternal(url);
   },
 });

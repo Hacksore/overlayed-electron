@@ -60,9 +60,9 @@ class SocketManager {
       console.log("error with rpc", error);
     });
 
-    this.client.on("close", (error) => {
+    this.client.on("close", error => {
       console.log("ipc closed connection", error);
-    })
+    });
 
     this.client.on("message", this.onDiscordMessage.bind(this));
   }
