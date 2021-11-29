@@ -68,8 +68,14 @@ class SocketManager {
       console.log("error with rpc", error);
     });
 
-    this.client.on("close", error => {
-      console.log("ipc closed connection", error);
+    this.client.on("disconnected", () => {
+      console.log("lost connection to discord");
+
+      // tell frontend we are disconnected
+      this.sendElectronMessage({
+        evt: "DISCONNECTED_FROM_DISCORD",
+      });
+
     });
 
     this.client.on("message", this.onDiscordMessage.bind(this));

@@ -19,7 +19,6 @@ export const store = configureStore({
     if (!isProd) {
       middleware.concat(logger);
     }
-
     return middleware;
   }
 });

@@ -31,6 +31,7 @@ declare global {
 function App() {
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const users = useAppSelector((state: RootState) => state.root.users);
+  const isReady = useAppSelector((state: RootState) => state.root.isReady);
   const userId = useAppSelector((state: RootState) => state.root.profile?.id);
 
   const [divHeight, setDivHeight] = useState<number>(0);
@@ -50,7 +51,15 @@ function App() {
     if (isAuthed && !userId) {
       navigate("/list");
     }
-  }, [isAuthed, userId, navigate]);
+
+    // if they lose connection to discord, route them to the connection failed view
+    if (!isAuthed && !isReady) {
+      navigate("/failed");
+    }
+
+  }, [isAuthed, userId, isReady, navigate]);
+
+
 
   return (
     <Root>

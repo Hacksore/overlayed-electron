@@ -46,10 +46,18 @@ class IPCSocketService extends EventEmitter {
   onMessage(message: any) {
     const packet = JSON.parse(message);
     const { evt, cmd = null, data } = packet;
+    console.log(packet);
 
     // if discord running send ready msg
     if (evt === "DISCORD_RUNNING") {
       this.send({ evt: "I_AM_READY" });
+    }
+
+    // if has lost connection to discord
+    if (evt === "DISCONNECTED_FROM_DISCORD") {
+      store.dispatch(setIsAuthed(false));
+      store.dispatch(setReadyState(false));
+      store.dispatch(setProfile(null));
     }
 
     // we get any ready data from main process

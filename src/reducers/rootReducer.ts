@@ -60,7 +60,7 @@ export const appSlice = createSlice({
     setCurrentVoiceChannel: (state, action: PayloadAction<any>) => {
       state.currentChannel = action.payload;
     },
-    setProfile: (state, action: PayloadAction<IUserProfile>) => {
+    setProfile: (state, action: PayloadAction<IUserProfile|null>) => {
       state.profile = action.payload;
     },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
