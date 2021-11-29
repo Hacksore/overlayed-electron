@@ -47,6 +47,11 @@ class IPCSocketService extends EventEmitter {
     const packet = JSON.parse(message);
     const { evt, cmd = null, data } = packet;
 
+    // if discord running send ready msg
+    if (evt === "DISCORD_RUNNING") {
+      this.send({ evt: "I_AM_READY" });
+    }
+
     // we get any ready data from main process
     if (evt === CustomEvents.READY) {
       store.dispatch(setIsAuthed(true));

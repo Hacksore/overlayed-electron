@@ -6,8 +6,11 @@ const SocketManager = require("./socket");
 const ElectronStore = require("electron-store");
 const { LOGIN_URL } = require("./constants");
 const fs = require("fs");
+const { isDiscordRunning } = require("./util");
 
+// Base URL for the app
 const PORT = 3000;
+const APP_BASE_URL = isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../index.html")}`;
 
 const store = new ElectronStore();
 const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
@@ -66,6 +69,12 @@ const contextMenu = Menu.buildFromTemplate([
     type: "separator",
   },
   {
+    label: "Toggle Devtools",
+    click: function () {
+      win.webContents.openDevTools();
+    },
+  },
+  {
     label: "Help",
     click: () => {
       shell.openExternal("https://github.com/Hacksore/overlayed/issues");
@@ -80,7 +89,7 @@ const contextMenu = Menu.buildFromTemplate([
   },
 ]);
 
-function createWindow() {
+async function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 400,
@@ -106,9 +115,16 @@ function createWindow() {
   });
 
   // load socket manager to handle all IPC and socket events
-  ipcMain.on("toMain", (_, msg) => {
+  ipcMain.on("toMain", async (_, msg) => {
     const payload = JSON.parse(msg);
+    
     socketManager.onElectronMessage(msg);
+
+    // TODO: this needs to be implemented
+    // setup some ping to the client so we cant later on detect when it's not running
+    // setInterval(() => {
+      // socketManager.client.transport.ping();    
+    // }, 5000);
 
     // check if we got told to open auth window
     if (payload.evt === "LOGIN") {
@@ -144,13 +160,29 @@ function createWindow() {
 
     // Crude but works for now
     if (payload.event === "LOGOUT") {
-      const appDir = app.getPath("userData");      
+      const appDir = app.getPath("userData");
       fs.writeFileSync(`${appDir}/config.json`, "{}");
       app.quit();
     }
+
+    // check for discord to be running
+    if (payload.event === "CHECK_FOR_DISCORD") {
+      // first thing is test if discord is running and if not make sure they visit a new page
+      const isClientRunning = await isDiscordRunning();
+
+      if (isClientRunning) {
+        socketManager.sendElectronMessage({
+          evt: "DISCORD_RUNNING",
+        });
+      }
+    }
   });
 
-  win.loadURL(isDev ? `http://localhost:${PORT}#/login` : `file://${path.join(__dirname, "../index.html#/login")}`);
+  // first thing is test if discord is running and if not make sure they visit a new page
+  const isClientRunning = await isDiscordRunning();
+  const appPath = isClientRunning ? "login" : "failed";
+  win.loadURL(`${APP_BASE_URL}#/${appPath}`);
+
 }
 
 function createAuthWindow() {

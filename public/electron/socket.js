@@ -1,15 +1,9 @@
 const RPC = require("@hacksore/discord-rpc");
 
+const { uuid } = require("./util");
+
 // The overlayed prod client id
 const CLIENT_ID = "905987126099836938";
-
-function uuid() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
 
 // Events that we want to sub/unsub from
 const SUBSCRIBABLE_EVENTS = [
@@ -30,8 +24,19 @@ class SocketManager {
     this.overlayed = overlayed;
     this.client = new RPC.Client({ transport: "ipc" });
   }
+  
+  /**
+   * Destory the connected client first then create a new one
+   */
+  resetClient() {
+    this.client.destroy();
+    this.client = new RPC.Client({ transport: "ipc" });
+  }
 
   setupListeners() {
+    // Try and close the connection first before reconnecting
+    this.resetClient();
+
     this.client.on("ready", async () => {
       // sub to voice channel changes
       this.client.subscribe("VOICE_CHANNEL_SELECT");
@@ -46,6 +51,9 @@ class SocketManager {
           profile: this.client.user,
         },
       });
+
+      // tell the main proc we are ready
+      this._win.webContents.send("toMain", { event: "CONNECTED_TO_DISCORD" });
     });
 
     // Log in to RPC with client id

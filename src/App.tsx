@@ -9,6 +9,7 @@ import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 
 import socketSerivce from "./services/socketService";
 import { useEffect, useState } from "react";
+import ConnectionFailedView from "./views/ConnectionFailedView";
 
 // init socket service, no need for a hook
 socketSerivce.init();
@@ -58,6 +59,7 @@ function App() {
         <Route path="/login" element={<LoginView />} />
         <Route path="/list" element={<UserListView setDivHeight={setDivHeight} />} />
         <Route path="/settings" element={<SettingsView />} />
+        <Route path="/failed" element={<ConnectionFailedView />} />
       </Routes>
     </Root>
   );
