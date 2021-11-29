@@ -9,7 +9,7 @@ env:
 
 jobs:
   build-mac:
-    runs-on: "macos-11"
+    runs-on: "macos-latest"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -20,7 +20,7 @@ jobs:
       - name: Build react
         run: npm run build
       - name: Package
-        run: npm run pack:macos
+        run: npm run pack
       - uses: actions/upload-artifact@v2
         with:
           name: "overlayed-unstable-mac"

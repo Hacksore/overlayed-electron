@@ -25,7 +25,7 @@ jobs:
       - name: Build react
         run: npm run build
       - name: Package
-        run: npm run pack:macos
+        run: npm run pack
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
