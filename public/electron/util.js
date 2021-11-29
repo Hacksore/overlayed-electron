@@ -1,9 +1,20 @@
 const net = require("net");
-const basePath = "\\\\?\\pipe\\discord-ipc";
+
+// TODO: just export this from the rpc lib
+function getIPCPath(id) {
+  if (process.platform === "win32") {
+    return `\\\\?\\pipe\\discord-ipc-${id}`;
+  }
+  const {
+    env: { XDG_RUNTIME_DIR, TMPDIR, TMP, TEMP },
+  } = process;
+  const prefix = XDG_RUNTIME_DIR || TMPDIR || TMP || TEMP || "/tmp";
+  return `${prefix.replace(/\/$/, "")}/discord-ipc-${id}`;
+}
 
 function testSocketConnection(id) {
   return new Promise((resolve, reject) => {
-    const sock = net.createConnection(`${basePath}-${id}`, () => {
+    const sock = net.createConnection(getIPCPath(id), () => {
       resolve(`connected to discord @ index ${id}`);
       sock.end();
     });

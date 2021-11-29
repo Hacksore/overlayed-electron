@@ -54,7 +54,7 @@ const Toolbar = () => {
   const getTitle = () => {
     if (channel && channel.name) {
       return channel.name;
-    } else if (!channel?.guild_id && isAuthed) {
+    } else if (channel && !channel?.guild_id && isAuthed) {
       return "Private Call";
     } else {
       return "Overlayed";

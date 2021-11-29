@@ -7,6 +7,8 @@ export const Root = styled("div")(({ theme }) => ({
   padding: 16,
   background: theme.palette.background.default,
   color: theme.palette.primary.contrastText,
+  borderBottomLeftRadius: 6,
+  borderBottomRightRadius: 6,
   display: "flex",
   alignItems: "center",
   flexDirection: "column",

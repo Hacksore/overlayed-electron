@@ -18,7 +18,8 @@ export const Root = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   flexDirection: "column",
-
+  borderBottomLeftRadius: 6,
+  borderBottomRightRadius: 6,
   [`& .${classes.instructions}`]: {
     [`& div`]: {
       margin: "10px 0 10px 0",

@@ -3,7 +3,7 @@ import UserItem from "../components/UserItem";
 import { IUser } from "../types/user";
 import { RootState } from "../store";
 import { useAppSelector } from "../hooks/redux";
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import { styled, darken } from "@mui/system";
 
 const PREFIX = "UserList";
@@ -20,15 +20,15 @@ const Root = styled("div")(({ theme }) => ({
       width: 10,
     },
     "::-webkit-scrollbar-track": {
-      background: "rgba(0, 0, 0, 0.3)"
+      background: "rgba(0, 0, 0, 0.3)",
     },
     "::-webkit-scrollbar-thumb": {
       background: darken(theme.palette.secondary.main, 0.6),
-      borderRadius: 10  
+      borderRadius: 10,
     },
     "::-webkit-scrollbar-thumb:hover": {
-      background: darken(theme.palette.secondary.main, 0.4)
-    }
+      background: darken(theme.palette.secondary.main, 0.4),
+    },
   },
 }));
 
@@ -44,12 +44,14 @@ const UserList = ({ setDivHeight }: { setDivHeight: Function }) => {
   return (
     <Root ref={listRef} className={classes.root}>
       {users.length <= 0 && (
-        <Typography
-          color="textPrimary"
-          variant="h5"
-        >
-          Join a voice channel
-        </Typography>
+        <Box sx={{ pt: 1, pb: 1 }}>
+          <Typography color="textPrimary" variant="h5">
+            No Voice Chat 🙉
+          </Typography>
+          <Typography color="textPrimary" variant="body1">
+            Join a voice chat to display users
+          </Typography>
+        </Box>
       )}
 
       {users.map((item: IUser) => (

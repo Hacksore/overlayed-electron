@@ -22,7 +22,8 @@ export const Root = styled("div")(({ theme }) => ({
   background: theme.palette.background.default,
   color: theme.palette.primary.contrastText,
   display: "flex",
-  // alignItems: "center",
+  borderBottomLeftRadius: 6,
+  borderBottomRightRadius: 6,
   flexDirection: "column",
   height: 400,
   [`& .${classes.soonTM}`]: {
