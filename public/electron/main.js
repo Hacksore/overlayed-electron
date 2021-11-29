@@ -117,8 +117,6 @@ async function createWindow() {
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", async (_, msg) => {
     const payload = JSON.parse(msg);
-
-    console.log(payload);
     
     socketManager.onElectronMessage(msg);
 
@@ -172,7 +170,6 @@ async function createWindow() {
       // first thing is test if discord is running and if not make sure they visit a new page
       const isClientRunning = await isDiscordRunning();
 
-      console.log("isClientRunning", isClientRunning);
       if (isClientRunning) {
         socketManager.sendElectronMessage({
           evt: "DISCORD_RUNNING",
