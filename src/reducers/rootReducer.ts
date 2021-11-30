@@ -12,6 +12,7 @@ export interface AppState {
   isPinned: boolean;
   isAuthed: boolean;
   clickThrough: boolean;
+  currentRoute: string | null;
 }
 
 const initialState: AppState = {
@@ -23,6 +24,7 @@ const initialState: AppState = {
   isPinned: false,
   isAuthed: false,
   clickThrough: false,
+  currentRoute: null,
 };
 
 const createUserStateItem = (payload: IDiscordUser) => ({
@@ -44,10 +46,14 @@ const createUserStateItem = (payload: IDiscordUser) => ({
 });
 
 // TODO: we could move this user stuff to a seperate reducer
+// This thing is a bit out of controll now and does need some splitting up
 export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
+    setCurrentRoute: (state, action: PayloadAction<string>) => {
+      state.currentRoute = action.payload;
+    },
     setClickThrough: (state, action: PayloadAction<boolean>) => {
       state.clickThrough = action.payload;
     },
@@ -60,7 +66,7 @@ export const appSlice = createSlice({
     setCurrentVoiceChannel: (state, action: PayloadAction<any>) => {
       state.currentChannel = action.payload;
     },
-    setProfile: (state, action: PayloadAction<IUserProfile|null>) => {
+    setProfile: (state, action: PayloadAction<IUserProfile | null>) => {
       state.profile = action.payload;
     },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
@@ -85,14 +91,14 @@ export const appSlice = createSlice({
       // TODO: this can't be the right place in the array?
       const item = action.payload;
       // dont any anyone already in the state?
-      if (state.users.find((user) => user.id === item.user.id)) {
+      if (state.users.find(user => user.id === item.user.id)) {
         return;
-      };
+      }
 
       state.users.push(createUserStateItem(item));
     },
     removeUser: (state, action: PayloadAction<string>) => {
-      // check for myself leaving a channel so that I can unsubscribe from the old channel      
+      // check for myself leaving a channel so that I can unsubscribe from the old channel
       if (action.payload === state.profile?.id) {
         // unset channel
         state.users = [];
@@ -103,7 +109,7 @@ export const appSlice = createSlice({
       state.users = state.users.filter((item: IUser) => item.id !== action.payload);
     },
     updateUser: (state, action: PayloadAction<IDiscordUser>) => {
-      // don't get updates yet until the client is read
+      // don't get updates yet until the client is ready
       if (!state.isReady) {
         return;
       }

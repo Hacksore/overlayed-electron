@@ -29,10 +29,8 @@ declare global {
 }
 
 function App() {
-  const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const users = useAppSelector((state: RootState) => state.root.users);
-  const isReady = useAppSelector((state: RootState) => state.root.isReady);
-  const userId = useAppSelector((state: RootState) => state.root.profile?.id);
+  const currentRoute = useAppSelector((state: RootState) => state.root.currentRoute);
 
   const [divHeight, setDivHeight] = useState<number>(0);
   const navigate = useNavigate();
@@ -46,20 +44,13 @@ function App() {
     }
   }, [users.length, divHeight, location]);
 
-  // side effect to route them to the list when authed
+  // this side effect allows us to control the route outside of a react comp
   useEffect(() => {
-    if (isAuthed && !userId) {
-      navigate("/list");
+    if (currentRoute && currentRoute !== location.pathname) {
+      // @ts-ignore
+      navigate(currentRoute);
     }
-
-    // if they lose connection to discord, route them to the connection failed view
-    if (!isAuthed && !isReady) {
-      navigate("/failed");
-    }
-
-  }, [isAuthed, userId, isReady, navigate]);
-
-
+  }, [currentRoute, location.pathname, navigate]);
 
   return (
     <Root>

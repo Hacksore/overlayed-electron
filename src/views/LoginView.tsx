@@ -1,5 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import { styled, lighten } from "@mui/system";
+import { useEffect } from "react";
 import socketService from "../services/socketService";
 
 const PREFIX = "LoginView";
@@ -50,6 +51,11 @@ export const Root = styled("div")(({ theme }) => ({
 }));
 
 const LoginView = () => {
+  // TODO: this could be a custom hook as it's use in a few  comps
+  useEffect(() => {
+    socketService.send({ event: "WINDOW_RESIZE", data: { height: 350 } });
+  }, []);
+
   return (
     <Root>
       <Typography gutterBottom variant="h4" color="textPrimary">
@@ -79,7 +85,7 @@ const LoginView = () => {
         <Typography variant="body2" color="textPrimary">
           Click “Sign In” to agree to Overlayed{" "}
           <a
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               window.electron.openInBrowser("https://overlayed.dev/tos");
             }}
@@ -89,7 +95,7 @@ const LoginView = () => {
           </a>{" "}
           and acknowledge that Overlayed{" "}
           <a
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               window.electron.openInBrowser("https://overlayed.dev/privacy");
             }}

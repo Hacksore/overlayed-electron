@@ -15,6 +15,7 @@ const {
   setProfile,
   setClickThrough,
   setCurrentVoiceChannel,
+  setCurrentRoute,
 } = appSlice.actions;
 
 let instance;
@@ -54,9 +55,15 @@ class IPCSocketService extends EventEmitter {
 
     // if has lost connection to discord
     if (evt === "DISCONNECTED_FROM_DISCORD") {
+      // reset vars
       store.dispatch(setIsAuthed(false));
       store.dispatch(setReadyState(false));
       store.dispatch(setProfile(null));
+      store.dispatch(setCurrentVoiceChannel(null));
+      store.dispatch(setAppUsers([]));
+
+      // set route
+      store.dispatch(setCurrentRoute("/failed"));
     }
 
     // we get any ready data from main process
@@ -64,6 +71,9 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(setIsAuthed(true));
       store.dispatch(setReadyState(true));
       store.dispatch(setProfile(data.profile));
+
+      // set route
+      store.dispatch(setCurrentRoute("/list"));
     }
 
     // electron did the work for us and got a token ;)

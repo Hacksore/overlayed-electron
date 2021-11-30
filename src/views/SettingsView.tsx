@@ -104,9 +104,14 @@ const SettingsView = () => {
       </div>
 
       <div style={{ marginTop: "auto", marginLeft: "auto" }}>
-        <Button style={{ marginRight: 6 }} color="secondary" variant="contained" onClick={() =>  {
-          !isAuthed ? navigate("/login") : navigate("/list");
-        }}>
+        <Button
+          style={{ marginRight: 6 }}
+          color="secondary"
+          variant="contained"
+          onClick={() => {
+            !isAuthed ? navigate("/login") : navigate("/list");
+          }}
+        >
           Cancel
         </Button>
         <Button
@@ -129,11 +134,7 @@ const SettingsView = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setIsLogoutDialogOpen(false)}
-          >
+          <Button variant="contained" color="secondary" onClick={() => setIsLogoutDialogOpen(false)}>
             Cancel
           </Button>
           <Button variant="contained" color="error" onClick={() => socketService.send({ event: CustomEvents.LOGOUT })}>

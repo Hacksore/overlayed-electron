@@ -12,6 +12,7 @@ export const Root = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   flexDirection: "column",
+  height: 400,
 }));
 
 const ConnectionFailedView = () => {
