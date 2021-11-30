@@ -68,6 +68,10 @@ class SocketManager {
       console.log("error with rpc", error);
     });
 
+    this.client.on("close", () => {
+      console.log("Close event");
+    });
+    
     this.client.on("disconnected", () => {
       console.log("lost connection to discord");
 

@@ -6,10 +6,8 @@ import IconLogout from "@mui/icons-material/Logout";
 import IconFolder from "@mui/icons-material/Folder";
 import socketService from "../services/socketService";
 import { RootState } from "../store";
-import { useAppSelector, useHistoryDispatch } from "../hooks/redux";
-import { historySlice } from "../reducers/historyReducer";
-
-const { setCurrentRoute } = historySlice.actions;
+import { useAppSelector } from "../hooks/redux";
+import { useNavigate } from "react-router-dom";
 
 const PREFIX = "Settings";
 const classes = {
@@ -42,8 +40,7 @@ export const Root = styled("div")(({ theme }) => ({
 const SettingsView = () => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
-  const dispatch = useHistoryDispatch();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     socketService.send({ event: "WINDOW_RESIZE", data: { height: 500 } });
@@ -111,11 +108,12 @@ const SettingsView = () => {
           color="secondary"
           variant="contained"
           onClick={() => {
-            if (isAuthed) {
-              dispatch(setCurrentRoute("/list"));
-            } else {
-              dispatch(setCurrentRoute("/login"));
-            }
+            navigate(-1);
+            // if (isAuthed) {
+            //   dispatch(setCurrentRoute("/list"));
+            // } else {
+            //   dispatch(setCurrentRoute("/login"));
+            // }
           }}
         >
           Cancel

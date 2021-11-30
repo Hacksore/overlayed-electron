@@ -1,7 +1,6 @@
 import { EventEmitter } from "events";
 import { store } from "../store";
 import { appSlice } from "../reducers/rootReducer";
-import { historySlice } from "../reducers/historyReducer";
 import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";
 const {
   updateUser,
@@ -17,20 +16,21 @@ const {
   setCurrentVoiceChannel,
 } = appSlice.actions;
 
-const { setCurrentRoute } = historySlice.actions;
-
 let instance;
 
 // this lets us send messages back to the main electron process who also holds the discord socket
 class IPCSocketService extends EventEmitter {
+  private navigate: any;
+
   constructor() {
     super();
 
     window.electron.receive("fromMain", this.onMessage.bind(this));
   }
 
-  init() {
+  init(nagivate: any) {
     this.send({ evt: "I_AM_READY" });
+    this.navigate = nagivate;
   }
 
   /**
@@ -64,7 +64,7 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(setAppUsers([]));
 
       // set route
-      store.dispatch(setCurrentRoute("/failed"));
+      this.navigate("/failed");
     }
 
     // we get any ready data from main process
@@ -74,7 +74,8 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(setProfile(data.profile));
 
       // set route
-      store.dispatch(setCurrentRoute("/list"));
+      this.navigate("/list");
+
     }
 
     // electron did the work for us and got a token ;)

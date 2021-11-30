@@ -2,15 +2,12 @@ import { IconButton, Tooltip } from "@mui/material";
 import { darken } from "@mui/material/styles";
 import IconSettings from "@mui/icons-material/Settings";
 import IconHide from "@mui/icons-material/VisibilityOff";
-import { useAppSelector, useHistoryDispatch } from "../hooks/redux";
+import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
 import socketService from "../services/socketService";
 import { CustomEvents } from "../constants/discord";
-import { useLocation } from "react-router-dom";
-import { historySlice } from "../reducers/historyReducer";
-
-const { setCurrentRoute } = historySlice.actions;
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PREFIX = "Toolbar";
 const classes = {
@@ -52,7 +49,7 @@ const Toolbar = () => {
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
   const location = useLocation();
-  const dispatch = useHistoryDispatch();
+  const navigate = useNavigate();
 
   const isLoginPage = location.pathname === "/login";
   const isSettingsPage = location.pathname === "/settings";
@@ -112,8 +109,7 @@ const Toolbar = () => {
           <Tooltip arrow title={getSettingsText()}>
             <IconButton
               onClick={() => {
-                dispatch(setCurrentRoute("/settings"));
-                
+                navigate("/settings");
               }}
             >
               <IconSettings sx={{ color: "text.primary" }} />

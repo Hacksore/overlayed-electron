@@ -5,7 +5,7 @@
   "author": "Hacksore",
   "private": true,
   "dependencies": {
-    "@hacksore/discord-rpc": "^5.0.0-alpha1",
+    "@hacksore/discord-rpc": "^5.0.0-beta1",
     "@reduxjs/toolkit": "^1.6.2",
     "@types/react-router-dom": "^5.3.2",
     "electron-is-dev": "^2.0.0",

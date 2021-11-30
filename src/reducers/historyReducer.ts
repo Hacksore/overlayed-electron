@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// TODO: this is already setup just repurpose as history in redux was bad idea
+// and we solved that be a ref to the socket class
 export interface HistoryState {
   currentRoute: string | null;
 }
