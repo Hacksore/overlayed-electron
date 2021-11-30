@@ -221,10 +221,8 @@ function createAuthWindow() {
         `);
       } else {
         dialog.showMessageBox(win, {
-          message: "Something went wrong authenticating, you might not have access!",
+          message: "Something went wrong authenticating, you might not have access! error: " + details.url,
         });
-
-        shell.openExternal("https://github.com/Hacksore/overlayed/issues/2");
 
         authWin.close();
         authWin = null;
