@@ -174,6 +174,10 @@ async function createWindow() {
         socketManager.sendElectronMessage({
           evt: "DISCORD_RUNNING",
         });
+      } else {
+        socketManager.sendElectronMessage({
+          evt: "DISCONNECTED_FROM_DISCORD",
+        });
       }
     }
   });

@@ -12,7 +12,6 @@ export interface AppState {
   isPinned: boolean;
   isAuthed: boolean;
   clickThrough: boolean;
-  currentRoute: string | null;
 }
 
 const initialState: AppState = {
@@ -23,9 +22,7 @@ const initialState: AppState = {
   isReady: false,
   isPinned: false,
   isAuthed: false,
-  clickThrough: false,
-  currentRoute: null,
-};
+  clickThrough: false,};
 
 const createUserStateItem = (payload: IDiscordUser) => ({
   username: payload.nick,
@@ -51,9 +48,6 @@ export const appSlice = createSlice({
   name: "root",
   initialState,
   reducers: {
-    setCurrentRoute: (state, action: PayloadAction<string>) => {
-      state.currentRoute = action.payload;
-    },
     setClickThrough: (state, action: PayloadAction<boolean>) => {
       state.clickThrough = action.payload;
     },

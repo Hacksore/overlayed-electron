@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
 import { store } from "../store";
 import { appSlice } from "../reducers/rootReducer";
+import { historySlice } from "../reducers/historyReducer";
 import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";
-
 const {
   updateUser,
   removeUser,
@@ -15,8 +15,9 @@ const {
   setProfile,
   setClickThrough,
   setCurrentVoiceChannel,
-  setCurrentRoute,
 } = appSlice.actions;
+
+const { setCurrentRoute } = historySlice.actions;
 
 let instance;
 

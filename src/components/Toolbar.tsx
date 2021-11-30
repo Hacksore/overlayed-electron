@@ -2,13 +2,15 @@ import { IconButton, Tooltip } from "@mui/material";
 import { darken } from "@mui/material/styles";
 import IconSettings from "@mui/icons-material/Settings";
 import IconHide from "@mui/icons-material/VisibilityOff";
-import IconBack from "@mui/icons-material/ArrowBack";
-import { useAppSelector } from "../hooks/redux";
+import { useAppSelector, useHistoryDispatch } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
 import socketService from "../services/socketService";
 import { CustomEvents } from "../constants/discord";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { historySlice } from "../reducers/historyReducer";
+
+const { setCurrentRoute } = historySlice.actions;
 
 const PREFIX = "Toolbar";
 const classes = {
@@ -31,6 +33,7 @@ const Root = styled("div", {
   padding: "0 10px 0 10px",
   borderTopLeftRadius: 6,
   borderTopRightRadius: 6,
+  height: 40,
   // @ts-ignore
   appRegion: "drag",
   // HACK: maybe this works for the drag bug?
@@ -48,8 +51,12 @@ const Toolbar = () => {
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
-  const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useHistoryDispatch();
+
+  const isLoginPage = location.pathname === "/login";
+  const isSettingsPage = location.pathname === "/settings";
+  const isFailedPage = location.pathname === "/failed";
 
   const getTitle = () => {
     if (channel && channel.name) {
@@ -61,22 +68,12 @@ const Toolbar = () => {
     }
   };
 
-  const isLoginPage = location.pathname === "/login";
-  const isSettingsPage = location.pathname === "/settings";
-  const isListPage = location.pathname === "/list";
-
   const getSettingsText = () => {
-    if (!isAuthed && isLoginPage) {
-      return "Settings";
-    } else if (!isAuthed && isSettingsPage) {
+    if (isSettingsPage) {
       return "Go Back";
-    } else if (isAuthed && isListPage) {
+    } else {
       return "Settings";
-    } else if (isAuthed && isSettingsPage) {
-      return "Go back";
     }
-
-    return "Unknown";
   };
 
   return (
@@ -103,7 +100,7 @@ const Toolbar = () => {
           appRegion: "no-drag",
         }}
       >
-        {!isSettingsPage && !isLoginPage && (
+        {!isSettingsPage && !isLoginPage && !isFailedPage && (
           <Tooltip arrow title="Enable clickthrough">
             <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_CLICKTHROUGH })}>
               <IconHide sx={{ color: "text.primary" }} />
@@ -111,27 +108,18 @@ const Toolbar = () => {
           </Tooltip>
         )}
 
-        <Tooltip arrow title={getSettingsText()}>
-          <IconButton
-            onClick={() => {
-              if (!isAuthed && isLoginPage) {
-                navigate("/settings");
-              } else if (!isAuthed && isSettingsPage) {
-                navigate("/login");
-              } else if (isAuthed && isListPage) {
-                navigate("/settings");
-              } else if (isAuthed && isSettingsPage) {
-                navigate("/list");
-              }
-            }}
-          >
-            {isListPage || isLoginPage ? (
+        {!isSettingsPage && (
+          <Tooltip arrow title={getSettingsText()}>
+            <IconButton
+              onClick={() => {
+                dispatch(setCurrentRoute("/settings"));
+                
+              }}
+            >
               <IconSettings sx={{ color: "text.primary" }} />
-            ) : (
-              <IconBack sx={{ color: "text.primary" }} />
-            )}
-          </IconButton>
-        </Tooltip>
+            </IconButton>
+          </Tooltip>
+        )}
       </div>
     </Root>
   );

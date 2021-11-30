@@ -1,10 +1,10 @@
 import { Root } from "./style";
-import { useAppSelector } from "./hooks/redux";
+import { useAppSelector, useHistoryDispatch, useHistorySelector } from "./hooks/redux";
 import Toolbar from "./components/Toolbar";
 import UserListView from "./views/UserListView";
 import LoginView from "./views/LoginView";
 import SettingsView from "./views/SettingsView";
-import { RootState } from "./store";
+import { RootState, HistoryState } from "./store";
 import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 
 import socketSerivce from "./services/socketService";
@@ -30,10 +30,11 @@ declare global {
 
 function App() {
   const users = useAppSelector((state: RootState) => state.root.users);
-  const currentRoute = useAppSelector((state: RootState) => state.root.currentRoute);
+  const currentRoute = useHistorySelector((state: HistoryState) => state.history.currentRoute);
 
   const [divHeight, setDivHeight] = useState<number>(0);
   const navigate = useNavigate();
+  const dispatch = useHistoryDispatch();
   const location = useLocation();
 
   // side effect to only start sending resize events when there are users
@@ -45,12 +46,12 @@ function App() {
   }, [users.length, divHeight, location]);
 
   // this side effect allows us to control the route outside of a react comp
+  // not quite sure that this is ideal but it works for now
   useEffect(() => {
     if (currentRoute && currentRoute !== location.pathname) {
-      // @ts-ignore
       navigate(currentRoute);
     }
-  }, [currentRoute, location.pathname, navigate]);
+  }, [currentRoute, location, dispatch, navigate]);
 
   return (
     <Root>

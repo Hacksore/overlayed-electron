@@ -1,5 +1,6 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
+import historyReducer from "./reducers/historyReducer";
 import rootReducer from "./reducers/rootReducer";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -7,31 +8,28 @@ const isProd = process.env.NODE_ENV === "production";
 const FILTERD_EVENTS: Array<string> = ["root/setUserTalking"];
 const logger = createLogger({
   // @ts-ignore
-  predicate: (_, action) => !FILTERD_EVENTS.includes(action.type),
+  predicate: (_, action) => !isProd && !FILTERD_EVENTS.includes(action.type),
 });
 
 export const store = configureStore({
   reducer: {
     root: rootReducer,
+    history: historyReducer
   },
-  middleware: getDefaultMiddleware => {
-    const middleware = getDefaultMiddleware();
-    if (!isProd) {
-      middleware.concat(logger);
-    }
-    return middleware;
-  }
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
+
 });
 
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type HistoryState = ReturnType<typeof store.getState>;
+
 export type AppDispatch = typeof store.dispatch;
+export type HistoryDispatch = typeof store.dispatch;
 
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
-  RootState,
+  RootState | HistoryState,
   unknown,
   Action<string>
 >;
