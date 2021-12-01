@@ -89,13 +89,13 @@ class IPCSocketService extends EventEmitter {
     }
 
     // get a current channel info and list of voice states
-    if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL) {
+    if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL && data) {
       store.dispatch(setCurrentVoiceChannel(data));
       store.dispatch(setAppUsers(data.voice_states));
     }
 
     // get a list of the channel voice states
-    if (evt === RPCCommands.GET_CHANNEL) {
+    if (evt === RPCCommands.GET_CHANNEL && data) {
       store.dispatch(setAppUsers(data.voice_states));
       store.dispatch(setCurrentVoiceChannel(data));
     }
