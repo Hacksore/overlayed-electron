@@ -53,7 +53,7 @@ class SocketManager {
       });
 
       // tell the main proc we are ready
-      this._win.webContents.send("toMain", { event: "CONNECTED_TO_DISCORD" });
+      this._win.webContents.send("toMain", { evt: "CONNECTED_TO_DISCORD" });
     });
 
     // Log in to RPC with client id

@@ -1,21 +1,25 @@
 // TODO: add typescript support but searching the web it seems this is way more involed
 const path = require("path");
-const { app, BrowserWindow, ipcMain, globalShortcut, dialog, shell, Tray, Menu, nativeTheme } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme } = require("electron");
 const isDev = require("electron-is-dev");
 const SocketManager = require("./socket");
 const ElectronStore = require("electron-store");
 const { LOGIN_URL } = require("./constants");
 const fs = require("fs");
 const { isDiscordRunning } = require("./util");
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 // Base URL for the app
-const PORT = 3000;
+const PORT = 3001;
 const APP_BASE_URL = isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../index.html")}`;
 
 const store = new ElectronStore();
 const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
 const iconPath = `${__dirname}/img/${iconFile}`;
 
+let authApp = null;
 let win = null;
 let authWin = null;
 let socketManager = null;
@@ -117,20 +121,25 @@ async function createWindow() {
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", async (_, msg) => {
     const payload = JSON.parse(msg);
-    
+
     socketManager.onElectronMessage(msg);
 
     // TODO: this needs to be implemented
     // setup some ping to the client so we cant later on detect when it's not running
     // setInterval(() => {
-      // socketManager.client.transport.ping();    
+    // socketManager.client.transport.ping();
     // }, 5000);
+
+    // check if we got told to open auth window
+    if (payload.evt === "CONNECTED_TO_DISCORD") {
+      console.log("Stopping the auth serivce as we are connected");
+      authApp.close();
+    }
 
     // check if we got told to open auth window
     if (payload.evt === "LOGIN") {
       if (!authWin) {
-        createAuthWindow();
-        authWin.show();
+        shell.openExternal(LOGIN_URL);
       }
     }
 
@@ -186,75 +195,54 @@ async function createWindow() {
   const isClientRunning = await isDiscordRunning();
   const appPath = isClientRunning ? "login" : "failed";
   win.loadURL(`${APP_BASE_URL}#/${appPath}`);
-
 }
 
-function createAuthWindow() {
-  // Create the browser window.
-  authWin = new BrowserWindow({
-    width: 550,
-    height: 800,
-    frame: true,
-    icon: iconPath,
-    show: true,
-    webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, "./preload.js"),
-    },
-  });
+/**
+ * Create a simple express server waiting for a POST
+ * from the main site with a valid auth token
+ */
+function createAuthService() {
+  authApp = express();
+  console.log("Starting auth app service");
 
-  authWin.on("close", () => {
-    authWin = null;
-  });
+  const allowlist = ["http://localhost:8000", "https://overlayed.dev"];
+  const corsOptionsDelegate = function (req, callback) {
+    let corsOptions;
+    if (allowlist.indexOf(req.header("Origin")) !== -1) {
+      corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+    } else {
+      corsOptions = { origin: false }; // disable CORS for this request
+    }
+    callback(null, corsOptions); // callback expects two parameters: error and options
+  };
 
-  // load the auth url
-  authWin.loadURL(LOGIN_URL);
+  authApp.use(bodyParser.json());
+  authApp.use(cors(corsOptionsDelegate));
 
-  // TODO: this is rather insecure as the window can be seen for a split second with your token
-  authWin.webContents.on("will-navigate", function (event, newUrl) {
-    // More complex code to handle tokens goes here
-    authWin.webContents.session.webRequest.onCompleted({ urls: [newUrl] }, details => {
-      if (details.url.includes("code=")) {
-        authWin.webContents.executeJavaScript(`
-          const payload = { event: 'AUTH', data: document.getElementsByTagName('pre')[0].innerHTML };
-          window.electron.send('toMain', payload)
-        `);
-      } else {
-        dialog.showMessageBox(win, {
-          message: "Something went wrong authenticating, you might not have access! error: " + details.url,
-        });
+  authApp.post("/auth", (req, res) => {
+    console.log("got auth", req.body);
+    overlayed.auth = {...req.body};
 
-        authWin.close();
-        authWin = null;
-      }
+    socketManager.setupListeners();
+
+    // tell client auth is done
+    socketManager.sendElectronMessage({
+      evt: "OAUTH_DANCE_COMPLETED",
+      data: overlayed.auth, // TODO: we probably don't need this
+    });
+
+    // save token to store
+    store.set("auth", overlayed.auth);
+
+    res.send({
+      message: "Token received!"
     });
   });
 
-  // get auth token back over IPC - C R I N G E
-  ipcMain.on("toMain", (_, msg) => {
-    const payload = JSON.parse(msg);
-
-    if (payload.event === "AUTH") {
-      overlayed.auth = JSON.parse(payload.data);
-
-      if (authWin) {
-        authWin.close();
-        authWin = null;
-      }
-
-      socketManager.setupListeners();
-
-      // tell client auth is done
-      socketManager.sendElectronMessage({
-        evt: "OAUTH_DANCE_COMPLETED",
-        data: overlayed.auth, // TODO: we probably don't need this
-      });
-
-      // save token to store
-      store.set("auth", overlayed.auth);
-    }
-  });
+  authApp.listen(61200);
 }
+
+createAuthService();
 
 function toggleClickthrough() {
   overlayed.clickThrough = !overlayed.clickThrough;
