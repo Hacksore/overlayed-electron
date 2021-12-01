@@ -237,6 +237,9 @@ function createAuthService() {
     res.send({
       message: "Token received!"
     });
+
+    // bring window to top after getting a token
+    win.show();
   });
 
   authApp.listen(61200);
