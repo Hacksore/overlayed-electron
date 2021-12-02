@@ -2,9 +2,16 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "develop",
+      "label": "develop:react",
       "type": "npm",
       "script": "react",
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "develop:electron",
+      "type": "npm",
+      "script": "electron",
       "group": "build",
       "isBackground": true
     }

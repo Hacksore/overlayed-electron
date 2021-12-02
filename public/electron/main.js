@@ -257,9 +257,12 @@ function toggleClickthrough() {
 
   // enableing click through
   win.setIgnoreMouseEvents(overlayed.clickThrough);
-
+ 
   // update the state for the menu item
   contextMenu.items[1].checked = overlayed.clickThrough;
+
+  // focus window
+  win.show();
 }
 
 app

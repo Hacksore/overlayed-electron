@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import UserItem from "../components/UserItem";
+import { UserItem } from "../components/UserItem";
 import { IUser } from "../types/user";
 import { RootState } from "../store";
 import { useAppSelector } from "../hooks/redux";
@@ -39,7 +39,7 @@ const UserList = ({ setDivHeight }: { setDivHeight: Function }) => {
   useEffect(() => {
     const height: number = listRef?.current?.offsetHeight || 0;
     setDivHeight(height);
-  }, [users.length, setDivHeight]);
+  }, [listRef?.current?.offsetHeight, setDivHeight]);
 
   return (
     <Root ref={listRef} className={classes.root}>
@@ -49,7 +49,7 @@ const UserList = ({ setDivHeight }: { setDivHeight: Function }) => {
             No Voice Chat 🙉
           </Typography>
           <Typography color="textPrimary" variant="body1">
-            Join a voice chat to display users
+            Join a voice channel to display users
           </Typography>
         </Box>
       )}

@@ -21,5 +21,5 @@ contextBridge.exposeInMainWorld("electron", {
     shell.openPath(url);
   },
   platform: process.platform,
-  home: process.env.HOME
+  home: process.env.HOME || process.env.USERPROFILE
 });

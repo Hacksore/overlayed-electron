@@ -1,4 +1,14 @@
-import { Dialog, Typography, Button, TextField, DialogContent, DialogActions, DialogTitle } from "@mui/material";
+import {
+  Dialog,
+  Slider,
+  Typography,
+  Button,
+  TextField,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+  Box,
+} from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect, useState } from "react";
 import { CustomEvents } from "../constants/discord";
@@ -38,13 +48,25 @@ export const Root = styled("div")(({ theme }) => ({
 }));
 
 const SettingsView = () => {
+  const [scale, setScale] = useState(1);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const navigate = useNavigate();
 
   useEffect(() => {
-    socketService.send({ event: "WINDOW_RESIZE", data: { height: 500 } });
+    socketService.send({ event: "WINDOW_RESIZE", data: { height: 480 } });
+
+    const localScale = localStorage.getItem("scale") || "";
+    setScale(parseInt(localScale));
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("scale", scale.toString());
+  }, [scale]);
+
+  const handleSlider = (event: any) => {
+    setScale(event.target.value);
+  };
 
   return (
     <Root>
@@ -89,17 +111,20 @@ const SettingsView = () => {
           <IconLogout classes={{ root: classes.buttonIcon }} /> Disconnect Discord Account
         </Button>
       </div>
+
+      <Typography gutterBottom variant="body2" color="textPrimary">
+        UI Scale
+      </Typography>
+      <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 200 }} className={classes.item}>
+        <Slider aria-label="Scale" min={1} max={8} value={scale} onChange={handleSlider} />
+        <Box sx={{ ml: 2 }}>{scale}</Box>
+      </Box>
+
       <div className={classes.item}>
         <Typography gutterBottom variant="body2" color="textPrimary">
           Clickthrough Hotkey
         </Typography>
         <TextField variant="standard" color="info" focused value="Control+Shift+Space" />
-      </div>
-      <div className={classes.item}>
-        <Typography gutterBottom variant="body2" color="textPrimary">
-          Focus Hotkey
-        </Typography>
-        <TextField variant="standard" color="info" focused value="TBD" />
       </div>
 
       <div style={{ marginTop: "auto", marginLeft: "auto" }}>
@@ -109,11 +134,6 @@ const SettingsView = () => {
           variant="contained"
           onClick={() => {
             navigate(-1);
-            // if (isAuthed) {
-            //   dispatch(setCurrentRoute("/list"));
-            // } else {
-            //   dispatch(setCurrentRoute("/login"));
-            // }
           }}
         >
           Cancel
@@ -121,9 +141,10 @@ const SettingsView = () => {
         <Button
           color="primary"
           variant="contained"
-          disabled
           onClick={() => {
             // TODO: save config to file
+
+            navigate(-1);
           }}
         >
           Save

@@ -25,7 +25,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start": "concurrently -k npm:react npm:electron",
-    "electron": "wait-on http://localhost:3001 && electron .",
+    "electron": "wait-on http://localhost:3001 && electron --remote-debugging-port=9223 .",
     "pack": "electron-builder --x64 -p never -c electron-builder.json"
   },
   "homepage": "./",

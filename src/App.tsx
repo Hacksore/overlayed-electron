@@ -2,6 +2,7 @@ import { Root } from "./style";
 import { useAppSelector } from "./hooks/redux";
 import Toolbar from "./components/Toolbar";
 import UserListView from "./views/UserListView";
+import UserGridView from "./views/UserGridView";
 import LoginView from "./views/LoginView";
 import SettingsView from "./views/SettingsView";
 import { RootState } from "./store";
@@ -33,8 +34,14 @@ function App() {
 
   useEffect(() => {
     // init socket service, no need for a hook
-    console.log("Load socket service")
+    console.log("Load socket service");
     socketSerivce.init(navigate);
+
+    // disble mouse buttons
+    window.addEventListener("mouseup", e => {
+      if (e.button === 3 || e.button === 4) e.preventDefault();
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
