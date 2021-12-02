@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { styled, lighten } from "@mui/material/styles";
 import { Box } from "@mui/material";
 
@@ -60,18 +60,8 @@ const Root = styled("div", {
 });
 
 export const UserItem = React.memo((props: IUser) => {
-  const { id, deafened, username, avatarHash, talking, muted, selfDeafened, selfMuted } = props;
+  const { deafened, username, muted, selfDeafened, selfMuted } = props;
   const scale = useScale();
-
-  const getIconColor = () => {
-    if (talking) {
-      return "#43b581";
-    } else if (muted) {
-      return "#565656";
-    } else {
-      return "rgba(0,0,0,0)";
-    }
-  };
 
   const getNameColor = () => {
     if (selfDeafened || muted) {

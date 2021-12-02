@@ -2,7 +2,6 @@ import { Root } from "./style";
 import { useAppSelector } from "./hooks/redux";
 import Toolbar from "./components/Toolbar";
 import UserListView from "./views/UserListView";
-import UserGridView from "./views/UserGridView";
 import LoginView from "./views/LoginView";
 import SettingsView from "./views/SettingsView";
 import { RootState } from "./store";
