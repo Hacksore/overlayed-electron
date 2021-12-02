@@ -2,6 +2,7 @@ import { Root } from "./style";
 import { useAppSelector } from "./hooks/redux";
 import Toolbar from "./components/Toolbar";
 import UserListView from "./views/UserListView";
+// import UserGridView from "./views/UserListView";
 import LoginView from "./views/LoginView";
 import SettingsView from "./views/SettingsView";
 import { RootState } from "./store";
@@ -29,7 +30,7 @@ function App() {
   const users = useAppSelector((state: RootState) => state.root.users);
   const [divHeight, setDivHeight] = useState<number>(0);
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); 
 
   useEffect(() => {
     // init socket service, no need for a hook
