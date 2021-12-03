@@ -12,22 +12,23 @@ const classes = {
 
 interface RootProps {
   scale: number;
+  iconColor: string;
+  disabled: boolean;
 }
 
 export const DEFAULT_FONT_SIZE = 16;
 export const DEFAULT_AVATAR_SIZE = 38;
 
-const Root = styled("div", {
-  shouldForwardProp: prop => prop !== "scale",
-})<RootProps>(({ scale }) => {
+const Root = styled("div")<RootProps>(({ scale, iconColor, disabled }) => {
   const realScale = scale * 0.4;
-
   return {
     position: "relative",
+    filter: `${disabled ? "grayscale(90%)" : "none"}`,
     [`& .${classes.avatar}`]: {
       width: DEFAULT_AVATAR_SIZE * realScale,
       height: DEFAULT_AVATAR_SIZE * realScale,
       borderRadius: Math.floor((DEFAULT_AVATAR_SIZE * realScale) / 1),
+      border: `3px solid ${iconColor}`,
     },
   };
 });
@@ -50,7 +51,7 @@ export const DiscordAvatar = React.memo((props: IUser) => {
   const avatarUrl = avatarHash ? `https://cdn.discordapp.com/avatars/${id}/${avatarHash}.jpg` : "./img/default.png";
 
   return (
-    <Root scale={scale}>
+    <Root disabled={selfDeafened} iconColor={getIconColor()} scale={scale}>
       <img
         onError={e => {
           // @ts-ignore
@@ -59,11 +60,6 @@ export const DiscordAvatar = React.memo((props: IUser) => {
           e.target.src = "./img/default.png";
         }}
         className={classes.avatar}
-        // TODO: how to pass props
-        style={{
-          border: `3px solid ${getIconColor()}`,
-          filter: `${selfDeafened ? "grayscale(90%)" : "none"}`,
-        }}
         alt="avatar"
         src={avatarUrl}
       />

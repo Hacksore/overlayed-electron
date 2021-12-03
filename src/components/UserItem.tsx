@@ -23,9 +23,7 @@ interface RootProps {
 export const DEFAULT_FONT_SIZE = 16;
 export const DEFAULT_AVATAR_SIZE = 38;
 
-const Root = styled("div", {
-  shouldForwardProp: prop => prop !== "scale",
-})<RootProps>(({ theme, scale }) => {
+const Root = styled("div")<RootProps>(({ theme, scale }) => {
   const realScale = scale * 0.4;
 
   return {
@@ -49,8 +47,8 @@ const Root = styled("div", {
       "&:hover": {
         background: lighten(theme.palette.background.default, 0.1),
         borderColor: lighten(theme.palette.background.default, 0.2),
-        color: `${theme.palette.primary.contrastText} !important`
-      }
+        color: `${theme.palette.primary.contrastText} !important`,
+      },
     },
     [`& .${classes.icon}`]: {
       width: DEFAULT_FONT_SIZE * realScale,
@@ -89,7 +87,7 @@ export const UserItem = React.memo((props: IUser) => {
             maxWidth: 150,
             whiteSpace: "nowrap",
             overflow: "hidden",
-            textOverflow: "ellipsis",      
+            textOverflow: "ellipsis",
           }}
         >
           {username}
