@@ -7,6 +7,8 @@ import { StyledEngineProvider } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import { HashRouter } from "react-router-dom";
 import { theme } from "./theme";
+import { GlobalStyleOverride } from "./globalStyles";
+
 
 ReactDOM.render(
   <React.StrictMode>
@@ -14,6 +16,7 @@ ReactDOM.render(
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <HashRouter>
+            <GlobalStyleOverride />
             <App />
           </HashRouter>
         </ThemeProvider>

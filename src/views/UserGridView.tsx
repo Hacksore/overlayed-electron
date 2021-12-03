@@ -12,7 +12,6 @@ const classes = {
   users: `${PREFIX}-users`,
 };
 
-// TODO: this is repeated
 const Root = styled("div")(({ theme }) => ({
   [`&.${classes.root}`]: {
     display: "flex",
@@ -20,9 +19,13 @@ const Root = styled("div")(({ theme }) => ({
   },
   [`& .${classes.users}`]: {
     display: "flex",
+    flexWrap: "wrap",
+    maxHeight: 500,
+    overflowY: "auto"
   },
 }));
 
+// TODO: fix this later
 const UserGridView = ({ setDivHeight }: { setDivHeight: Function }) => {
   const users = useAppSelector((state: RootState) => state.root.users);
   const listRef = useRef<any>(null);
@@ -47,7 +50,7 @@ const UserGridView = ({ setDivHeight }: { setDivHeight: Function }) => {
 
       <div className={classes.users}>
         {users.map((props: IUser) => (
-          <DiscordAvatar {...props} />
+          <DiscordAvatar key={props.id} {...props} />
         ))}
       </div>
     </Root>

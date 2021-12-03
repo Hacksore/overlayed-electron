@@ -34,7 +34,7 @@ const createUserStateItem = (payload: IDiscordUser) => ({
   suppress: payload.voice_state.suppress,
   talking: false,
   id: payload.user.id,
-  volume: 100,
+  volume: payload.volume,
   bot: payload.user.bot,
   flags: payload.user.flags,
   premium: payload.user.premium_type,

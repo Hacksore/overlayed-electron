@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, lighten } from "@mui/material/styles";
+import { styled, lighten, darken } from "@mui/material/styles";
 import { Box } from "@mui/material";
 
 import { IUser } from "../types/user";
@@ -18,12 +18,15 @@ const classes = {
 
 interface RootProps {
   scale: number;
+  nameColor: string;
 }
 
 export const DEFAULT_FONT_SIZE = 16;
 export const DEFAULT_AVATAR_SIZE = 38;
 
-const Root = styled("div")<RootProps>(({ theme, scale }) => {
+const Root = styled("div", {
+  shouldForwardProp: prop => !["scale", "nameColor"].includes(prop.toString()),
+})<RootProps>(({ nameColor, theme, scale }) => {
   const realScale = scale * 0.4;
 
   return {
@@ -38,11 +41,12 @@ const Root = styled("div")<RootProps>(({ theme, scale }) => {
     [`& .${classes.name}`]: {
       fontSize: DEFAULT_FONT_SIZE * realScale,
       background: "rgba(40,40,40,1)",
-      padding: "6px 10px 6px 10px",
+      padding: "6px 10px 6px 0px",
       border: "1px solid #3a3a3a",
       borderRadius: 8,
       display: "flex",
-      alignItems: "flex-start",
+      color: nameColor,
+      alignItems: "center",
       margin: "0 0 0 5px",
       "&:hover": {
         background: lighten(theme.palette.background.default, 0.1),
@@ -57,8 +61,12 @@ const Root = styled("div")<RootProps>(({ theme, scale }) => {
   };
 });
 
-export const UserItem = React.memo((props: IUser) => {
-  const { deafened, username, muted, selfDeafened, selfMuted } = props;
+interface IUserItem extends IUser {
+  scale?: number;
+}
+
+export const UserItem = React.memo((props: IUserItem) => {
+  const { deafened, username, muted, selfDeafened, selfMuted, volume } = props;
   const scale = useScale();
 
   const getNameColor = () => {
@@ -73,14 +81,9 @@ export const UserItem = React.memo((props: IUser) => {
   const shouldShowIcons = selfDeafened || selfMuted || muted || deafened;
 
   return (
-    <Root scale={scale} className={classes.root}>
+    <Root scale={props.scale || scale} nameColor={getNameColor()} className={classes.root}>
       <DiscordAvatar {...props} />
-      <div
-        className={classes.name}
-        style={{
-          color: getNameColor(),
-        }}
-      >
+      <div className={classes.name}>
         <Box
           sx={{
             minWidth: "auto",
@@ -88,8 +91,26 @@ export const UserItem = React.memo((props: IUser) => {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            display: "flex",
+            alignItems: "center",
           }}
         >
+          <Box
+            sx={{
+              width: 3,
+              height: 18,
+              mr: 1,
+              backgroundColor: () => {
+                const volFloat = parseFloat((volume / 100).toFixed(1));
+
+                if (volFloat < 1) {
+                  return darken("#f92222", volFloat - 0.2);
+                } else {
+                  return "rgba(0, 0, 0, 0)";
+                }
+              },
+            }}
+          />
           {username}
         </Box>
 

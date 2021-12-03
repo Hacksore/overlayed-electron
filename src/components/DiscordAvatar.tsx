@@ -19,7 +19,9 @@ interface RootProps {
 export const DEFAULT_FONT_SIZE = 16;
 export const DEFAULT_AVATAR_SIZE = 38;
 
-const Root = styled("div")<RootProps>(({ scale, iconColor, disabled }) => {
+const Root = styled("div", {
+  shouldForwardProp: prop => !["scale", "iconColor", "disabled"].includes(prop.toString())
+})<RootProps>(({ scale, iconColor, disabled }) => {
   const realScale = scale * 0.4;
   return {
     position: "relative",

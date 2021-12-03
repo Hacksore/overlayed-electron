@@ -19,7 +19,9 @@ interface RootProps {
 }
 
 // Might be on the top tier cringe list for muiv5
-const Root = styled("div")<RootProps>(({ theme, clickThrough }) => ({
+const Root = styled("div", {
+  shouldForwardProp: prop => prop !== "clickThrough"
+})<RootProps>(({ theme, clickThrough }) => ({
   visibility: clickThrough ? "hidden" : "visible",
   display: "flex",
   justifyContent: "flex-end",
