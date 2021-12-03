@@ -1,6 +1,7 @@
 import { Typography, Button } from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect } from "react";
+import { CustomEvents } from "../constants/discord";
 import socketService from "../services/socketService";
 
 export const Root = styled("div")(({ theme }) => ({
@@ -37,7 +38,7 @@ const ConnectionFailedView = () => {
         variant="contained"
         onClick={() => {
           // TODO: add to enums
-          socketService.send({ event: "CHECK_FOR_DISCORD" });
+          socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });
         }}
       >
         Check for discord

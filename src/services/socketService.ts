@@ -55,7 +55,7 @@ class IPCSocketService extends EventEmitter {
     }
 
     // if has lost connection to discord
-    if (evt === "DISCONNECTED_FROM_DISCORD") {
+    if (evt === CustomEvents.CHECK_FOR_DISCORD) {
       // reset vars
       store.dispatch(setIsAuthed(false));
       store.dispatch(setReadyState(false));

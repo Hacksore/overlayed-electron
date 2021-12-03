@@ -1,6 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import { styled, lighten } from "@mui/system";
 import { useEffect } from "react";
+import { CustomEvents } from "../constants/discord";
 import socketService from "../services/socketService";
 
 const PREFIX = "LoginView";
@@ -57,7 +58,7 @@ const LoginView = () => {
     socketService.send({ event: "WINDOW_RESIZE", data: { height: 350 } });
 
     // ask electron if we are connected?
-    socketService.send({ event: "CHECK_FOR_DISCORD" });
+    socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });
 
   }, []);
 

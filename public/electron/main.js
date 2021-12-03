@@ -178,6 +178,7 @@ async function createWindow() {
     if (payload.event === "CHECK_FOR_DISCORD") {
       // first thing is test if discord is running and if not make sure they visit a new page
       const isClientRunning = await isDiscordRunning();
+      console.log("Is discord client running", isClientRunning);
 
       if (isClientRunning) {
         socketManager.sendElectronMessage({
@@ -221,7 +222,7 @@ function createAuthService() {
 
   authApp.post("/auth", (req, res) => {
     console.log("got auth", req.body);
-    overlayed.auth = {...req.body};
+    overlayed.auth = { ...req.body };
 
     socketManager.setupListeners();
 
@@ -235,7 +236,7 @@ function createAuthService() {
     store.set("auth", overlayed.auth);
 
     res.send({
-      message: "Token received!"
+      message: "Token received!",
     });
 
     // bring window to top after getting a token
@@ -257,7 +258,7 @@ function toggleClickthrough() {
 
   // enableing click through
   win.setIgnoreMouseEvents(overlayed.clickThrough);
- 
+
   // update the state for the menu item
   contextMenu.items[1].checked = overlayed.clickThrough;
 

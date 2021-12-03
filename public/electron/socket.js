@@ -77,9 +77,9 @@ class SocketManager {
 
       // TODO: sometimes this is called when we are in dev breaking the socket?
       // tell frontend we are disconnected
-      // this.sendElectronMessage({
-      //   evt: "DISCONNECTED_FROM_DISCORD",
-      // });
+      this.sendElectronMessage({
+        evt: "DISCONNECTED_FROM_DISCORD",
+      });
 
     });
 
