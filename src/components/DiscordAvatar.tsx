@@ -16,13 +16,12 @@ interface RootProps {
   disabled: boolean;
 }
 
-export const DEFAULT_FONT_SIZE = 16;
-export const DEFAULT_AVATAR_SIZE = 38;
+export const DEFAULT_AVATAR_SIZE = 36;
 
 const Root = styled("div", {
-  shouldForwardProp: prop => !["scale", "iconColor", "disabled"].includes(prop.toString())
+  shouldForwardProp: prop => !["scale", "iconColor", "disabled"].includes(prop.toString()),
 })<RootProps>(({ scale, iconColor, disabled }) => {
-  const realScale = scale * 0.4;
+  const realScale = 1 + scale * 0.1;
   return {
     position: "relative",
     filter: `${disabled ? "grayscale(90%)" : "none"}`,
@@ -35,7 +34,11 @@ const Root = styled("div", {
   };
 });
 
-export const DiscordAvatar = React.memo((props: IUser) => {
+interface IDiscordAvatar extends IUser {
+  scale?: number;
+}
+
+export const DiscordAvatar = React.memo((props: IDiscordAvatar) => {
   const { id, avatarHash, talking, muted, selfDeafened } = props;
   const scale = useScale();
 
@@ -53,7 +56,7 @@ export const DiscordAvatar = React.memo((props: IUser) => {
   const avatarUrl = avatarHash ? `https://cdn.discordapp.com/avatars/${id}/${avatarHash}.jpg` : "./img/default.png";
 
   return (
-    <Root disabled={selfDeafened} iconColor={getIconColor()} scale={scale}>
+    <Root disabled={selfDeafened} iconColor={getIconColor()} scale={props.scale || scale}>
       <img
         onError={e => {
           // @ts-ignore

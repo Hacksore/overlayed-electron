@@ -1,9 +1,9 @@
-import { useState } from "react";
 import UserListView from "./UserListView";
 import UserGridView from "./UserGridView";
+import settings from "../services/settingsService";
 
 const UserLayoutView = ({ setDivHeight }: { setDivHeight: Function }) => {
-  const [listStyle] = useState(localStorage.getItem("listStyle") || "list");
+  const listStyle = settings.get("listStyle");
 
   return (
     <>

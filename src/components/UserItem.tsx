@@ -21,27 +21,21 @@ interface RootProps {
   nameColor: string;
 }
 
-export const DEFAULT_FONT_SIZE = 16;
-export const DEFAULT_AVATAR_SIZE = 38;
+export const DEFAULT_FONT_SIZE = 15;
 
 const Root = styled("div", {
   shouldForwardProp: prop => !["scale", "nameColor"].includes(prop.toString()),
 })<RootProps>(({ nameColor, theme, scale }) => {
-  const realScale = scale * 0.4;
+  const realScale = 1 + scale * 0.1;
 
   return {
     alignItems: "center",
     display: "flex",
     margin: "4px 0 4px 0",
-    [`& .${classes.avatar}`]: {
-      width: DEFAULT_AVATAR_SIZE * realScale,
-      height: DEFAULT_AVATAR_SIZE * realScale,
-      borderRadius: Math.floor((DEFAULT_AVATAR_SIZE * realScale) / 1),
-    },
     [`& .${classes.name}`]: {
       fontSize: DEFAULT_FONT_SIZE * realScale,
       background: "rgba(40,40,40,1)",
-      padding: "6px 10px 6px 0px",
+      padding: "6px 10px 6px 10px",
       border: "1px solid #3a3a3a",
       borderRadius: 8,
       display: "flex",
@@ -55,6 +49,7 @@ const Root = styled("div", {
       },
     },
     [`& .${classes.icon}`]: {
+      marginRight: 2,
       width: DEFAULT_FONT_SIZE * realScale,
       height: DEFAULT_FONT_SIZE * realScale,
     },
@@ -82,7 +77,21 @@ export const UserItem = React.memo((props: IUserItem) => {
 
   return (
     <Root scale={props.scale || scale} nameColor={getNameColor()} className={classes.root}>
-      <DiscordAvatar {...props} />
+      <Box
+        sx={{
+          borderLeft: "2px solid rgba(0, 0, 0, 0)",
+          borderColor: () => {
+            const volFloat = parseFloat((volume / 100).toFixed(1));
+            if (volFloat < 1) {
+              return darken("#f92222", volFloat - 0.2);
+            } else {
+              return "rgba(0, 0, 0, 0)";
+            }
+          },
+        }}
+      >
+        <DiscordAvatar scale={props.scale || scale} {...props} />
+      </Box>
       <div className={classes.name}>
         <Box
           sx={{
@@ -95,27 +104,11 @@ export const UserItem = React.memo((props: IUserItem) => {
             alignItems: "center",
           }}
         >
-          <Box
-            sx={{
-              width: 3,
-              height: 18,
-              mr: 1,
-              backgroundColor: () => {
-                const volFloat = parseFloat((volume / 100).toFixed(1));
-
-                if (volFloat < 1) {
-                  return darken("#f92222", volFloat - 0.2);
-                } else {
-                  return "rgba(0, 0, 0, 0)";
-                }
-              },
-            }}
-          />
           {username}
         </Box>
 
         {shouldShowIcons && (
-          <div style={{ marginLeft: 10, display: "flex", alignSelf: "self-end" }}>
+          <div style={{ marginLeft: 8, display: "flex", alignSelf: "self-end" }}>
             {(selfDeafened || deafened) && (
               <IconDeafend classes={{ root: classes.icon }} style={{ color: muted || deafened ? "red" : "inherit" }} />
             )}

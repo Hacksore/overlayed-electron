@@ -56,7 +56,9 @@ const Toolbar = () => {
   const isFailedPage = location.pathname === "/failed";
 
   const getTitle = () => {
-    if (channel && channel.name) {
+    if (location.pathname === "/settings") {
+      return "Overlayed Settings";
+    } else if (channel && channel.name) {
       return channel.name;
     } else if (channel && !channel?.guild_id && isAuthed) {
       return "Private Call";
