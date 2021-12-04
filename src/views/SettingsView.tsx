@@ -116,7 +116,7 @@ const SettingsView = () => {
             <Controller
               name="scale"
               control={control}
-              defaultValue={settings.get("scale")}
+              defaultValue={settings.get("scale") || 1}
               render={({ field: { onChange, value } }) => (
                 <Slider
                   aria-label="Scale"
