@@ -197,7 +197,7 @@ const SettingsView = () => {
             <Controller
               name="listStyle"
               control={control}
-              defaultValue={settings.get("listStyle")}
+              defaultValue={settings.get("listStyle") || "list"}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
                   onChange={onChange}

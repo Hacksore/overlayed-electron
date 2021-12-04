@@ -10,7 +10,8 @@ import settings from "../services/settingsService";
 const PREFIX = "UserGridView";
 const classes = {
   root: `${PREFIX}-root`,
-  users: `${PREFIX}-users`,
+  user: `${PREFIX}-user`,
+  userWrap: `${PREFIX}-userWrap`,
 };
 
 const Root = styled("div", { 
@@ -20,11 +21,15 @@ const Root = styled("div", {
     display: "flex",
     flexDirection: "column",
   },
-  [`& .${classes.users}`]: {
+  [`& .${classes.userWrap}`]: {
     display: "flex",
     flexWrap: "wrap",
     maxHeight: 500,
     overflowY: scroll ? "none" : "auto",
+    paddingTop: 4,
+  },
+  [`& .${classes.user}`]: {
+    padding: "2px 2px 2px 2px"
   },
 }));
 
@@ -53,9 +58,11 @@ const UserGridView = ({ setDivHeight }: { setDivHeight: Function }) => {
         </Box>
       )}
 
-      <div className={classes.users}>
+      <div className={classes.userWrap}>
         {users.map((props: IUser) => (
-          <DiscordAvatar key={props.id} {...props} />
+          <div className={classes.user}>
+            <DiscordAvatar key={props.id} {...props} />
+          </div>
         ))}
       </div>
     </Root>
