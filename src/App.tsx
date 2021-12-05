@@ -21,6 +21,9 @@ declare global {
       openDirectory: Function;
       platform: string;
       home: string;
+      appData: string;
+      setConfigValue: Function;
+      getConfigValue: Function;
     };
   }
 }
@@ -34,6 +37,8 @@ function App() {
   useEffect(() => {
     // init socket service, no need for a hook
     console.log("Load socket service");
+
+    // init socket service
     socketSerivce.init(navigate);
 
     // disble mouse buttons

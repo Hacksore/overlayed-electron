@@ -15,7 +15,9 @@ const bodyParser = require("body-parser");
 const PORT = 3001;
 const APP_BASE_URL = isDev ? `http://localhost:${PORT}` : `file://${path.join(__dirname, "../index.html")}`;
 
-const store = new ElectronStore();
+const authStore = new ElectronStore({ name: "auth" });
+const settingsStore = new ElectronStore({ name: "settings" });
+
 const iconFile = process.platform === "darwin" ? "icon-mac.icns" : "icon.png";
 const iconPath = `${__dirname}/img/${iconFile}`;
 
@@ -106,6 +108,7 @@ async function createWindow() {
     show: true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: true,
       preload: path.join(__dirname, "./preload.js"),
     },
   });
@@ -146,7 +149,7 @@ async function createWindow() {
     if (payload.evt === "I_AM_READY") {
       console.log("Got ready event from renderer process");
 
-      const auth = store.get("auth");
+      const auth = authStore.get("auth");
       if (auth) {
         overlayed.auth = JSON.parse(JSON.stringify(auth));
         socketManager.setupListeners();
@@ -189,6 +192,12 @@ async function createWindow() {
           evt: "DISCONNECTED_FROM_DISCORD",
         });
       }
+    }
+
+    // config stuff
+    if (payload.event === "SET_CONFIG") {
+      console.log(payload)
+      authStore.set(payload.data.key, payload.data.value);
     }
   });
 
@@ -233,7 +242,7 @@ function createAuthService() {
     });
 
     // save token to store
-    store.set("auth", overlayed.auth);
+    authStore.set("auth", overlayed.auth);
 
     res.send({
       message: "Token received!",
@@ -270,14 +279,16 @@ app
   .whenReady()
   .then(() => {
     // add tray icon
-    const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
-    const trayIconPath = path.resolve(`${__dirname}/../img/trayicon-${trayIconTheme}.png`);
-    tray = new Tray(trayIconPath);
+    if (!settingsStore.get("hideTrayIcon")) {
+      const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
+      const trayIconPath = path.resolve(`${__dirname}/../img/trayicon-${trayIconTheme}.png`);
+      tray = new Tray(trayIconPath);
 
-    tray.setToolTip("Overlayed");
-    tray.setContextMenu(contextMenu);
+      tray.setToolTip("Overlayed");
+      tray.setContextMenu(contextMenu);
 
-    tray.on("click", function (event) {});
+      tray.on("click", function (event) {});
+    }
 
     // TODO: allow custom keybindings
     globalShortcut.register("Control+Shift+Space", toggleClickthrough);

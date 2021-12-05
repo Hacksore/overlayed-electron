@@ -1,17 +1,16 @@
 import { EventEmitter } from "events";
-
 let instance;
-
 class SettingsService extends EventEmitter {
-  
+    
+  // write to file config    
   set(key: string, value: unknown) {
-    localStorage.setItem(key, JSON.stringify(value));
+    window.electron.setConfigValue(key, value);
   }
 
   get(key: string) {
-    const item = localStorage.getItem(key);
+    const item = window.electron.getConfigValue(key);
     if (item) {
-      return JSON.parse(item);
+      return item;
     } else {
       return null;
     }

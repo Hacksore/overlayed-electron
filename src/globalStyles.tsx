@@ -14,14 +14,14 @@ export const GlobalStyleOverride = () => {
           },
           "::-webkit-scrollbar-track": {
             borderRadius: 10,
-            background: "#000",
+            background: "#141414",
           },
           "::-webkit-scrollbar-thumb": {
-            background: darken(theme.palette.secondary.main, 0.1),
+            background: darken(theme.palette.secondary.main, 0.4),
             borderRadius: 10,
           },
           "::-webkit-scrollbar-thumb:hover": {
-            background: darken(theme.palette.secondary.main, 0.4),
+            background: darken(theme.palette.secondary.main, 0.1),
           },
         },
       })}

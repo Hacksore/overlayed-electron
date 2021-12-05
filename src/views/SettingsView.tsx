@@ -12,6 +12,7 @@ import {
   RadioGroup,
   Radio,
   Checkbox,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect, useState } from "react";
@@ -69,14 +70,14 @@ export const Root = styled("div")(({ theme }) => ({
 const SettingsView = () => {
   const { handleSubmit, control } = useForm();
   const [scale, setScale] = useState(1);
+  const [listStyle, setListStyle] = useState(settings.get("listStyle") || "list");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
   const navigate = useNavigate();
 
   useEffect(() => {
     socketService.send({ event: "WINDOW_RESIZE", data: { height: 620 } });
-    const localScale = localStorage.getItem("scale") || "";
-    setScale(parseInt(localScale));
+    setScale(parseInt(settings.get("scale") || 1));
   }, []);
 
   // TODO: make a nice selector
@@ -154,28 +155,7 @@ const SettingsView = () => {
             />
           </Box>
 
-          <Box
-            sx={{  display: "flex", flexDirection: "column", ml: 1, width: 240 }}
-            className={classes.item}
-          >
-            <Controller
-              name="compactListView"
-              control={control}
-              defaultValue={settings.get("compactListView") || false}
-              render={({ field: { onChange, value } }) => (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={value}
-                      onChange={onChange}
-                      sx={{ color: "text.primary" }}
-                      name="compactListView"
-                    />
-                  }
-                  label="Compact List View"
-                />
-              )}
-            />
+          <Box sx={{ display: "flex", flexDirection: "column", ml: 1, width: 240 }} className={classes.item}>
             <Controller
               name="showJoinText"
               control={control}
@@ -200,7 +180,10 @@ const SettingsView = () => {
               defaultValue={settings.get("listStyle") || "list"}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
-                  onChange={onChange}
+                  onChange={(event: any) => {
+                    onChange(event);
+                    setListStyle(event.target.value);
+                  }}
                   value={value}
                   classes={{ root: classes.radio }}
                   aria-label="list style"
@@ -213,7 +196,28 @@ const SettingsView = () => {
               )}
             />
           </Box>
-
+          {listStyle === "list" && (
+            <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
+              <Controller
+                name="compactListView"
+                control={control}
+                defaultValue={settings.get("compactListView") || false}
+                render={({ field: { onChange, value } }) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={value}
+                        onChange={onChange}
+                        sx={{ color: "text.primary" }}
+                        name="compactListView"
+                      />
+                    }
+                    label="Compact List View (WIP)"
+                  />
+                )}
+              />
+            </Box>
+          )}
           <div className={classes.item}>
             <Typography gutterBottom variant="body2" color="textPrimary">
               Clickthrough Hotkey
@@ -237,6 +241,30 @@ const SettingsView = () => {
               )}
             />
           </div>
+
+          <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
+            <Controller
+              name="hideTrayIcon"
+              control={control}
+              defaultValue={settings.get("hideTrayIcon") || false}
+              render={({ field: { onChange, value } }) => (
+                <Tooltip arrow title="Requires you to restart Overlayed">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={value}
+                        onChange={onChange}
+                        sx={{ color: "text.primary" }}
+                        name="hideTrayIcon"
+                      />
+                    }
+                    label="Hide tray icon"
+                  />
+                </Tooltip>
+              )}
+            />
+          </Box>
+
           <div className={classes.item}>
             <Typography gutterBottom variant="body2" color="textPrimary">
               Open your overlayed settings folder
@@ -245,16 +273,16 @@ const SettingsView = () => {
               variant="contained"
               onClick={() => {
                 let appDir;
-                const { platform, home } = window.electron;
+                const { platform, home, appData } = window.electron;
 
                 if (platform === "darwin") {
                   appDir = `${home}/Library/Application Support/overlayed`;
                 } else if (platform === "win32") {
-                  appDir = `${home}/AppData/Local/overlayed`;
+                  appDir = `${appData}/overlayed`;
                 } else if (platform === "linux") {
                   appDir = `${home}/.config`;
                 }
-
+                console.log(appDir);
                 window.electron.openDirectory(appDir);
               }}
             >
