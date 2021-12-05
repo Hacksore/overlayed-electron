@@ -173,7 +173,7 @@ async function createWindow() {
     // Crude but works for now
     if (payload.event === "LOGOUT") {
       const appDir = app.getPath("userData");
-      fs.writeFileSync(`${appDir}/config.json`, "{}");
+      fs.writeFileSync(`${appDir}/auth.json`, "{}");
       app.quit();
     }
 
