@@ -1,7 +1,7 @@
 const isDev = require("electron-is-dev");
 
 const CLIENT_ID = "905987126099836938";
-const CALLBACK_URL = isDev ? "http://localhost:8000/auth" : "https://overlayed.dev/auth";
+const CALLBACK_URL = isDev ? "http://localhost:3000/auth" : "https://overlayed.dev/auth";
 
 const paramsMap = {
   client_id: CLIENT_ID,

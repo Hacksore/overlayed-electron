@@ -206,7 +206,7 @@ function createAuthService() {
   authApp = express();
   console.log("Starting auth app service");
 
-  const allowlist = ["http://localhost:8000", "https://overlayed.dev"];
+  const allowlist = ["http://localhost:3000", "https://overlayed.dev"];
   const corsOptionsDelegate = function (req, callback) {
     let corsOptions;
     if (allowlist.indexOf(req.header("Origin")) !== -1) {
