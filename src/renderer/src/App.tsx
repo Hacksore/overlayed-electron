@@ -43,7 +43,7 @@ function App() {
     socketSerivce.init(navigate);
 
     // disble mouse buttons
-    window.addEventListener("mouseup", e => {
+    window.addEventListener("mouseup", (e) => {
       if (e.button === 3 || e.button === 4) e.preventDefault();
     });
 
@@ -54,7 +54,10 @@ function App() {
   // stops it from happening on the auth window
   useEffect(() => {
     if (users.length > 0 && location.pathname === "/list") {
-      socketSerivce.send({ event: "WINDOW_RESIZE", data: { height: divHeight + 68 } });
+      socketSerivce.send({
+        event: "WINDOW_RESIZE",
+        data: { height: divHeight + 68 },
+      });
     }
   }, [users.length, divHeight, location]);
 
@@ -63,7 +66,10 @@ function App() {
       <Toolbar />
       <Routes>
         <Route path="/login" element={<LoginView />} />
-        <Route path="/list" element={<UserLayoutView setDivHeight={setDivHeight} />} />
+        <Route
+          path="/list"
+          element={<UserLayoutView setDivHeight={setDivHeight} />}
+        />
         <Route path="/settings" element={<SettingsView />} />
         <Route path="/failed" element={<ConnectionFailedView />} />
       </Routes>

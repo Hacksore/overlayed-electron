@@ -4,6 +4,6 @@
   "semi": true,
   "printWidth": 120,
   "singleQuote": false,
-  "quoteProps": "preserve",
+  "quoteProps": "as-needed",
   "arrowParens": "avoid"
 }

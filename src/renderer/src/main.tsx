@@ -9,7 +9,6 @@ import { HashRouter } from "react-router-dom";
 import { theme } from "./theme";
 import { GlobalStyleOverride } from "./globalStyles";
 
-
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
