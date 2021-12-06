@@ -23,6 +23,11 @@ function testSocketConnection(id) {
       reject(`error connecting to discord @ index ${id}`);
       sock.end();
     });
+
+    sock.once("close", err => {
+      reject(`error connecting to discord @ index ${id}`);
+      sock.end();
+    });
   });
 }
 

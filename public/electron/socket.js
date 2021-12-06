@@ -146,7 +146,6 @@ class SocketManager {
    */
   onDiscordMessage(message) {
     const { evt, cmd, data } = message;
-
     if (evt === "VOICE_CHANNEL_SELECT") {
       // attempt to unsub prior channel if found
       if (this.overlayed.lastChannelId) {
@@ -179,6 +178,15 @@ class SocketManager {
    */
   sendElectronMessage(message) {
     this._win.webContents.send("fromMain", JSON.stringify(message));
+  }
+
+  /**
+   * Send a message to discord
+   * @param {String} cmd - the message cmd to send
+   * 
+   */
+  sendDiscordMessage({ cmd, args }) {
+    this.client.send({ cmd, args, nonce: uuid() });
   }
 }
 

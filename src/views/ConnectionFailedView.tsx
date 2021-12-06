@@ -37,7 +37,6 @@ const ConnectionFailedView = () => {
       <Button
         variant="contained"
         onClick={() => {
-          // TODO: add to enums
           socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });
         }}
       >

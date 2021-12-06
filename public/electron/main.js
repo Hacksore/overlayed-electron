@@ -178,8 +178,11 @@ async function createWindow() {
     }
 
     // check for discord to be running
+    // TODO: I thik this is bugged
     if (payload.event === "CHECK_FOR_DISCORD") {
+      console.log("Test for client");
       // first thing is test if discord is running and if not make sure they visit a new page
+
       const isClientRunning = await isDiscordRunning();
       console.log("Is discord client running", isClientRunning);
 
@@ -192,12 +195,17 @@ async function createWindow() {
           evt: "DISCONNECTED_FROM_DISCORD",
         });
       }
+   
     }
 
     // config stuff
     if (payload.event === "SET_CONFIG") {
-      console.log(payload)
       authStore.set(payload.data.key, payload.data.value);
+    }
+
+    // proxy to discord
+    if (payload.event === "DISCORD_MESSAGE") {
+      socketManager.sendDiscordMessage(payload.data);
     }
   });
 

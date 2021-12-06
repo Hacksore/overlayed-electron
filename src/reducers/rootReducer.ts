@@ -35,7 +35,7 @@ const initialState: AppState = {
 const createUserStateItem = (payload: IDiscordUser) => ({
   username: payload.nick,
   avatarHash: payload.user.avatar,
-  muted: payload.voice_state.mute,
+  muted: payload.mute,
   deafened: payload.voice_state.deaf, // Probably only bots can deafen themselves
   selfDeafened: payload.voice_state.self_deaf,
   selfMuted: payload.voice_state.self_mute,
