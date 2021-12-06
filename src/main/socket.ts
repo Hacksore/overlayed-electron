@@ -1,6 +1,7 @@
-const RPC = require("@hacksore/discord-rpc");
-
-const { uuid } = require("./util");
+// @ts-ignore
+import * as RPC from "@hacksore/discord-rpc";
+import { BrowserWindow } from "electron";
+import { uuid } from "./util";
 
 // The overlayed prod client id
 const CLIENT_ID = "905987126099836938";
@@ -15,11 +16,15 @@ const SUBSCRIBABLE_EVENTS = [
 ];
 
 class SocketManager {
+  private _win: BrowserWindow;
+  private overlayed: any;
+  private client: any;
+
   /**
    * This is meant to send and recieve messages from the discord RPC
    * As well as relay the messages over IPC to the electron main/render processes
    */
-  constructor({ win, overlayed }) {
+  constructor({ win, overlayed }: { win: BrowserWindow, overlayed: any }) {
     this._win = win;
     this.overlayed = overlayed;
     this.client = new RPC.Client({ transport: "ipc" });
@@ -64,7 +69,7 @@ class SocketManager {
       accessToken: this.overlayed.auth.access_token,
     });
 
-    this.client.on("error", async error => {
+    this.client.on("error", async (error: Error) => {
       console.log("error with rpc", error);
     });
 
@@ -90,7 +95,7 @@ class SocketManager {
    * Subscribe to events by channelId defined in getRPCEvents
    * @returns {Array} - an array of subscribed events
    */
-  subscribeAllEvents(channelId) {
+  subscribeAllEvents(channelId: string) {
     SUBSCRIBABLE_EVENTS.map(eventName =>
       this.client.send({
         cmd: "SUBSCRIBE",
@@ -104,7 +109,7 @@ class SocketManager {
   /**
    * Unsubscribe to events by channelId defined in getRPCEvents
    */
-  unsubscribeAllEvents(channelId) {
+  unsubscribeAllEvents(channelId: string) {
     SUBSCRIBABLE_EVENTS.map(eventName =>
       this.client.send({
         cmd: "UNSUBSCRIBE",
@@ -119,7 +124,7 @@ class SocketManager {
    * Receieve message from the electron renderer process
    * @param {string} message
    */
-  onElectronMessage(message) {
+  onElectronMessage(message: string) {
     const { event } = JSON.parse(message);
 
     if (event === "TOGGLE_DEVTOOLS") {
@@ -142,9 +147,9 @@ class SocketManager {
 
   /**
    * Receieve message from the discord RPC websocket
-   * @param {string} message
+   * @param {Object} message
    */
-  onDiscordMessage(message) {
+  onDiscordMessage(message: any) {
     const { evt, cmd, data } = message;
     if (evt === "VOICE_CHANNEL_SELECT") {
       // attempt to unsub prior channel if found
@@ -176,7 +181,7 @@ class SocketManager {
    * Send a message to electron renderer process
    * @param {Object} message - the message to send in object format
    */
-  sendElectronMessage(message) {
+  sendElectronMessage(message: any) {
     this._win.webContents.send("fromMain", JSON.stringify(message));
   }
 
@@ -185,9 +190,9 @@ class SocketManager {
    * @param {String} cmd - the message cmd to send
    * 
    */
-  sendDiscordMessage({ cmd, args }) {
+  sendDiscordMessage({ cmd, args }: {cmd: string, args: any }) {
     this.client.send({ cmd, args, nonce: uuid() });
   }
 }
 
-module.exports = SocketManager;
+export default SocketManager;

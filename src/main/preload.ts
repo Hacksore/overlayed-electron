@@ -1,33 +1,36 @@
 /* eslint-disable no-undef */
-const { contextBridge, ipcRenderer } = require("electron");
-const { shell } = require("electron");
+import { shell, contextBridge, ipcRenderer } from "electron";
 
-const ElectronStore = require("electron-store");
-const store = new ElectronStore({ name: "settings" });
+import ElectronStore from "electron-store";
+
+const store = new ElectronStore({
+  name: "settings",
+  configFileMode: 0x666
+});
 
 contextBridge.exposeInMainWorld("electron", {
-  send: (channel, data) => {
+  send: (channel: string, data: any) => {
     const validChannels = ["toMain"];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, JSON.stringify(data));
     }
   },
-  receive: (channel, func) => {
+  receive: (channel: string, func: Function) => {
     const validChannels = ["fromMain"];
     if (validChannels.includes(channel)) {
       ipcRenderer.on(channel, (_, ...args) => func(...args));
     }
   },
-  setConfigValue: (key, value) => {
+  setConfigValue: (key: string, value: string) => {
     store.set(key, value);
   },
-  getConfigValue: (key) => {
+  getConfigValue: (key: string) => {
     return store.get(key);
   },
-  openInBrowser: url => {
+  openInBrowser: (url: string) => {
     shell.openExternal(url);
   },
-  openDirectory: url => {
+  openDirectory: (url: string) => {
     shell.openPath(url);
   },
   platform: process.platform,

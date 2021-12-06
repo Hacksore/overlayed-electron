@@ -1,7 +1,7 @@
-const net = require("net");
+import net from "net";
 
 // TODO: just export this from the rpc lib
-function getIPCPath(id) {
+function getIPCPath(id: number) {
   if (process.platform === "win32") {
     return `\\\\?\\pipe\\discord-ipc-${id}`;
   }
@@ -12,7 +12,7 @@ function getIPCPath(id) {
   return `${prefix.replace(/\/$/, "")}/discord-ipc-${id}`;
 }
 
-function testSocketConnection(id) {
+function testSocketConnection(id: number) {
   return new Promise((resolve, reject) => {
     const sock = net.createConnection(getIPCPath(id), () => {
       resolve(`connected to discord @ index ${id}`);
@@ -55,7 +55,7 @@ function uuid() {
 }
 
 
-module.exports = {
+export {
   isDiscordRunning,
   uuid
 };

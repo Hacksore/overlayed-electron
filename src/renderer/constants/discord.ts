@@ -1,8 +1,7 @@
 // @ts-ignore
-import * as RPC from "@hacksore/discord-rpc";
+// HACK: to not have client complain about node-fetch
+import { RPCCommands, RPCEvents } from "@hacksore/discord-rpc/src/constants";
 
-export const RPCCommands = RPC.Commands;
-export const RPCEvents = RPC.Events;
 
 export enum CustomEvents {
   WINDOW_RESIZE = "WINDOW_RESIZE",
@@ -14,4 +13,9 @@ export enum CustomEvents {
   CHECK_FOR_DISCORD = "CHECK_FOR_DISCORD",
   DISCONNECTED_FROM_DISCORD = "DISCONNECTED_FROM_DISCORD",
   SET_HOTKEY = "SET_HOTKEY",
+}
+
+export {
+  RPCCommands,
+  RPCEvents
 }
