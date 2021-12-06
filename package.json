@@ -1,13 +1,15 @@
 {
-  "name": "vite-react-electron",
-  "version": "1.0.0",
-  "description": "Vite React Electron boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "name": "overlayed",
+  "description": "A discord overlay",
+  "version": "1.0.0-alpha8",
+  "author": "Hacksore",
+  "private": true,
   "license": "MIT",
   "main": "dist/main/index.cjs",
   "scripts": {
     "dev": "node scripts/watch.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "pack": "node scripts/package.mjs"
   },
   "engines": {
     "node": ">=14.17.0"
@@ -52,8 +54,7 @@
     "vite-plugin-style-import": "^1.3.0"
   },
   "env": {
-    "//": "Used in build scripts",
-    "HOST": "127.0.0.1",
-    "PORT": 3344
+    "HOST": "localhost",
+    "PORT": 3000
   }
 }

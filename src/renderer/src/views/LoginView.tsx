@@ -82,7 +82,7 @@ const LoginView = () => {
             });
           }}
         >
-          <img className={classes.discordIcon} alt="Discord" src="img/discord-logo-small.svg" />
+          <img className={classes.discordIcon} alt="Discord" src="/img/discord-logo-small.svg" />
           Sign In with Discord
         </Button>
       </div>

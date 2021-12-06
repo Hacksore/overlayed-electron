@@ -1,14 +1,15 @@
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = "development";
 
-import { readFileSync } from 'fs'
-import { join } from 'path'
-import electron from 'electron'
-import { spawn } from 'child_process'
-import { createServer, build as viteBuild } from 'vite'
-import chalk from 'chalk'
+import { readFileSync } from "fs";
+import { join } from "path";
+import electron from "electron";
+import { spawn } from "child_process";
+import { createServer, build as viteBuild } from "vite";
+import chalk from "chalk";
+import path from "path";
 
-const TAG = chalk.bgGreen('[dev.mjs]')
-const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'))
+const TAG = chalk.bgGreen("[dev.mjs]");
+const pkg = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8"));
 
 /**
  * @param {{ name: string; configFile: string; writeBundle: import('rollup').OutputPlugin['writeBundle'] }} param0
@@ -22,10 +23,8 @@ function getWatcher({ name, configFile, writeBundle }) {
       watch: {},
     },
     configFile,
-    plugins: [
-      { name, writeBundle },
-    ],
-  })
+    plugins: [{ name, writeBundle }],
+  });
 }
 
 /**
@@ -35,24 +34,24 @@ async function watchMain() {
   /**
    * @type {import('child_process').ChildProcessWithoutNullStreams | null}
    */
-  let electronProcess = null
+  let electronProcess = null;
 
   /**
    * @type {import('rollup').RollupWatcher}
    */
   const watcher = await getWatcher({
-    name: 'electron-main-watcher',
-    configFile: 'configs/vite.main.ts',
+    name: "electron-main-watcher",
+    configFile: "configs/vite.main.ts",
     writeBundle() {
-      electronProcess && electronProcess.kill()
-      electronProcess = spawn(electron, ['.'], {
-        stdio: 'inherit',
+      electronProcess && electronProcess.kill();
+      electronProcess = spawn(electron, ["."], {
+        stdio: "inherit",
         env: Object.assign(process.env, pkg.env),
-      })
+      });
     },
-  })
+  });
 
-  return watcher
+  return watcher;
 }
 
 /**
@@ -61,19 +60,23 @@ async function watchMain() {
  */
 async function watchPreload(viteDevServer) {
   return getWatcher({
-    name: 'electron-preload-watcher',
-    configFile: 'configs/vite.preload.ts',
+    name: "electron-preload-watcher",
+    configFile: "configs/vite.preload.ts",
     writeBundle() {
       viteDevServer.ws.send({
-        type: 'full-reload',
-      })
+        type: "full-reload",
+      });
     },
-  })
+  });
 }
 
 // bootstrap
-const viteDevServer = await createServer({ configFile: 'configs/vite.renderer.ts' })
+const viteDevServer = await createServer({
+  configFile: "configs/vite.renderer.ts",
+  logLevel: "info",
+  publicDir: path.resolve("../public")
+});
 
-await viteDevServer.listen()
-await watchPreload(viteDevServer)
-await watchMain()
+await viteDevServer.listen();
+await watchPreload(viteDevServer);
+await watchMain();
