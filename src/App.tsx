@@ -10,6 +10,7 @@ import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 import socketSerivce from "./services/socketService";
 import { useEffect, useState } from "react";
 import ConnectionFailedView from "./views/ConnectionFailedView";
+import { ContextMenu } from "./components/ContextMenu";
 
 // Put this somewhere else?
 declare global {
@@ -66,6 +67,8 @@ function App() {
         <Route path="/settings" element={<SettingsView />} />
         <Route path="/failed" element={<ConnectionFailedView />} />
       </Routes>
+
+      <ContextMenu />
     </Root>
   );
 }

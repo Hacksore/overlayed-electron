@@ -15,6 +15,7 @@ let theme = createTheme({
     },
     text: {
       primary: "#fff",
+      disabled: "#c9c9c9",
     },
     secondary: {
       main: "#747474",
@@ -29,7 +30,6 @@ let theme = createTheme({
 
 // overrides with access to the theme here  
 theme = createTheme(theme, {
-  spacing: 0,
   components: {
     MuiTooltip: {
       styleOverrides: {
@@ -38,17 +38,18 @@ theme = createTheme(theme, {
           "&::before": {
             // apply to the border of the arrow
             border: `1px solid #3a3a3a`,
-            backgroundColor: theme.palette.background.default,
+            backgroundColor: darken(theme.palette.background.default, 0.2),
             boxSizing: "border-box",
           },
         },
         tooltip: {
-          backgroundColor: theme.palette.background.default,
+          backgroundColor: darken(theme.palette.background.default, 0.2),
           border: `1px solid #3a3a3a`,
           fontSize: 20,
         },
       },
-    }
+    },
+
   }, 
 });
 

@@ -18,7 +18,7 @@ const Root = styled("div", {
 })<{ scroll: boolean }>(({ scroll }) => ({
   [`&.${classes.root}`]: {
     padding: "0 12px 6px 12px",
-    maxHeight: 650,
+    maxHeight: 800,
     overflowY: scroll ? "none" : "auto",
   },
 }));

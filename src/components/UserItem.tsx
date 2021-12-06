@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, lighten, darken } from "@mui/material/styles";
+import { styled, lighten } from "@mui/material/styles";
 import { Box } from "@mui/material";
 
 import { IUser } from "../types/user";
@@ -61,7 +61,7 @@ interface IUserItem extends IUser {
 }
 
 export const UserItem = React.memo((props: IUserItem) => {
-  const { deafened, username, muted, selfDeafened, selfMuted, volume } = props;
+  const { deafened, username, muted, selfDeafened, selfMuted } = props;
   const scale = useScale();
 
   const getNameColor = () => {
@@ -79,15 +79,7 @@ export const UserItem = React.memo((props: IUserItem) => {
     <Root scale={props.scale || scale} nameColor={getNameColor()} className={classes.root}>
       <Box
         sx={{
-          borderLeft: "2px solid rgba(0, 0, 0, 0)",
-          borderColor: () => {
-            const volFloat = parseFloat((volume / 100).toFixed(1));
-            if (volFloat < 1) {
-              return darken("#f92222", volFloat - 0.2);
-            } else {
-              return "rgba(0, 0, 0, 0)";
-            }
-          },
+          position: "relative",
         }}
       >
         <DiscordAvatar scale={props.scale || scale} {...props} />

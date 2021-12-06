@@ -14,8 +14,8 @@ const classes = {
   userWrap: `${PREFIX}-userWrap`,
 };
 
-const Root = styled("div", { 
-  shouldForwardProp: prop => prop !== "scroll"
+const Root = styled("div", {
+  shouldForwardProp: prop => prop !== "scroll",
 })<{ scroll: boolean }>(({ scroll }) => ({
   [`&.${classes.root}`]: {
     display: "flex",
@@ -29,7 +29,7 @@ const Root = styled("div", {
     paddingTop: 4,
   },
   [`& .${classes.user}`]: {
-    padding: "2px 2px 2px 2px"
+    padding: "2px 2px 2px 2px",
   },
 }));
 
@@ -47,7 +47,7 @@ const UserGridView = ({ setDivHeight }: { setDivHeight: Function }) => {
 
   return (
     <Root scroll={clickThrough} ref={listRef} className={classes.root}>
-      {(!showJoinText && users.length <= 0) && (
+      {!showJoinText && users.length <= 0 && (
         <Box sx={{ pt: 1, pb: 1 }}>
           <Typography color="textPrimary" variant="h5">
             No Voice Chat 🙉
@@ -60,8 +60,8 @@ const UserGridView = ({ setDivHeight }: { setDivHeight: Function }) => {
 
       <div className={classes.userWrap}>
         {users.map((props: IUser) => (
-          <div className={classes.user}>
-            <DiscordAvatar key={props.id} {...props} />
+          <div key={props.id} className={classes.user}>
+            <DiscordAvatar {...props} />
           </div>
         ))}
       </div>

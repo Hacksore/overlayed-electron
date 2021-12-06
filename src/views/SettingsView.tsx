@@ -80,26 +80,15 @@ const SettingsView = () => {
     setScale(parseInt(settings.get("scale") || 1));
   }, []);
 
-  // TODO: make a nice selector
-  // const handleKeyDown = (event: React.KeyboardEvent) => {
-  //   const { key } = event;
-
-  //   const keyToAdd = keys.length > 0 ? keys + "+" : "";
-  //   if (event.metaKey || event.shiftKey) {
-  //     setKeys(keyToAdd + event.key);
-  //   } else {
-  //     setKeys(event.key);
-  //   }
-
-  //   if (key === "Enter") {
-  //     setKeys("");
-  //   }
-  // };
 
   const onSubmit = (data: any) => {
     for (const [key, val] of Object.entries(data)) {
       // save items to settings
       settings.set(key, val);
+    }
+
+    if (listStyle === "grid") {
+      settings.set("compactListView", false);
     }
 
     // go back to previous screen
@@ -196,28 +185,29 @@ const SettingsView = () => {
               )}
             />
           </Box>
-          {listStyle === "list" && (
-            <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
-              <Controller
-                name="compactListView"
-                control={control}
-                defaultValue={settings.get("compactListView") || false}
-                render={({ field: { onChange, value } }) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={value}
-                        onChange={onChange}
-                        sx={{ color: "text.primary" }}
-                        name="compactListView"
-                      />
-                    }
-                    label="Compact List View (WIP)"
-                  />
-                )}
-              />
-            </Box>
-          )}
+
+          <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
+            <Controller
+              name="compactListView"
+              control={control}
+              defaultValue={settings.get("compactListView") || false}
+              render={({ field: { onChange, value } }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      disabled={listStyle === "grid"}
+                      checked={listStyle === "grid" ? false : value}
+                      onChange={onChange}
+                      sx={{ color: "text.primary" }}
+                      name="compactListView"
+                    />
+                  }
+                  label="Compact List View"
+                />
+              )}
+            />
+          </Box>
+
           <div className={classes.item}>
             <Typography gutterBottom variant="body2" color="textPrimary">
               Clickthrough Hotkey
@@ -242,7 +232,7 @@ const SettingsView = () => {
             />
           </div>
 
-          <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
+          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 240 }} className={classes.item}>
             <Controller
               name="hideTrayIcon"
               control={control}

@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useRef } from "react";
 import { styled } from "@mui/material/styles";
 
 import { IUser } from "../types/user";
 import { useScale } from "../hooks/useScale";
+import { useAppDispatch } from "../hooks/redux";
+import { appSlice } from "../reducers/rootReducer";
+const { setContextMenu } = appSlice.actions;
 
 const PREFIX = "UserItem";
 const classes = {
@@ -19,7 +22,7 @@ interface RootProps {
 export const DEFAULT_AVATAR_SIZE = 36;
 
 const Root = styled("div", {
-  shouldForwardProp: prop => !["scale", "iconColor", "disabled"].includes(prop.toString()),
+  shouldForwardProp: (prop: any) => !["scale", "iconColor", "disabled"].includes(prop.toString()),
 })<RootProps>(({ scale, iconColor, disabled }) => {
   const realScale = 1 + scale * 0.1;
   return {
@@ -39,8 +42,10 @@ interface IDiscordAvatar extends IUser {
 }
 
 export const DiscordAvatar = React.memo((props: IDiscordAvatar) => {
+  const dispatch = useAppDispatch();
   const { id, avatarHash, talking, muted, selfDeafened } = props;
   const scale = useScale();
+  const ref = useRef(null);
 
   const getIconColor = () => {
     if (talking) {
@@ -56,7 +61,21 @@ export const DiscordAvatar = React.memo((props: IDiscordAvatar) => {
   const avatarUrl = avatarHash ? `https://cdn.discordapp.com/avatars/${id}/${avatarHash}.jpg` : "./img/default.png";
 
   return (
-    <Root disabled={selfDeafened} iconColor={getIconColor()} scale={props.scale || scale}>
+    <Root
+      ref={ref}
+      onContextMenu={(event: any) => {
+        event.preventDefault();
+        dispatch(setContextMenu({ 
+          open: true, 
+          id: props.id, 
+          x: event.clientX, 
+          y: event.clientY 
+        }));
+      }}
+      disabled={selfDeafened}
+      iconColor={getIconColor()}
+      scale={props.scale || scale}
+    >
       <img
         onError={e => {
           // @ts-ignore

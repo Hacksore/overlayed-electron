@@ -12,6 +12,7 @@ export interface AppState {
   isPinned: boolean;
   isAuthed: boolean;
   clickThrough: boolean;
+  contextMenu: any;
 }
 
 const initialState: AppState = {
@@ -22,7 +23,14 @@ const initialState: AppState = {
   isReady: false,
   isPinned: false,
   isAuthed: false,
-  clickThrough: false,};
+  clickThrough: false,
+  contextMenu: {
+    open: false,
+    id: null,
+    x: null,
+    y: null,
+  }
+};
 
 const createUserStateItem = (payload: IDiscordUser) => ({
   username: payload.nick,
@@ -123,6 +131,9 @@ export const appSlice = createSlice({
           }
         })
         .map((item: IUser) => (item.id === action.payload.user.id ? createUserStateItem(action.payload) : item));
+    },
+    setContextMenu: (state, action: PayloadAction<any>) => {
+      state.contextMenu = action.payload;
     },
   },
 });
