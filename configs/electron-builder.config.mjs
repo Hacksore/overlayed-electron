@@ -14,7 +14,7 @@ const config = {
     target: [
       {
         target: "dmg",
-        arch: ["universal"],
+        arch: ["x64", "arm64"],
       },
     ],
     icon: "public/img/icon-mac.icns",
