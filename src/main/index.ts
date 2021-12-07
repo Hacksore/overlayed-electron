@@ -7,9 +7,6 @@ import fs from "fs";
 import { isDiscordRunning } from "./util";
 import AuthServer from "./auth";
 
-// Base URL for the app
-const PORT = process.env.PORT || 3001;
-
 const authStore = new ElectronStore({ name: "auth" });
 const settingsStore = new ElectronStore({ name: "settings" });
 
@@ -131,6 +128,7 @@ async function createWindow() {
     if (payload.evt === "CONNECTED_TO_DISCORD") {
       console.log("Stopping the auth serivce as we are connected");
       authApp.close();
+      authApp = null;
     }
 
     // check if we got told to open auth window
@@ -207,7 +205,7 @@ async function createWindow() {
   const appPath = isClientRunning ? "login" : "failed";
 
   if (app.isPackaged) {
-    const mainUrl = path.join(__dirname, `../renderer/index.html`);
+    const mainUrl = path.join(__dirname, "../renderer/index.html");
     win.loadURL(`file://${mainUrl}#/${appPath}`);
   } else {
     const pkg = await import("../../package.json");
@@ -269,15 +267,15 @@ app
     // add tray icon
     if (!settingsStore.get("hideTrayIcon")) {
       const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
-      const trayIconPath = path.resolve(
-        `${__dirname}/../renderer/img/trayicon-${trayIconTheme}.png`
-      );
+      const trayIconPath = path.resolve(`${__dirname}/../renderer/img/trayicon-${trayIconTheme}.png`);
       tray = new Tray(trayIconPath);
 
       tray.setToolTip("Overlayed");
       tray.setContextMenu(contextMenu);
 
-      tray.on("click", function (event) {});
+      tray.on("click", () => {
+        win.focus();
+      });
     }
 
     // TODO: allow custom keybindings

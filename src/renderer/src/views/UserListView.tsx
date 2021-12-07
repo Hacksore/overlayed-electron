@@ -23,7 +23,7 @@ const Root = styled("div", {
   },
 }));
 
-const UserList = ({ setDivHeight }: { setDivHeight: Function }) => {
+const UserList = ({ setDivHeight }: { setDivHeight: (height: number) => void }) => {
   const users = useAppSelector((state: RootState) => state.root.users);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
   const listRef = useRef<any>(null);

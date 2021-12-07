@@ -16,15 +16,15 @@ import { ContextMenu } from "./components/ContextMenu";
 declare global {
   interface Window {
     electron: {
-      send: Function;
-      receive: Function;
-      openInBrowser: Function;
-      openDirectory: Function;
+      send: (key: string, val: any) => void;
+      receive: (key: string, fn: any) => void;
+      openInBrowser: (path: string) => void;
+      openDirectory: (path: string) => void;
       platform: string;
       home: string;
       appData: string;
-      setConfigValue: Function;
-      getConfigValue: Function;
+      setConfigValue: (key: string, val: any) => void;
+      getConfigValue: (key: string) => any;
     };
   }
 }
@@ -47,7 +47,6 @@ function App() {
       if (e.button === 3 || e.button === 4) e.preventDefault();
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // side effect to only start sending resize events when there are users

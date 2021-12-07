@@ -1,4 +1,3 @@
-import { BrowserWindow } from "electron";
 import EventEmitter from "events";
 import http from "http";
 

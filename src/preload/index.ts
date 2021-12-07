@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld("electron", {
       ipcRenderer.send(channel, JSON.stringify(data));
     }
   },
-  receive: (channel: string, func: Function) => {
+  receive: (channel: string, func: (...input: any) => void) => {
     const validChannels = ["fromMain"];
     if (validChannels.includes(channel)) {
       ipcRenderer.on(channel, (_, ...args) => func(...args));

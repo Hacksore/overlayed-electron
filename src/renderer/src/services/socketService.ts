@@ -37,7 +37,7 @@ class IPCSocketService extends EventEmitter {
    * Send a message to the main process via IPC
    * @param message - Object
    */
-  send(message: Object) {
+  send(message: any) {
     window.electron.send("toMain", message);
   }
 
@@ -135,7 +135,9 @@ class IPCSocketService extends EventEmitter {
    * Remove all the attached listeners
    */
   // @ts-ignore
-  removeAllListeners() {}
+  removeAllListeners() {
+    // TODO:
+  }
 }
 
 if (!instance) {

@@ -28,7 +28,7 @@ let theme = createTheme({
   },
 });
 
-// overrides with access to the theme here  
+// overrides with access to the theme here
 theme = createTheme(theme, {
   components: {
     MuiTooltip: {
@@ -37,20 +37,19 @@ theme = createTheme(theme, {
           color: theme.palette.background.default,
           "&::before": {
             // apply to the border of the arrow
-            border: `1px solid #3a3a3a`,
+            border: "1px solid #3a3a3a",
             backgroundColor: darken(theme.palette.background.default, 0.2),
             boxSizing: "border-box",
           },
         },
         tooltip: {
           backgroundColor: darken(theme.palette.background.default, 0.2),
-          border: `1px solid #3a3a3a`,
+          border: "1px solid #3a3a3a",
           fontSize: 20,
         },
       },
     },
-
-  }, 
+  },
 });
 
 export { theme };

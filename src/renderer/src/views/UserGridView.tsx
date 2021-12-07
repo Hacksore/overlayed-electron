@@ -34,7 +34,7 @@ const Root = styled("div", {
 }));
 
 // TODO: fix this later
-const UserGridView = ({ setDivHeight }: { setDivHeight: Function }) => {
+const UserGridView = ({ setDivHeight }: { setDivHeight: (height: number) => void }) => {
   const users = useAppSelector((state: RootState) => state.root.users);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
   const listRef = useRef<any>(null);

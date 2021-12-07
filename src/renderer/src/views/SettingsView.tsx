@@ -80,7 +80,6 @@ const SettingsView = () => {
     setScale(parseInt(settings.get("scale") || 1));
   }, []);
 
-
   const onSubmit = (data: any) => {
     for (const [key, val] of Object.entries(data)) {
       // save items to settings
@@ -217,13 +216,13 @@ const SettingsView = () => {
               name="clickthroughHotkey"
               control={control}
               defaultValue="Control+Shift+Space"
-              render={({ field: { onChange, value } }) => (
+              render={({ field: { value } }) => (
                 <TextField
                   variant="standard"
                   color="info"
                   focused
                   value={value}
-                  onKeyDown={(e: any) => {
+                  onKeyDown={() => {
                     // TODO: This one is hard
                     // onChange
                   }}

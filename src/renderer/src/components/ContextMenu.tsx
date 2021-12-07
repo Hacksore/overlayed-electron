@@ -15,7 +15,7 @@ const classes = {
   paper: `${PREFIX}-paper`,
 };
 
-export const Root = styled("div")(({ theme }) => ({
+export const Root = styled("div")(() => ({
   [`& .${classes.root}`]: {
     position: "inherit",
   },
@@ -81,10 +81,10 @@ export const ContextMenu: FC = () => {
                 cmd: "SET_USER_VOICE_SETTINGS",
                 args: {
                   user_id: userInfo?.id,
-                  mute: !muted,                
-                }
-              }
-            })
+                  mute: !muted,
+                },
+              },
+            });
             handleClose();
           }}
         >

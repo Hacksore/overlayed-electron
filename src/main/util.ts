@@ -19,12 +19,12 @@ function testSocketConnection(id: number) {
       sock.end();
     });
 
-    sock.once("error", err => {
+    sock.once("error", () => {
       reject(`error connecting to discord @ index ${id}`);
       sock.end();
     });
 
-    sock.once("close", err => {
+    sock.once("close", () => {
       reject(`error connecting to discord @ index ${id}`);
       sock.end();
     });
@@ -38,7 +38,7 @@ async function isDiscordRunning() {
       if (res) {
         return true;
       }
-    } catch (err) {     
+    } catch (err) {
       // Do nothing
     }
   }
@@ -48,14 +48,10 @@ async function isDiscordRunning() {
 
 function uuid() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
+    const r = (Math.random() * 16) | 0,
       v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
 
-
-export {
-  isDiscordRunning,
-  uuid
-};
+export { isDiscordRunning, uuid };

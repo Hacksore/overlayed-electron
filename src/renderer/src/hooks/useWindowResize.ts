@@ -4,11 +4,11 @@ import socketService from "../services/socketService";
 interface IType {
   height: number;
   offset?: number;
-};
+}
 
-export const useWindowResize = ({ height , offset = 0}: IType) => {  
+export const useWindowResize = ({ height, offset = 0 }: IType) => {
   useEffect(() => {
-    console.log("resize", height)
+    console.log("resize", height);
     socketService.send({ event: "WINDOW_RESIZE", data: { height: height + offset } });
   }, [height, offset]);
 };

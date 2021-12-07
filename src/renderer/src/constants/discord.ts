@@ -1,7 +1,6 @@
-// @ts-ignore
 // HACK: to not have client complain about node-fetch
+// @ts-ignore
 import { RPCCommands, RPCEvents } from "@hacksore/discord-rpc/src/constants";
-
 
 export enum CustomEvents {
   WINDOW_RESIZE = "WINDOW_RESIZE",
@@ -15,7 +14,4 @@ export enum CustomEvents {
   SET_HOTKEY = "SET_HOTKEY",
 }
 
-export {
-  RPCCommands,
-  RPCEvents
-}
+export { RPCCommands, RPCEvents };

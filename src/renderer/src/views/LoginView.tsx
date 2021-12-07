@@ -23,7 +23,7 @@ export const Root = styled("div")(({ theme }) => ({
   borderBottomLeftRadius: 6,
   borderBottomRightRadius: 6,
   [`& .${classes.instructions}`]: {
-    [`& div`]: {
+    ["& div"]: {
       margin: "10px 0 10px 0",
       padding: "10px 12px 10px 12px",
       background: "#1c1c1c",
@@ -46,7 +46,7 @@ export const Root = styled("div")(({ theme }) => ({
     flexGrow: 1,
   },
 
-  [`& a`]: {
+  ["& a"]: {
     color: lighten(theme.palette.primary.main, 0.35),
   },
 }));
@@ -59,7 +59,6 @@ const LoginView = () => {
 
     // ask electron if we are connected?
     socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });
-
   }, []);
 
   return (
