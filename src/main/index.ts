@@ -210,7 +210,7 @@ async function createWindow() {
   const appPath = isClientRunning ? "login" : "failed";
 
   if (app.isPackaged) {
-    win.loadFile(path.join(__dirname, `../renderer/index.html`));
+    win.loadFile(path.join(__dirname, `../renderer/index.html#/${appPath}`));
   } else {
     const pkg = await import("../../package.json");
     const url = `http://${pkg.env.HOST || "127.0.0.1"}:${pkg.env.PORT}`;
@@ -229,24 +229,19 @@ function createAuthService() {
   http
     .createServer((request: any, response: any) => {
       if (request.method == "POST" && request.urk === "/auth") {
-        // const body = 
+        // const body =
         // overlayed.auth = { ...req.body };
-
         // socketManager.setupListeners();
-
         // // tell client auth is done
         // socketManager.sendElectronMessage({
         // evt: "OAUTH_DANCE_COMPLETED",
         // data: overlayed.auth, // TODO: we probably don't need this
         // });
-
         // // save token to store
         // authStore.set("auth", overlayed.auth);
-
         // res.send({
         //   message: "Token received!",
         // });
-
         // // bring window to top after getting a token
         // win.show();
       }

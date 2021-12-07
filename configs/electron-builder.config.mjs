@@ -6,6 +6,7 @@ const config = {
   asar: true,
   directories: {
     output: "release/${version}",
+    buildResources: "public",
   },
   files: ["!node_modules", "dist", "package.json"],
   mac: {
@@ -19,6 +20,7 @@ const config = {
     icon: "public/img/icon.png",
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
   },
+  afterSign: "scripts/afterSignHook.js",
 };
 
 export { config };
