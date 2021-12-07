@@ -11,13 +11,12 @@ const config = {
   files: ["build/**/*", "node_modules/**/*"],
   mac: {
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
-    target: [{
-      target: "dmg",
-      "arch": [
-        "x64",
-        "arm64"
-      ]
-    }],
+    target: [
+      {
+        target: "dmg",
+        arch: ["universal"],
+      },
+    ],
     icon: "public/img/icon-mac.icns",
     entitlements: "configs/entitlements.mac.inherit.plist",
   },
