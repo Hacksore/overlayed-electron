@@ -267,18 +267,18 @@ app
   .whenReady()
   .then(() => {
     // add tray icon
-    // if (!settingsStore.get("hideTrayIcon")) {
-    //   const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
-    //   const trayIconPath = path.resolve(
-    //     `${__dirname}/../img/trayicon-${trayIconTheme}.png`
-    //   );
-    //   tray = new Tray(trayIconPath);
+    if (!settingsStore.get("hideTrayIcon")) {
+      const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
+      const trayIconPath = path.resolve(
+        `${__dirname}/../renderer/img/trayicon-${trayIconTheme}.png`
+      );
+      tray = new Tray(trayIconPath);
 
-    //   tray.setToolTip("Overlayed");
-    //   tray.setContextMenu(contextMenu);
+      tray.setToolTip("Overlayed");
+      tray.setContextMenu(contextMenu);
 
-    //   tray.on("click", function (event) {});
-    // }
+      tray.on("click", function (event) {});
+    }
 
     // TODO: allow custom keybindings
     globalShortcut.register("Control+Shift+Space", toggleClickthrough);
@@ -301,17 +301,4 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
-});
-
-// -------------------------------------
-
-/**
- * Expose 'electron-store' to renderer through 'ipcMain.handle'
- */
-const store = new ElectronStore();
-ipcMain.handle("electron-store", async (_evnet, methodSign: string, ...args: any[]) => {
-  if (typeof (store as any)[methodSign] === "function") {
-    return (store as any)[methodSign](...args);
-  }
-  return (store as any)[methodSign];
 });
