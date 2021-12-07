@@ -1,24 +1,24 @@
 import { join } from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-// TODO:
-import styleImport from "vite-plugin-style-import";
 import pkg from "../package.json";
-import { builtinModules } from "module";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   mode: process.env.NODE_ENV,
   root: join(__dirname, "../src/renderer"),
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   base: "./",
   build: {
     emptyOutDir: true,
     outDir: "../../dist/renderer",
     rollupOptions: {
-      external: [...builtinModules, "events"],
+      plugins: [
+        nodeResolve({
+          browser: true,
+          preferBuiltins: false,
+        }),
+      ],
     },
   },
   server: {

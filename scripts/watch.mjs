@@ -5,10 +5,8 @@ import { join } from "path";
 import electron from "electron";
 import { spawn } from "child_process";
 import { createServer, build as viteBuild } from "vite";
-import chalk from "chalk";
 import path from "path";
 
-const TAG = chalk.bgGreen("[dev.mjs]");
 const pkg = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8"));
 
 /**
@@ -74,7 +72,7 @@ async function watchPreload(viteDevServer) {
 const viteDevServer = await createServer({
   configFile: "configs/vite.renderer.ts",
   logLevel: "info",
-  publicDir: path.resolve("../public")
+  publicDir: path.resolve("./public"),
 });
 
 await viteDevServer.listen();

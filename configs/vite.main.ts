@@ -15,7 +15,7 @@ export default defineConfig({
     minify: false,
     emptyOutDir: true,
     rollupOptions: {
-      external: [...builtinModules, "electron", "events"],
+      external: [...builtinModules, "electron"],
       output: {
         entryFileNames: "[name].cjs",
       },

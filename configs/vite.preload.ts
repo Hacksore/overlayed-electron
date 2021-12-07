@@ -1,6 +1,7 @@
 import { join } from "path";
 import { builtinModules } from "module";
 import { defineConfig } from "vite";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
 export default defineConfig({
   mode: process.env.NODE_ENV,
@@ -15,7 +16,12 @@ export default defineConfig({
     minify: false,
     emptyOutDir: true,
     rollupOptions: {
-      external: [...builtinModules, "electron", "events"],
+      external: [...builtinModules, "electron"],
+      plugins: [
+        nodeResolve({
+          preferBuiltins: false,
+        }),
+      ],
       output: {
         entryFileNames: "[name].cjs",
       },

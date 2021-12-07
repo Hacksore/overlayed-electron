@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import EventEmitter from "events";
 import { store } from "../store";
 import { appSlice } from "../reducers/rootReducer";
 import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";

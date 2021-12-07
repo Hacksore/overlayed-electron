@@ -1,14 +1,5 @@
 import * as path from "path";
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  globalShortcut,
-  shell,
-  Tray,
-  Menu,
-  nativeTheme,
-} from "electron";
+import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme } from "electron";
 import isDev from "electron-is-dev";
 import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
@@ -50,8 +41,7 @@ const overlayed = {
 };
 
 // util method
-const clamp = (num: number, min: number, max: number) =>
-  Math.min(Math.max(num, min), max);
+const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
 // make global
 const contextMenu = Menu.buildFromTemplate([
@@ -220,7 +210,7 @@ async function createWindow() {
   const appPath = isClientRunning ? "login" : "failed";
 
   if (app.isPackaged) {
-    win.loadFile(path.join(__dirname, `../renderer/index.html#/${appPath}`));
+    win.loadFile(path.join(__dirname, `../renderer/index.html`));
   } else {
     const pkg = await import("../../package.json");
     const url = `http://${pkg.env.HOST || "127.0.0.1"}:${pkg.env.PORT}`;
@@ -229,55 +219,85 @@ async function createWindow() {
   }
 }
 
-// /**
-//  * Create a simple express server waiting for a POST
-//  * from the main site with a valid auth token
-//  */
-// function createAuthService() {
-//   authApp = express();
-//   console.log("Starting auth app service");
+/**
+ * Create a simple express server waiting for a POST
+ * from the main site with a valid auth token
+ */
+function createAuthService() {
+  const http = require("http");
 
-//   const allowlist = ["http://localhost:3000", "https://overlayed.dev"];
-//   const corsOptionsDelegate = function (req: any, callback: Function) {
-//     let corsOptions;
-//     if (allowlist.indexOf(req.header("Origin")) !== -1) {
-//       corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
-//     } else {
-//       corsOptions = { origin: false }; // disable CORS for this request
-//     }
-//     callback(null, corsOptions); // callback expects two parameters: error and options
-//   };
+  http
+    .createServer((request: any, response: any) => {
+      if (request.method == "POST" && request.urk === "/auth") {
+        // const body = 
+        // overlayed.auth = { ...req.body };
 
-//   authApp.use(bodyParser.json());
-//   authApp.use(cors(corsOptionsDelegate));
+        // socketManager.setupListeners();
 
-//   authApp.post("/auth", (req: Request, res: Response) => {
-//     console.log("got auth", req.body);
-//     overlayed.auth = { ...req.body };
+        // // tell client auth is done
+        // socketManager.sendElectronMessage({
+        // evt: "OAUTH_DANCE_COMPLETED",
+        // data: overlayed.auth, // TODO: we probably don't need this
+        // });
 
-//     socketManager.setupListeners();
+        // // save token to store
+        // authStore.set("auth", overlayed.auth);
 
-//     // tell client auth is done
-//     socketManager.sendElectronMessage({
-//       evt: "OAUTH_DANCE_COMPLETED",
-//       data: overlayed.auth, // TODO: we probably don't need this
-//     });
+        // res.send({
+        //   message: "Token received!",
+        // });
 
-//     // save token to store
-//     authStore.set("auth", overlayed.auth);
+        // // bring window to top after getting a token
+        // win.show();
+      }
+    })
+    .listen(61200);
+  console.log("Server running at http://127.0.0.1:8125/");
+  // TODO: this is broke nad is throwing an error
+  // authApp = express();
+  // console.log("Starting auth app service");
 
-//     res.send({
-//       message: "Token received!",
-//     });
+  // const allowlist = ["http://localhost:3000", "https://overlayed.dev"];
+  // const corsOptionsDelegate = function (req: any, callback: Function) {
+  //   let corsOptions;
+  //   if (allowlist.indexOf(req.header("Origin")) !== -1) {
+  //     corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+  //   } else {
+  //     corsOptions = { origin: false }; // disable CORS for this request
+  //   }
+  //   callback(null, corsOptions); // callback expects two parameters: error and options
+  // };
 
-//     // bring window to top after getting a token
-//     win.show();
-//   });
+  // authApp.use(bodyParser.json());
+  // authApp.use(cors(corsOptionsDelegate));
 
-//   authApp.listen(61200);
-// }
+  // authApp.post("/auth", (req: Request, res: Response) => {
+  //   console.log("got auth", req.body);
+  //   overlayed.auth = { ...req.body };
 
-// createAuthService();
+  //   socketManager.setupListeners();
+
+  //   // tell client auth is done
+  //   socketManager.sendElectronMessage({
+  //     evt: "OAUTH_DANCE_COMPLETED",
+  //     data: overlayed.auth, // TODO: we probably don't need this
+  //   });
+
+  //   // save token to store
+  //   authStore.set("auth", overlayed.auth);
+
+  //   res.send({
+  //     message: "Token received!",
+  //   });
+
+  //   // bring window to top after getting a token
+  //   win.show();
+  // });
+
+  // authApp.listen(61200);
+}
+
+createAuthService();
 
 function toggleClickthrough() {
   overlayed.clickThrough = !overlayed.clickThrough;
@@ -343,12 +363,9 @@ app.on("activate", () => {
  * Expose 'electron-store' to renderer through 'ipcMain.handle'
  */
 const store = new ElectronStore();
-ipcMain.handle(
-  "electron-store",
-  async (_evnet, methodSign: string, ...args: any[]) => {
-    if (typeof (store as any)[methodSign] === "function") {
-      return (store as any)[methodSign](...args);
-    }
-    return (store as any)[methodSign];
+ipcMain.handle("electron-store", async (_evnet, methodSign: string, ...args: any[]) => {
+  if (typeof (store as any)[methodSign] === "function") {
+    return (store as any)[methodSign](...args);
   }
-);
+  return (store as any)[methodSign];
+});
