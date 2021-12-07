@@ -20,6 +20,11 @@ const config = {
     icon: "public/img/icon.png",
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
   },
+  linux: {
+    target: ["zip"],
+    icon: "public/img/icon.png",
+    artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
+  },
   afterSign: "scripts/afterSignHook.js",
 };
 
