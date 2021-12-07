@@ -6,6 +6,8 @@ on:
 
 env:
   NODE_VERSION: "16"
+  CSC_LINK: "${{ secrets.CSC_LINK }}"
+  CSC_KEY_PASSWORD: "${{ secrets.CSC_KEY_PASSWORD }}"
 
 jobs:
   build-mac:
