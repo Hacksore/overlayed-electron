@@ -5,7 +5,6 @@ const config = {
   appId: "com.hacksore.overlayed",
   asar: true,
   directories: {
-    output: "release/${version}",
     buildResources: "public",
   },
   files: ["!node_modules", "dist", "package.json"],
