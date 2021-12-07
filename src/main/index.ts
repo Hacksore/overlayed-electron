@@ -1,15 +1,11 @@
 import * as path from "path";
 import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme } from "electron";
-import isDev from "electron-is-dev";
 import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
 import SocketManager from "./socket";
 import fs from "fs";
 import { isDiscordRunning } from "./util";
-import express, { Request, Response } from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import url from "url";
+import AuthServer from "./auth";
 
 // Base URL for the app
 const PORT = process.env.PORT || 3001;
@@ -213,8 +209,6 @@ async function createWindow() {
   if (app.isPackaged) {
     const mainUrl = path.join(__dirname, `../renderer/index.html`);
     win.loadURL(`file://${mainUrl}#/${appPath}`);
-
-    win.webContents.openDevTools();
   } else {
     const pkg = await import("../../package.json");
     const url = `http://${pkg.env.HOST || "127.0.0.1"}:${pkg.env.PORT}`;
@@ -227,8 +221,26 @@ async function createWindow() {
  * Create a simple express server waiting for a POST
  * from the main site with a valid auth token
  */
-function createAuthService() {
-  // TODO: redo auth
+async function createAuthService() {
+  const authService = new AuthServer();
+
+  authService.on("token", auth => {
+    overlayed.auth = { ...auth };
+
+    socketManager.setupListeners();
+
+    // tell client auth is done
+    socketManager.sendElectronMessage({
+      evt: "OAUTH_DANCE_COMPLETED",
+      data: overlayed.auth, // TODO: we probably don't need this
+    });
+
+    // save token to store
+    authStore.set("auth", overlayed.auth);
+
+    // bring window to top after getting a token
+    win.show();
+  });
 }
 
 createAuthService();

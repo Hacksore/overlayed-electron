@@ -23,12 +23,8 @@
     "@mui/styled-engine": "^5.2.0",
     "@mui/system": "^5.2.3",
     "@reduxjs/toolkit": "^1.6.2",
-    "antd": "^4.16.13",
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
     "electron-is-dev": "^2.0.0",
     "events": "^3.3.0",
-    "express": "^4.17.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.21.0",
@@ -56,6 +52,6 @@
   },
   "env": {
     "HOST": "localhost",
-    "PORT": 3000
+    "PORT": 3001
   }
 }
