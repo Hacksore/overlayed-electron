@@ -7,7 +7,7 @@ const config = {
   directories: {
     buildResources: "public",
   },
-  files: ["!node_modules", "dist", "package.json"],
+  files: ["build/**/*", "node_modules/**/*"],
   mac: {
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
     target: ["dmg"],

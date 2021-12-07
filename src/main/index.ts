@@ -9,6 +9,7 @@ import { isDiscordRunning } from "./util";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import url from "url";
 
 // Base URL for the app
 const PORT = process.env.PORT || 3001;
@@ -210,7 +211,10 @@ async function createWindow() {
   const appPath = isClientRunning ? "login" : "failed";
 
   if (app.isPackaged) {
-    win.loadFile(path.join(__dirname, `../renderer/index.html#/${appPath}`));
+    const mainUrl = path.join(__dirname, `../renderer/index.html`);
+    win.loadURL(`file://${mainUrl}#/${appPath}`);
+
+    win.webContents.openDevTools();
   } else {
     const pkg = await import("../../package.json");
     const url = `http://${pkg.env.HOST || "127.0.0.1"}:${pkg.env.PORT}`;
@@ -224,72 +228,7 @@ async function createWindow() {
  * from the main site with a valid auth token
  */
 function createAuthService() {
-  const http = require("http");
-
-  http
-    .createServer((request: any, response: any) => {
-      if (request.method == "POST" && request.urk === "/auth") {
-        // const body =
-        // overlayed.auth = { ...req.body };
-        // socketManager.setupListeners();
-        // // tell client auth is done
-        // socketManager.sendElectronMessage({
-        // evt: "OAUTH_DANCE_COMPLETED",
-        // data: overlayed.auth, // TODO: we probably don't need this
-        // });
-        // // save token to store
-        // authStore.set("auth", overlayed.auth);
-        // res.send({
-        //   message: "Token received!",
-        // });
-        // // bring window to top after getting a token
-        // win.show();
-      }
-    })
-    .listen(61200);
-  console.log("Server running at http://127.0.0.1:8125/");
-  // TODO: this is broke nad is throwing an error
-  // authApp = express();
-  // console.log("Starting auth app service");
-
-  // const allowlist = ["http://localhost:3000", "https://overlayed.dev"];
-  // const corsOptionsDelegate = function (req: any, callback: Function) {
-  //   let corsOptions;
-  //   if (allowlist.indexOf(req.header("Origin")) !== -1) {
-  //     corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
-  //   } else {
-  //     corsOptions = { origin: false }; // disable CORS for this request
-  //   }
-  //   callback(null, corsOptions); // callback expects two parameters: error and options
-  // };
-
-  // authApp.use(bodyParser.json());
-  // authApp.use(cors(corsOptionsDelegate));
-
-  // authApp.post("/auth", (req: Request, res: Response) => {
-  //   console.log("got auth", req.body);
-  //   overlayed.auth = { ...req.body };
-
-  //   socketManager.setupListeners();
-
-  //   // tell client auth is done
-  //   socketManager.sendElectronMessage({
-  //     evt: "OAUTH_DANCE_COMPLETED",
-  //     data: overlayed.auth, // TODO: we probably don't need this
-  //   });
-
-  //   // save token to store
-  //   authStore.set("auth", overlayed.auth);
-
-  //   res.send({
-  //     message: "Token received!",
-  //   });
-
-  //   // bring window to top after getting a token
-  //   win.show();
-  // });
-
-  // authApp.listen(61200);
+  // TODO: redo auth
 }
 
 createAuthService();

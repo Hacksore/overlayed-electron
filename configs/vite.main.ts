@@ -6,7 +6,7 @@ export default defineConfig({
   mode: process.env.NODE_ENV,
   root: join(__dirname, "../src/main"),
   build: {
-    outDir: "../../dist/main",
+    outDir: "../../build/main",
     lib: {
       entry: "index.ts",
       formats: ["cjs"],

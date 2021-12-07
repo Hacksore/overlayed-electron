@@ -7,7 +7,7 @@ export default defineConfig({
   mode: process.env.NODE_ENV,
   root: join(__dirname, "../src/preload"),
   build: {
-    outDir: "../../dist/preload",
+    outDir: "../../build/preload",
     lib: {
       entry: "index.ts",
       formats: ["cjs"],

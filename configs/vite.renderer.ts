@@ -11,7 +11,7 @@ export default defineConfig({
   base: "./",
   build: {
     emptyOutDir: true,
-    outDir: "../../dist/renderer",
+    outDir: "../../build/renderer",
     rollupOptions: {
       plugins: [
         nodeResolve({
