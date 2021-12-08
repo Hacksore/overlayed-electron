@@ -31,7 +31,7 @@ class IPCSocketService extends EventEmitter {
   }
 
   init(nagivate: any) {
-    this.send({ evt: "I_AM_READY" });
+    this.send({ evt: CustomEvents.I_AM_READY });
     this.navigate = nagivate;
   }
 
@@ -53,7 +53,7 @@ class IPCSocketService extends EventEmitter {
 
     // if discord running send ready msg
     if (evt === "DISCORD_RUNNING") {
-      this.send({ evt: "I_AM_READY" });
+      this.send({ evt: CustomEvents.I_AM_READY });
     }
 
     // if has lost connection/cant connect to discord

@@ -1,7 +1,8 @@
 // @ts-ignore
 import RPCClient from "../common/ipc/client";
 import { BrowserWindow } from "electron";
-import { uuid } from "./util";
+import { uuid } from "../common/util";
+import { CustomEvents } from "../common/constants";
 
 // The overlayed prod client id
 const CLIENT_ID = "905987126099836938";
@@ -51,7 +52,7 @@ class SocketManager {
 
       // tell client we are ready
       this.sendElectronMessage({
-        evt: "READY",
+        evt: CustomEvents.READY,
         data: {
           profile: this.client.user,
         },
@@ -83,7 +84,7 @@ class SocketManager {
       // TODO: sometimes this is called when we are in dev breaking the socket?
       // tell frontend we are disconnected
       this.sendElectronMessage({
-        evt: "DISCONNECTED_FROM_DISCORD",
+        evt: CustomEvents.DISCONNECTED_FROM_DISCORD
       });
 
     });

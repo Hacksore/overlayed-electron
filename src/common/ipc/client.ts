@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 import IPCTransport from "./ipc";
 import { RPCCommands, RPCEvents } from "./constants";
-import { uuid } from "./util";
+import { uuid } from "../util";
 
 /**
  * The main hub for interacting with Discord RPC

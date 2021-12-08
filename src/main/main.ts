@@ -4,8 +4,9 @@ import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
 import SocketManager from "./socket";
 import fs from "fs";
-import { isDiscordRunning } from "./util";
+import { isDiscordRunning } from "../common/util";
 import AuthServer from "./auth";
+import { CustomEvents } from "../common/constants";
 
 const authStore = new ElectronStore({ name: "auth" });
 const settingsStore = new ElectronStore({ name: "settings" });
@@ -50,7 +51,7 @@ const contextMenu = Menu.buildFromTemplate([
       win.setFullScreenable(false);
 
       socketManager.sendElectronMessage({
-        evt: "PINNED_STATUS",
+        evt: CustomEvents.PINNED_STATUS,
         value: overlayed.isPinned,
       });
     },
@@ -125,20 +126,20 @@ async function createWindow() {
     // }, 5000);
 
     // check if we got told to open auth window
-    if (payload.evt === "CONNECTED_TO_DISCORD") {
+    if (payload.evt === CustomEvents.CONNECTED_TO_DISCORD) {
       console.log("Stopping the auth serivce as we are connected");
       authApp.close();
       authApp = null;
     }
 
     // check if we got told to open auth window
-    if (payload.evt === "LOGIN") {
+    if (payload.evt === CustomEvents.LOGIN) {
       if (!authWin) {
         shell.openExternal(LOGIN_URL);
       }
     }
 
-    if (payload.evt === "I_AM_READY") {
+    if (payload.evt === CustomEvents.I_AM_READY) {
       console.log("Got ready event from renderer process");
 
       const auth = authStore.get("auth");
@@ -148,30 +149,28 @@ async function createWindow() {
 
         // tell client auth is done
         socketManager.sendElectronMessage({
-          evt: "OAUTH_DANCE_COMPLETED",
+          evt: CustomEvents.OAUTH_DANCE_COMPLETED,
           data: overlayed.auth,
         });
       }
     }
 
-    if (payload.event === "TOGGLE_CLICKTHROUGH") {
+    if (payload.event === CustomEvents.TOGGLE_CLICKTHROUGH) {
       toggleClickthrough();
     }
 
-    if (payload.event === "WINDOW_RESIZE") {
+    if (payload.event === CustomEvents.WINDOW_RESIZE) {
       win.setSize(400, clamp(payload.data.height, 100, 1400));
     }
 
     // Crude but works for now
-    if (payload.event === "LOGOUT") {
-      const appDir = app.getPath("userData");
-      fs.writeFileSync(`${appDir}/auth.json`, "{}");
+    if (payload.event === CustomEvents.LOGOUT) {
+      authStore.set("auth", null);
       app.quit();
     }
 
     // check for discord to be running
-    // TODO: I thik this is bugged
-    if (payload.event === "CHECK_FOR_DISCORD") {
+    if (payload.event === CustomEvents.CHECK_FOR_DISCORD) {
       console.log("Test for client");
       // first thing is test if discord is running and if not make sure they visit a new page
 
@@ -180,22 +179,17 @@ async function createWindow() {
 
       if (isClientRunning) {
         socketManager.sendElectronMessage({
-          evt: "DISCORD_RUNNING",
+          evt: CustomEvents.DISCORD_RUNNING,
         });
       } else {
         socketManager.sendElectronMessage({
-          evt: "DISCONNECTED_FROM_DISCORD",
+          evt: CustomEvents.DISCONNECTED_FROM_DISCORD,
         });
       }
     }
 
-    // config stuff
-    if (payload.event === "SET_CONFIG") {
-      authStore.set(payload.data.key, payload.data.value);
-    }
-
-    // proxy to discord
-    if (payload.event === "DISCORD_MESSAGE") {
+    // allows us to proxy messages to the discord ipc from the front end
+    if (payload.event === CustomEvents.DISCORD_MESSAGE) {
       socketManager.sendDiscordMessage(payload.data);
     }
   });

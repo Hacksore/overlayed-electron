@@ -77,7 +77,7 @@ const LoginView = () => {
           classes={{ root: classes.buttonRoot }}
           onClick={() => {
             socketService.send({
-              evt: "LOGIN",
+              evt: CustomEvents.LOGIN,
             });
           }}
         >

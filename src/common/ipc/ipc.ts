@@ -1,6 +1,6 @@
 import net from "net";
 import EventEmitter from "events";
-import { uuid } from "./util";
+import { uuid } from "../../common/util";
 
 const OPCodes = {
   HANDSHAKE: 0,

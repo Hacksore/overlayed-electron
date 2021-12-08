@@ -1,6 +1,12 @@
 import net from "net";
 
-// TODO: just export this from the rpc lib
+function pid() {
+  if (typeof process !== "undefined") {
+    return process.pid;
+  }
+  return null;
+}
+
 function getIPCPath(id: number) {
   if (process.platform === "win32") {
     return `\\\\?\\pipe\\discord-ipc-${id}`;
@@ -54,4 +60,4 @@ function uuid() {
   });
 }
 
-export { isDiscordRunning, uuid };
+export { pid, isDiscordRunning, uuid };
