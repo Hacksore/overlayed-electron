@@ -6,7 +6,7 @@ import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
 import socketService from "../services/socketService";
-import { CustomEvents } from "../constants/discord";
+import { CustomEvents } from "../../../common/constants";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const PREFIX = "Toolbar";

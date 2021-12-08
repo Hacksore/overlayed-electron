@@ -1,7 +1,9 @@
 import EventEmitter from "events";
 import { store } from "../store";
 import { appSlice } from "../reducers/rootReducer";
-import { RPCEvents, RPCCommands, CustomEvents } from "../constants/discord";
+import { CustomEvents } from "../../../common/constants";
+import { RPCEvents, RPCCommands } from "../../../common/ipc/constants";
+
 const {
   updateUser,
   removeUser,
@@ -75,7 +77,6 @@ class IPCSocketService extends EventEmitter {
 
       // set route
       this.navigate("/list");
-
     }
 
     // electron did the work for us and got a token ;)
@@ -95,7 +96,7 @@ class IPCSocketService extends EventEmitter {
     }
 
     // get a list of the channel voice states
-    if (evt === RPCEvents.GET_CHANNEL && data) {
+    if (evt === RPCCommands.GET_CHANNEL && data) {
       store.dispatch(setAppUsers(data.voice_states));
       store.dispatch(setCurrentVoiceChannel(data));
     }

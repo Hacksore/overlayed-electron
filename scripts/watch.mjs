@@ -1,11 +1,10 @@
 process.env.NODE_ENV = "development";
 
 import { readFileSync } from "fs";
-import { join } from "path";
+import path, { join } from "path";
 import electron from "electron";
 import { spawn } from "child_process";
 import { createServer, build as viteBuild } from "vite";
-import path from "path";
 
 const pkg = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8"));
 

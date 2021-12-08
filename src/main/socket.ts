@@ -1,5 +1,5 @@
 // @ts-ignore
-import * as RPC from "@hacksore/discord-rpc";
+import RPCClient from "../common/ipc/client";
 import { BrowserWindow } from "electron";
 import { uuid } from "./util";
 
@@ -27,7 +27,7 @@ class SocketManager {
   constructor({ win, overlayed }: { win: BrowserWindow, overlayed: any }) {
     this._win = win;
     this.overlayed = overlayed;
-    this.client = new RPC.Client({ transport: "ipc" });
+    this.client = new RPCClient();
   }
   
   /**
@@ -35,7 +35,7 @@ class SocketManager {
    */
   resetClient() {
     this.client.destroy();
-    this.client = new RPC.Client({ transport: "ipc" });
+    this.client = new RPCClient();
   }
 
   setupListeners() {

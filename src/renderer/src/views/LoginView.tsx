@@ -1,7 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import { styled, lighten } from "@mui/system";
 import { useEffect } from "react";
-import { CustomEvents } from "../constants/discord";
+import { CustomEvents } from "../../../common/constants";
 import socketService from "../services/socketService";
 
 const PREFIX = "LoginView";
@@ -52,7 +52,7 @@ export const Root = styled("div")(({ theme }) => ({
 }));
 
 const LoginView = () => {
-  // TODO: this could be a custom hook as it's use in a few  comps
+  // TODO: this could be a custom hook as it's use in a few comps
   useEffect(() => {
     // resize
     socketService.send({ event: "WINDOW_RESIZE", data: { height: 350 } });

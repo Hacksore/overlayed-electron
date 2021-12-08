@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "build/main/index.cjs",
   "scripts": {
-    "dev": "node scripts/watch.mjs",
+    "start": "node scripts/watch.mjs",
     "build": "node scripts/build.mjs",
     "pack": "node scripts/package.mjs",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
@@ -16,7 +16,6 @@
     "node": ">=14.17.0"
   },
   "dependencies": {
-    "@hacksore/discord-rpc": "^5.0.0-beta2",
     "electron-is-dev": "^2.0.0",
     "events": "^3.3.0"
   },

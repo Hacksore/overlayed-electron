@@ -58,6 +58,10 @@ class AuthServer extends EventEmitter {
       })
     );
   }
+
+  close() {
+    this.app.close();
+  }
 }
 
 export default AuthServer;

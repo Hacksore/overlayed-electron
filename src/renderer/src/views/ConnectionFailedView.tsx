@@ -1,7 +1,7 @@
 import { Typography, Button } from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect } from "react";
-import { CustomEvents } from "../constants/discord";
+import { CustomEvents } from "../../../common/constants";
 import socketService from "../services/socketService";
 
 export const Root = styled("div")(({ theme }) => ({

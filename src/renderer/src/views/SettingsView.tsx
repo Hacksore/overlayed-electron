@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect, useState } from "react";
-import { CustomEvents } from "../constants/discord";
+import { CustomEvents } from "../../../common/constants";
 import IconLogout from "@mui/icons-material/Logout";
 import IconFolder from "@mui/icons-material/Folder";
 import socketService from "../services/socketService";
