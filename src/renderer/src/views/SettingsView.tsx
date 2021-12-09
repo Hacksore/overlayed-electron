@@ -46,7 +46,7 @@ export const Root = styled("div")(({ theme }) => ({
   borderBottomRightRadius: 6,
   flexDirection: "column",
   height: 550,
-  padding: "16px 0 100px 16px",
+  padding: "16px 0 16px 16px",
   overflowY: "auto",
   [`& .${classes.soonTM}`]: {
     color: "lime",
@@ -103,7 +103,7 @@ const SettingsView = () => {
           <Typography gutterBottom variant="body2" color="textPrimary">
             UI Scale
           </Typography>
-          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 200 }} className={classes.item}>
+          <Box sx={{ alignItems: "center", display: "flex", ml: 2, width: 200 }} className={classes.item}>
             <Controller
               name="scale"
               control={control}

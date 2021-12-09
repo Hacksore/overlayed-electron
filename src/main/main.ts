@@ -3,10 +3,13 @@ import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeT
 import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
 import SocketManager from "./socket";
-import fs from "fs";
 import { isDiscordRunning } from "../common/util";
 import AuthServer from "./auth";
 import { CustomEvents } from "../common/constants";
+
+const APP_BASE_PATH = app.isPackaged
+  ? path.resolve(`${__dirname}/../renderer`)
+  : path.resolve(`${__dirname}/../../public`);
 
 const authStore = new ElectronStore({ name: "auth" });
 const settingsStore = new ElectronStore({ name: "settings" });
@@ -265,7 +268,7 @@ const init = () => {
       // add tray icon
       if (!settingsStore.get("hideTrayIcon")) {
         const trayIconTheme = nativeTheme.shouldUseDarkColors ? "light" : "dark";
-        const trayIconPath = path.resolve(`${__dirname}/../renderer/img/trayicon-${trayIconTheme}.png`);
+        const trayIconPath = `${APP_BASE_PATH}/img/trayicon-${trayIconTheme}.png`;
         tray = new Tray(trayIconPath);
 
         tray.setToolTip("Overlayed");

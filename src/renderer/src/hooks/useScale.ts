@@ -6,7 +6,7 @@ export const useScale = () => {
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const localScale = settings.get("scale");
+    const localScale = settings.get("scale") || 1;
     setScale(parseFloat(localScale));
   }, []);
 
