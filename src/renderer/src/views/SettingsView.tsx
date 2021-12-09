@@ -27,6 +27,7 @@ import { UserItem } from "../components/UserItem";
 import settings from "../services/settingsService";
 import { useForm, Controller } from "react-hook-form";
 
+
 const PREFIX = "Settings";
 const classes = {
   root: `${PREFIX}-root`,
@@ -69,6 +70,7 @@ export const Root = styled("div")(({ theme }) => ({
 // TODO: save doesnt acutally save
 const SettingsView = () => {
   const { handleSubmit, control } = useForm();
+  const [hotkey, setHotkey] = useState(settings.get("clickthroughHotkey") || "Control+Shift+Space");
   const [scale, setScale] = useState(1);
   const [listStyle, setListStyle] = useState(settings.get("listStyle") || "list");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -215,16 +217,16 @@ const SettingsView = () => {
             <Controller
               name="clickthroughHotkey"
               control={control}
-              defaultValue="Control+Shift+Space"
-              render={({ field: { value } }) => (
+              defaultValue={hotkey}
+              render={({ field: { onChange, value } }) => (
                 <TextField
                   variant="standard"
                   color="info"
                   focused
                   value={value}
-                  onKeyDown={() => {
+                  onKeyDown={(event: any) => {
                     // TODO: This one is hard
-                    // onChange
+                    onChange(event);
                   }}
                 />
               )}

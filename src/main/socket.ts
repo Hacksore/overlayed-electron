@@ -1,8 +1,8 @@
-// @ts-ignore
 import RPCClient from "../common/ipc/client";
 import { BrowserWindow } from "electron";
 import { uuid } from "../common/util";
 import { CustomEvents } from "../common/constants";
+import { RPCCommands, RPCEvents } from "../common/ipc/constants";
 
 // The overlayed prod client id
 const CLIENT_ID = "905987126099836938";
@@ -45,10 +45,10 @@ class SocketManager {
 
     this.client.on("ready", async () => {
       // sub to voice channel changes
-      this.client.subscribe("VOICE_CHANNEL_SELECT");
+      this.client.subscribe(RPCEvents.VOICE_CHANNEL_SELECT);
 
       // Get the users currently joined channel
-      this.client.send({ cmd: "GET_SELECTED_VOICE_CHANNEL", nonce: uuid() });
+      this.client.send({ cmd: RPCCommands.GET_SELECTED_VOICE_CHANNEL, nonce: uuid() });
 
       // tell client we are ready
       this.sendElectronMessage({
@@ -99,7 +99,7 @@ class SocketManager {
   subscribeAllEvents(channelId: string) {
     SUBSCRIBABLE_EVENTS.map(eventName =>
       this.client.send({
-        cmd: "SUBSCRIBE",
+        cmd: RPCCommands.SUBSCRIBE,
         args: { channel_id: channelId },
         evt: eventName,
         nonce: uuid(),
@@ -113,7 +113,7 @@ class SocketManager {
   unsubscribeAllEvents(channelId: string) {
     SUBSCRIBABLE_EVENTS.map(eventName =>
       this.client.send({
-        cmd: "UNSUBSCRIBE",
+        cmd: RPCCommands.UNSUBSCRIBE,
         args: { channel_id: channelId },
         evt: eventName,
         nonce: uuid(),
@@ -152,22 +152,22 @@ class SocketManager {
    */
   onDiscordMessage(message: any) {
     const { evt, cmd, data } = message;
-    if (evt === "VOICE_CHANNEL_SELECT") {
+    if (evt === RPCEvents.VOICE_CHANNEL_SELECT) {
       // attempt to unsub prior channel if found
       if (this.overlayed.lastChannelId) {
         this.unsubscribeAllEvents(this.overlayed.lastChannelId);
       }
 
-      this.client.send({ cmd: "GET_SELECTED_VOICE_CHANNEL", nonce: uuid() });
+      this.client.send({ cmd: RPCCommands.GET_SELECTED_VOICE_CHANNEL, nonce: uuid() });
 
       this.overlayed.lastChannelId = this.overlayed.curentChannelId;
       this.overlayed.curentChannelId = data.channel_id;
     }
 
     // sub to channel events
-    if (cmd === "GET_SELECTED_VOICE_CHANNEL" && data) {
+    if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL && data) {
       this.subscribeAllEvents(data.id);
-    } else if (cmd === "GET_SELECTED_VOICE_CHANNEL" && !data) {
+    } else if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL && !data) {
       // we dont have a channel so we must have left vc?
       this.unsubscribeAllEvents(this.overlayed.lastChannelId);
       this.overlayed.lastChannelId = null;

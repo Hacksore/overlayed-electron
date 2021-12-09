@@ -1,6 +1,7 @@
 import net from "net";
 import EventEmitter from "events";
 import { uuid } from "../../common/util";
+import { RPCCommands, RPCEvents } from "./constants";
 
 const OPCodes = {
   HANDSHAKE: 0,
@@ -118,7 +119,7 @@ class IPCTransport extends EventEmitter {
             if (!data) {
               return;
             }
-            if (data.cmd === "AUTHORIZE" && data.evt !== "ERROR") {
+            if (data.cmd === RPCCommands.AUTHORIZE && data.evt !== RPCEvents.ERROR) {
               // TODO: handle this
             }
             this.emit("message", data);
