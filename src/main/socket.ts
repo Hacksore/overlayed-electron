@@ -1,8 +1,8 @@
-// @ts-ignore
 import RPCClient from "../common/ipc/client";
 import { BrowserWindow } from "electron";
 import { uuid } from "../common/util";
 import { CustomEvents } from "../common/constants";
+import { RPCCommands, RPCEvents } from "../common/ipc/constants";
 
 // The overlayed prod client id
 const CLIENT_ID = "905987126099836938";
@@ -45,10 +45,10 @@ class SocketManager {
 
     this.client.on("ready", async () => {
       // sub to voice channel changes
-      this.client.subscribe("VOICE_CHANNEL_SELECT");
+      this.client.subscribe(RPCEvents.VOICE_CHANNEL_SELECT);
 
       // Get the users currently joined channel
-      this.client.send({ cmd: "GET_SELECTED_VOICE_CHANNEL", nonce: uuid() });
+      this.client.send({ cmd: RPCCommands.GET_SELECTED_VOICE_CHANNEL, nonce: uuid() });
 
       // tell client we are ready
       this.sendElectronMessage({
@@ -59,7 +59,7 @@ class SocketManager {
       });
 
       // tell the main proc we are ready
-      this._win.webContents.send("toMain", { evt: "CONNECTED_TO_DISCORD" });
+      this._win.webContents.send("toMain", { evt: CustomEvents.CONNECTED_TO_DISCORD });
     });
 
     // Log in to RPC with client id
@@ -99,7 +99,7 @@ class SocketManager {
   subscribeAllEvents(channelId: string) {
     SUBSCRIBABLE_EVENTS.map(eventName =>
       this.client.send({
-        cmd: "SUBSCRIBE",
+        cmd: RPCCommands.SUBSCRIBE,
         args: { channel_id: channelId },
         evt: eventName,
         nonce: uuid(),
@@ -113,7 +113,7 @@ class SocketManager {
   unsubscribeAllEvents(channelId: string) {
     SUBSCRIBABLE_EVENTS.map(eventName =>
       this.client.send({
-        cmd: "UNSUBSCRIBE",
+        cmd: RPCCommands.UNSUBSCRIBE,
         args: { channel_id: channelId },
         evt: eventName,
         nonce: uuid(),
@@ -128,11 +128,11 @@ class SocketManager {
   onElectronMessage(message: string) {
     const { event } = JSON.parse(message);
 
-    if (event === "TOGGLE_DEVTOOLS") {
+    if (event === CustomEvents.TOGGLE_DEVTOOLS) {
       this._win.webContents.openDevTools();
     }
 
-    if (event === "TOGGLE_PIN") {
+    if (event === CustomEvents.TOGGLE_PIN) {
       this.overlayed.isPinned = !this.overlayed.isPinned;
 
       this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
@@ -140,7 +140,7 @@ class SocketManager {
       this._win.setFullScreenable(false);
 
       this.sendElectronMessage({
-        evt: "PINNED_STATUS",
+        evt: CustomEvents.PINNED_STATUS,
         value: this.overlayed.isPinned,
       });
     }
@@ -152,22 +152,22 @@ class SocketManager {
    */
   onDiscordMessage(message: any) {
     const { evt, cmd, data } = message;
-    if (evt === "VOICE_CHANNEL_SELECT") {
+    if (evt === RPCEvents.VOICE_CHANNEL_SELECT) {
       // attempt to unsub prior channel if found
       if (this.overlayed.lastChannelId) {
         this.unsubscribeAllEvents(this.overlayed.lastChannelId);
       }
 
-      this.client.send({ cmd: "GET_SELECTED_VOICE_CHANNEL", nonce: uuid() });
+      this.client.send({ cmd: RPCCommands.GET_SELECTED_VOICE_CHANNEL, nonce: uuid() });
 
       this.overlayed.lastChannelId = this.overlayed.curentChannelId;
       this.overlayed.curentChannelId = data.channel_id;
     }
 
     // sub to channel events
-    if (cmd === "GET_SELECTED_VOICE_CHANNEL" && data) {
+    if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL && data) {
       this.subscribeAllEvents(data.id);
-    } else if (cmd === "GET_SELECTED_VOICE_CHANNEL" && !data) {
+    } else if (cmd === RPCCommands.GET_SELECTED_VOICE_CHANNEL && !data) {
       // we dont have a channel so we must have left vc?
       this.unsubscribeAllEvents(this.overlayed.lastChannelId);
       this.overlayed.lastChannelId = null;

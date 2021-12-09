@@ -154,7 +154,7 @@ class RPCClient extends EventEmitter {
       this.emit("connected");
     } else if (this._expecting.has(message.nonce)) {
       const { resolve, reject } = this._expecting.get(message.nonce);
-      if (message.evt === "ERROR") {
+      if (message.evt ===  RPCEvents.ERROR) {
         const e: any = new Error(message.data.message);
         e.code = message.data.code;
         e.data = message.data;

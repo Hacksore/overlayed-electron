@@ -52,7 +52,7 @@ class IPCSocketService extends EventEmitter {
     const { evt, cmd = null, data } = packet;
 
     // if discord running send ready msg
-    if (evt === "DISCORD_RUNNING") {
+    if (evt === CustomEvents.DISCORD_RUNNING) {
       this.send({ evt: CustomEvents.I_AM_READY });
     }
 
