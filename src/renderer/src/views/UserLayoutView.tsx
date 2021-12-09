@@ -3,7 +3,7 @@ import UserGridView from "./UserGridView";
 import settings from "../services/settingsService";
 
 const UserLayoutView = ({ setDivHeight }: { setDivHeight: (height: number) => void }) => {
-  const listStyle = settings.get("listStyle");
+  const listStyle = settings.get("listStyle") || "list";
 
   return (
     <>
