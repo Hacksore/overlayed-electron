@@ -2,6 +2,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import { darken } from "@mui/material/styles";
 import IconSettings from "@mui/icons-material/Settings";
 import IconHide from "@mui/icons-material/VisibilityOff";
+import IconPin from "@mui/icons-material/PushPin";
 import { useAppSelector } from "../hooks/redux";
 import { RootState } from "../store";
 import { styled } from "@mui/system";
@@ -54,6 +55,7 @@ const Toolbar = () => {
   const isLoginPage = location.pathname === "/login";
   const isSettingsPage = location.pathname === "/settings";
   const isFailedPage = location.pathname === "/failed";
+  const shouldShowIcons = !isLoginPage && !isSettingsPage && !isFailedPage;
 
   const getTitle = () => {
     if (location.pathname === "/settings") {
@@ -99,24 +101,28 @@ const Toolbar = () => {
           appRegion: "no-drag",
         }}
       >
-        {!isSettingsPage && !isLoginPage && !isFailedPage && (
-          <Tooltip arrow title="Enable clickthrough">
-            <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_CLICKTHROUGH })}>
-              <IconHide sx={{ color: "text.primary" }} />
-            </IconButton>
-          </Tooltip>
-        )}
-
-        {!isSettingsPage && (
-          <Tooltip arrow title={getSettingsText()}>
-            <IconButton
-              onClick={() => {
-                navigate("/settings");
-              }}
-            >
-              <IconSettings sx={{ color: "text.primary" }} />
-            </IconButton>
-          </Tooltip>
+        {shouldShowIcons && (
+          <>
+            <Tooltip arrow title="Always on top">
+              <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_PIN })}>
+                <IconPin sx={{ color: "text.primary" }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title="Enable clickthrough">
+              <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_CLICKTHROUGH })}>
+                <IconHide sx={{ color: "text.primary" }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title={getSettingsText()}>
+              <IconButton
+                onClick={() => {
+                  navigate("/settings");
+                }}
+              >
+                <IconSettings sx={{ color: "text.primary" }} />
+              </IconButton>
+            </Tooltip>
+          </>
         )}
       </div>
     </Root>

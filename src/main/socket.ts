@@ -59,7 +59,7 @@ class SocketManager {
       });
 
       // tell the main proc we are ready
-      this._win.webContents.send("toMain", { evt: "CONNECTED_TO_DISCORD" });
+      this._win.webContents.send("toMain", { evt: CustomEvents.CONNECTED_TO_DISCORD });
     });
 
     // Log in to RPC with client id
@@ -128,11 +128,11 @@ class SocketManager {
   onElectronMessage(message: string) {
     const { event } = JSON.parse(message);
 
-    if (event === "TOGGLE_DEVTOOLS") {
+    if (event === CustomEvents.TOGGLE_DEVTOOLS) {
       this._win.webContents.openDevTools();
     }
 
-    if (event === "TOGGLE_PIN") {
+    if (event === CustomEvents.TOGGLE_PIN) {
       this.overlayed.isPinned = !this.overlayed.isPinned;
 
       this._win.setAlwaysOnTop(this.overlayed.isPinned, "floating");
@@ -140,7 +140,7 @@ class SocketManager {
       this._win.setFullScreenable(false);
 
       this.sendElectronMessage({
-        evt: "PINNED_STATUS",
+        evt: CustomEvents.PINNED_STATUS,
         value: this.overlayed.isPinned,
       });
     }
