@@ -3,7 +3,6 @@ import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeT
 import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
 import SocketManager from "./socket";
-import fs from "fs";
 import { isDiscordRunning } from "../common/util";
 import AuthServer from "./auth";
 import { CustomEvents } from "../common/constants";
@@ -244,7 +243,7 @@ function toggleClickthrough() {
   overlayed.clickThrough = !overlayed.clickThrough;
   // inform the UI to toggle the overlay
   socketManager.sendElectronMessage({
-    evt: "CLICKTHROUGH_STATUS",
+    evt: CustomEvents.CLICKTHROUGH_STATUS,
     value: overlayed.clickThrough,
   });
 

@@ -21,7 +21,7 @@ interface RootProps {
 
 // Might be on the top tier cringe list for muiv5
 const Root = styled("div", {
-  shouldForwardProp: prop => prop !== "clickThrough"
+  shouldForwardProp: prop => prop !== "clickThrough",
 })<RootProps>(({ theme, clickThrough }) => ({
   visibility: clickThrough ? "hidden" : "visible",
   display: "flex",
@@ -48,6 +48,7 @@ const Toolbar = () => {
   // TODO: Should this be once selecter pull?
   const channel = useAppSelector((state: RootState) => state.root.currentChannel);
   const isAuthed = useAppSelector((state: RootState) => state.root.isAuthed);
+  const isPinned = useAppSelector((state: RootState) => state.root.isPinned);
   const clickThrough = useAppSelector((state: RootState) => state.root.clickThrough);
   const location = useLocation();
   const navigate = useNavigate();
@@ -103,9 +104,14 @@ const Toolbar = () => {
       >
         {shouldShowIcons && (
           <>
-            <Tooltip arrow title="Always on top">
+            <Tooltip arrow title={isPinned ? "Remove from top" : "Stay on top"}>
               <IconButton onClick={() => socketService.send({ event: CustomEvents.TOGGLE_PIN })}>
-                <IconPin sx={{ color: "text.primary" }} />
+                <IconPin
+                  sx={{
+                    color: theme => (isPinned ? darken(theme.palette.primary.main, 0.6) : "text.primary"),
+                    transform: isPinned ? "rotate(-45deg)" : "none",
+                  }}
+                />
               </IconButton>
             </Tooltip>
             <Tooltip arrow title="Enable clickthrough">

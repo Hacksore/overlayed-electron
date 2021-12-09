@@ -8,6 +8,10 @@ import IconMuted from "@mui/icons-material/MicOff";
 import { useScale } from "../hooks/useScale";
 import { DiscordAvatar } from "./DiscordAvatar";
 
+import { useAppDispatch } from "../hooks/redux";
+import { appSlice } from "../reducers/rootReducer";
+
+const { setContextMenu } = appSlice.actions;
 const PREFIX = "UserItem";
 const classes = {
   root: `${PREFIX}-root`,
@@ -63,6 +67,7 @@ interface IUserItem extends IUser {
 export const UserItem = React.memo((props: IUserItem) => {
   const { deafened, username, muted, selfDeafened, selfMuted } = props;
   const scale = useScale();
+  const dispatch = useAppDispatch();
 
   const getNameColor = () => {
     if (selfDeafened || muted) {
@@ -84,7 +89,20 @@ export const UserItem = React.memo((props: IUserItem) => {
       >
         <DiscordAvatar scale={props.scale || scale} {...props} />
       </Box>
-      <div className={classes.name}>
+      <div
+        className={classes.name}
+        onContextMenu={(event: any) => {
+          event.preventDefault();
+          dispatch(
+            setContextMenu({
+              open: true,
+              id: props.id,
+              x: event.clientX,
+              y: event.clientY,
+            })
+          );
+        }}
+      >
         <Box
           sx={{
             minWidth: "auto",
