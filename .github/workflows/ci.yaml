@@ -15,11 +15,12 @@ env:
   GH_TOKEN: "${{ secrets.GH_TOKEN }}"
   APPLE_ID: "${{ secrets.APPLE_ID }}"
   APPLE_PASSWORD: "${{ secrets.APPLE_PASSWORD }}"
-  GIT_BRANCH: "${{ GITHUB_REF }}"
 
 jobs:
   build-mac:
     runs-on: "macos-latest"
+    env:
+      GIT_BRANCH: "${{ GITHUB_REF }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -37,6 +38,8 @@ jobs:
           path: "dist/**/*.dmg"
   build-windows:
     runs-on: "windows-latest"
+    env:
+      GIT_BRANCH: "${{ GITHUB_REF }}"    
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -54,6 +57,8 @@ jobs:
           path: "dist/**/*.msi"
   build-linux:
     runs-on: "ubuntu-latest"
+    env:
+      GIT_BRANCH: "${{ GITHUB_REF }}"    
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
