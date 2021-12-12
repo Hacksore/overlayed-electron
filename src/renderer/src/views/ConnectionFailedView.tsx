@@ -18,7 +18,7 @@ export const Root = styled("div")(({ theme }) => ({
 
 const ConnectionFailedView = () => {
   useEffect(() => {
-    socketService.send({ event: "WINDOW_RESIZE", data: { height: 300 } });
+    socketService.send({ event: CustomEvents.WINDOW_RESIZE, data: { height: 300 } });
   }, []);
 
   return (

@@ -85,6 +85,12 @@ const contextMenu = Menu.buildFromTemplate([
     },
   },
   {
+    label: "Check for updates",
+    click: () => {
+      autoUpdater.checkForUpdates();
+    },
+  },
+  {
     label: "Quit",
     click: function () {
       app.quit();
@@ -228,7 +234,7 @@ async function createAuthService() {
 
     // tell client auth is done
     socketManager.sendElectronMessage({
-      evt: "OAUTH_DANCE_COMPLETED",
+      evt: CustomEvents.OAUTH_DANCE_COMPLETED,
       data: overlayed.auth, // TODO: we probably don't need this
     });
 
@@ -240,6 +246,9 @@ async function createAuthService() {
 
     // close service down
     authService.close();
+
+    // check for updates and notify
+    autoUpdater.checkForUpdatesAndNotify();
   });
 }
 
@@ -311,8 +320,8 @@ const init = () => {
     socketManager.sendElectronMessage({
       evt: CustomEvents.AUTO_UPDATE,
       data: {
-        message: text
-      }
+        message: text,
+      },
     });
   }
 
@@ -342,7 +351,6 @@ const init = () => {
   autoUpdater.on("update-downloaded", () => {
     sendStatusToWindow("Update downloaded");
   });
-
 };
 
 export default init;

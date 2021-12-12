@@ -55,7 +55,7 @@ const LoginView = () => {
   // TODO: this could be a custom hook as it's use in a few comps
   useEffect(() => {
     // resize
-    socketService.send({ event: "WINDOW_RESIZE", data: { height: 350 } });
+    socketService.send({ event: CustomEvents.WINDOW_RESIZE, data: { height: 350 } });
 
     // ask electron if we are connected?
     socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });

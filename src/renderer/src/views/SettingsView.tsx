@@ -84,7 +84,7 @@ const SettingsView = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socketService.send({ event: "WINDOW_RESIZE", data: { height: 620 } });
+    socketService.send({ event: CustomEvents.WINDOW_RESIZE, data: { height: 620 } });
     setScale(parseInt(settings.get("scale") || 1));
   }, []);
 

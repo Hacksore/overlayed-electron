@@ -11,6 +11,7 @@ import socketSerivce from "./services/socketService";
 import { useEffect, useState } from "react";
 import ConnectionFailedView from "./views/ConnectionFailedView";
 import { ContextMenu } from "./components/ContextMenu";
+import { CustomEvents } from "../../common/constants";
 
 // Put this somewhere else?
 declare global {
@@ -54,7 +55,7 @@ function App() {
   useEffect(() => {
     if (users.length > 0 && location.pathname === "/list") {
       socketSerivce.send({
-        event: "WINDOW_RESIZE",
+        event: CustomEvents.WINDOW_RESIZE,
         data: { height: divHeight + 68 },
       });
     }
