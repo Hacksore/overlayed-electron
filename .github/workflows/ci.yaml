@@ -15,6 +15,7 @@ env:
   GH_TOKEN: "${{ secrets.GH_TOKEN }}"
   APPLE_ID: "${{ secrets.APPLE_ID }}"
   APPLE_PASSWORD: "${{ secrets.APPLE_PASSWORD }}"
+  GIT_BRANCH: "${{ GITHUB_REF }}"
 
 jobs:
   build-mac:
