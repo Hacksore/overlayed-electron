@@ -19,8 +19,6 @@ env:
 jobs:
   build-mac:
     runs-on: "macos-latest"
-    env:
-      GIT_BRANCH: "${{ github.GITHUB_REF }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -38,8 +36,6 @@ jobs:
           path: "dist/**/*.dmg"
   build-windows:
     runs-on: "windows-latest"
-    env:
-      GIT_BRANCH: "${{ github.GITHUB_REF }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -57,8 +53,6 @@ jobs:
           path: "dist/*.exe"
   build-linux:
     runs-on: "ubuntu-latest"
-    env:
-      GIT_BRANCH: "${{ github.GITHUB_REF }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2

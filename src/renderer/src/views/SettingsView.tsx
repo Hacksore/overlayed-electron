@@ -13,6 +13,7 @@ import {
   Radio,
   Checkbox,
   Tooltip,
+  Alert,
   Divider,
 } from "@mui/material";
 import { styled, darken } from "@mui/system";
@@ -67,7 +68,7 @@ export const Root = styled("div")(({ theme }) => ({
     overflowY: "auto",
   },
   [`& .${classes.radioItem}`]: {
-    width: 300,
+    width: 330,
     backgroundColor: darken(theme.palette.background.default, 0.2),
     margin: "2px 0 2px 0",
   },
@@ -104,6 +105,11 @@ const SettingsView = () => {
 
   return (
     <Root>
+
+      <Box sx={{ width: 340, mb: 1, }}>
+        <Alert severity="success">Update Available - Click here to apply</Alert>
+      </Box>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={classes.container}>
           <Typography gutterBottom variant="body2" color="textPrimary">
@@ -151,7 +157,6 @@ const SettingsView = () => {
             />
           </Box>
 
-          <Divider />
           <Typography gutterBottom variant="body2" color="textPrimary">
             User List style
           </Typography>
@@ -238,7 +243,7 @@ const SettingsView = () => {
               control={control}
               defaultValue={settings.get("hideTaskbar") || false}
               render={({ field: { onChange, value } }) => (
-                <Tooltip arrow title="Not yet implmented">
+                <Tooltip arrow title="Not yet implemented">
                   <FormControlLabel
                     control={
                       <Checkbox

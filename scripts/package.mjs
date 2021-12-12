@@ -11,6 +11,8 @@ const { GIT_BRANCH = "refs/heads/master" } = process.env;
 // only attempt to publish changes on a master build
 const publish = GIT_BRANCH === "refs/heads/master" ? "always" : "never";
 
+console.log("Current branch", GIT_BRANCH);
+
 // only notarize in master branch
 if (GIT_BRANCH !== "refs/heads/master") {
   delete process.env.APPLE_ID;

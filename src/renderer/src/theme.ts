@@ -2,6 +2,7 @@ import { darken, createTheme } from "@mui/material/styles";
 
 let theme = createTheme({
   palette: {
+    mode: "dark",
     background: {
       default: "#2C2F33",
       paper: "#2C2F33",
