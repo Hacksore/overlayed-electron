@@ -20,7 +20,7 @@ jobs:
   build-mac:
     runs-on: "macos-latest"
     env:
-      GIT_BRANCH: "${{ github.base_ref }}"
+      GIT_BRANCH: "${{ github.ref_name }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -39,7 +39,7 @@ jobs:
   build-windows:
     runs-on: "windows-latest"
     env:
-      GIT_BRANCH: "${{ github.base_ref }}"
+      GIT_BRANCH: "${{ github.ref_name }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
@@ -58,7 +58,7 @@ jobs:
   build-linux:
     runs-on: "ubuntu-latest"
     env:
-      GIT_BRANCH: "${{ github.base_ref }}"
+      GIT_BRANCH: "${{ github.ref_name }}"
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
