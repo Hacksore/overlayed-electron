@@ -6,9 +6,16 @@ import chalk from "chalk";
 
 const TAG = chalk.bgBlue("[build.mjs]");
 
-// grab the env to see if we should publish
 const { GIT_BRANCH = "refs/heads/master" } = process.env;
+
+// only attempt to publish changes on a master build
 const publish = GIT_BRANCH === "refs/heads/master" ? "always" : "never";
+
+// only notarize in master branch
+if (GIT_BRANCH !== "refs/heads/master") {
+  delete process.env.APPLE_ID;
+  delete process.env.APPLE_PASSWORD;
+}
 
 async function packElectron() {
   return electronBuild({
