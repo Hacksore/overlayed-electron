@@ -1,7 +1,9 @@
 name: CI
 
-on: 
+on:
   push:
+    tags-ignore:
+      - "v*"
   workflow_dispatch:
 
 env:
