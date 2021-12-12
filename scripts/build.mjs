@@ -12,9 +12,6 @@ const viteConfigs = {
   react: "configs/vite.renderer.ts",
 };
 
-
-console.log(1);
-
 async function buildElectron() {
   for (const [name, configPath] of Object.entries(viteConfigs)) {
     console.group(TAG, name);
