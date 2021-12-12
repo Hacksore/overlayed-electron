@@ -54,7 +54,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: "overlayed-unstable-windows"
-          path: "dist/**/*.msi"
+          path: "dist/*.exe"
   build-linux:
     runs-on: "ubuntu-latest"
     env:
