@@ -7,7 +7,6 @@ import { darken, styled } from "@mui/system";
 import socketSerivce from "../services/socketService";
 import { CustomEvents } from "../../../common/constants";
 import { RPCCommands } from "../../../common/ipc/constants";
-import settings from "../services/settingsService";
 
 const { setContextMenu } = appSlice.actions;
 

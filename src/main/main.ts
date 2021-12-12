@@ -6,6 +6,8 @@ import SocketManager from "./socket";
 import { isDiscordRunning } from "../common/util";
 import AuthServer from "./auth";
 import { CustomEvents } from "../common/constants";
+import { autoUpdater } from "electron-updater";
+import log from "electron-log";
 
 const APP_BASE_PATH = app.isPackaged
   ? path.resolve(`${__dirname}/../renderer`)
@@ -143,7 +145,7 @@ async function createWindow() {
     }
 
     if (payload.evt === CustomEvents.I_AM_READY) {
-      console.log("Got ready event from renderer process");
+      log.info("Got ready event from renderer process");
 
       const auth = authStore.get("auth");
       if (auth) {
@@ -301,6 +303,46 @@ const init = () => {
       createWindow();
     }
   });
+
+  // auto update
+  function sendStatusToWindow(text: string) {
+    log.info(text);
+
+    socketManager.sendElectronMessage({
+      evt: CustomEvents.AUTO_UPDATE,
+      data: {
+        message: text
+      }
+    });
+  }
+
+  autoUpdater.on("checking-for-update", () => {
+    sendStatusToWindow("Checking for update...");
+  });
+
+  autoUpdater.on("update-available", () => {
+    sendStatusToWindow("Update available.");
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    sendStatusToWindow("Update not available.");
+  });
+
+  autoUpdater.on("error", err => {
+    sendStatusToWindow("Error in auto-updater. " + err);
+  });
+
+  autoUpdater.on("download-progress", progressObj => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + " - Downloaded " + progressObj.percent + "%";
+    log_message = log_message + " (" + progressObj.transferred + "/" + progressObj.total + ")";
+    sendStatusToWindow(log_message);
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    sendStatusToWindow("Update downloaded");
+  });
+
 };
 
 export default init;

@@ -13,8 +13,9 @@ import {
   Radio,
   Checkbox,
   Tooltip,
+  Divider,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, darken } from "@mui/system";
 import { useEffect, useState } from "react";
 import { CustomEvents } from "../../../common/constants";
 import IconLogout from "@mui/icons-material/Logout";
@@ -27,7 +28,6 @@ import { UserItem } from "../components/UserItem";
 import settings from "../services/settingsService";
 import { useForm, Controller } from "react-hook-form";
 
-
 const PREFIX = "Settings";
 const classes = {
   root: `${PREFIX}-root`,
@@ -36,6 +36,7 @@ const classes = {
   buttonIcon: `${PREFIX}-buttonIcon`,
   radio: `${PREFIX}-radio`,
   container: `${PREFIX}-container`,
+  radioItem: `${PREFIX}-radioItem`,
 };
 
 export const Root = styled("div")(({ theme }) => ({
@@ -62,15 +63,20 @@ export const Root = styled("div")(({ theme }) => ({
     flexDirection: "row",
   },
   [`& .${classes.container}`]: {
-    height: 500,
+    height: 460,
     overflowY: "auto",
+  },
+  [`& .${classes.radioItem}`]: {
+    width: 300,
+    backgroundColor: darken(theme.palette.background.default, 0.2),
+    margin: "2px 0 2px 0",
   },
 }));
 
 // TODO: save doesnt acutally save
 const SettingsView = () => {
   const { handleSubmit, control } = useForm();
-  const [hotkey, setHotkey] = useState(settings.get("clickthroughHotkey") || "Control+Shift+Space");
+  const [hotkey] = useState(settings.get("clickthroughHotkey") || "Control+Shift+Space");
   const [scale, setScale] = useState(1);
   const [listStyle, setListStyle] = useState(settings.get("listStyle") || "list");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -145,21 +151,7 @@ const SettingsView = () => {
             />
           </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", ml: 1, width: 240 }} className={classes.item}>
-            <Controller
-              name="showJoinText"
-              control={control}
-              defaultValue={settings.get("showJoinText") || false}
-              render={({ field: { onChange, value } }) => (
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={value} onChange={onChange} sx={{ color: "text.primary" }} name="showJoinText" />
-                  }
-                  label="Hide join voice chat text"
-                />
-              )}
-            />
-          </Box>
+          <Divider />
           <Typography gutterBottom variant="body2" color="textPrimary">
             User List style
           </Typography>
@@ -180,14 +172,91 @@ const SettingsView = () => {
                   defaultValue="list"
                   name="list-style"
                 >
-                  <FormControlLabel value="list" control={<Radio sx={{ color: "text.primary" }} />} label="List" />
-                  <FormControlLabel value="grid" control={<Radio sx={{ color: "text.primary" }} />} label="Grid" />
+                  {["List", "Grid"].map(item => (
+                    <FormControlLabel
+                      classes={{ root: classes.radioItem }}
+                      sx={{
+                        backgroundColor: theme =>
+                          `${
+                            listStyle === item.toLowerCase()
+                              ? darken(theme.palette.background.default, 0.3)
+                              : darken(theme.palette.background.default, 0.2)
+                          } !important`,
+                      }}
+                      value={item.toLowerCase()}
+                      control={<Radio sx={{ color: "text.primary" }} />}
+                      label={item}
+                    />
+                  ))}
                 </RadioGroup>
               )}
             />
           </Box>
 
-          <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
+          <Box sx={{ display: "flex", flexDirection: "column", ml: 1, width: 240 }} className={classes.item}>
+            <Controller
+              name="showJoinText"
+              control={control}
+              defaultValue={settings.get("showJoinText") || false}
+              render={({ field: { onChange, value } }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox checked={value} onChange={onChange} sx={{ color: "text.primary" }} name="showJoinText" />
+                  }
+                  label="Hide join voice chat text"
+                />
+              )}
+            />
+          </Box>
+
+          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 240 }} className={classes.item}>
+            <Controller
+              name="hideTrayIcon"
+              control={control}
+              defaultValue={settings.get("hideTrayIcon") || false}
+              render={({ field: { onChange, value } }) => (
+                <Tooltip arrow title="Requires you to restart Overlayed">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={value}
+                        onChange={onChange}
+                        sx={{ color: "text.primary" }}
+                        name="hideTrayIcon"
+                      />
+                    }
+                    label="Hide from tray icon"
+                  />
+                </Tooltip>
+              )}
+            />
+          </Box>
+
+          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 240 }} className={classes.item}>
+            <Controller
+              name="hideTaskbar"
+              control={control}
+              defaultValue={settings.get("hideTaskbar") || false}
+              render={({ field: { onChange, value } }) => (
+                <Tooltip arrow title="Not yet implmented">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        disabled
+                        checked={value}
+                        onChange={onChange}
+                        sx={{ color: "text.primary" }}
+                        name="hideTaskbar"
+                      />
+                    }
+                    label="Hide from taskbar/dock"
+                  />
+                </Tooltip>
+              )}
+            />
+          </Box>
+          
+          {/* <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
             <Controller
               name="compactListView"
               control={control}
@@ -207,7 +276,7 @@ const SettingsView = () => {
                 />
               )}
             />
-          </Box>
+          </Box> */}
 
           <div className={classes.item}>
             <Typography gutterBottom variant="body2" color="textPrimary">
@@ -233,33 +302,7 @@ const SettingsView = () => {
             />
           </div>
 
-          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 240 }} className={classes.item}>
-            <Controller
-              name="hideTrayIcon"
-              control={control}
-              defaultValue={settings.get("hideTrayIcon") || false}
-              render={({ field: { onChange, value } }) => (
-                <Tooltip arrow title="Requires you to restart Overlayed">
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={value}
-                        onChange={onChange}
-                        sx={{ color: "text.primary" }}
-                        name="hideTrayIcon"
-                      />
-                    }
-                    label="Hide tray icon"
-                  />
-                </Tooltip>
-              )}
-            />
-          </Box>
-
           <div className={classes.item}>
-            <Typography gutterBottom variant="body2" color="textPrimary">
-              Open your overlayed settings folder
-            </Typography>
             <Button
               variant="contained"
               onClick={() => {
@@ -273,17 +316,16 @@ const SettingsView = () => {
                 } else if (platform === "linux") {
                   appDir = `${home}/.config`;
                 }
-                console.log(appDir);
-                window.electron.openDirectory(appDir);
+
+                if (appDir) {
+                  window.electron.openDirectory(appDir);
+                }
               }}
             >
               <IconFolder classes={{ root: classes.buttonIcon }} /> Open Config
             </Button>
           </div>
           <div className={classes.item}>
-            <Typography gutterBottom variant="body2" color="textPrimary">
-              Disconnect the account you have authorized
-            </Typography>
             <Button
               disabled={!isAuthed}
               variant="contained"
