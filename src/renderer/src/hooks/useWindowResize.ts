@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CustomEvents } from "root/src/common/constants";
+import { CustomEvents } from "../../../common/constants";
 import socketService from "../services/socketService";
 
 interface IType {
