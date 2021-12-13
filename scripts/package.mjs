@@ -5,8 +5,7 @@ import { config as builderConfig } from "../configs/electron-builder.config.mjs"
 import chalk from "chalk";
 
 const TAG = chalk.bgBlue("[build.mjs]");
-
-const { GIT_BRANCH = "master" } = process.env;
+const { GIT_BRANCH = "develop" } = process.env;
 
 // only attempt to publish changes on a master build
 const publish = GIT_BRANCH === "master" ? "always" : "never";

@@ -17,9 +17,7 @@ export const store = configureStore({
     history: historyReducer
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
-
 });
-
 
 export type RootState = ReturnType<typeof store.getState>;
 export type HistoryState = ReturnType<typeof store.getState>;
@@ -27,9 +25,4 @@ export type HistoryState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type HistoryDispatch = typeof store.dispatch;
 
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState | HistoryState,
-  unknown,
-  Action<string>
->;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState | HistoryState, unknown, Action<string>>;

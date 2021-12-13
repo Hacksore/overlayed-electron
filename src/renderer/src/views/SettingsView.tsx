@@ -14,13 +14,14 @@ import {
   Checkbox,
   Tooltip,
   Alert,
-  Divider,
 } from "@mui/material";
+
 import { styled, darken } from "@mui/system";
 import { useEffect, useState } from "react";
 import { CustomEvents } from "../../../common/constants";
 import IconLogout from "@mui/icons-material/Logout";
 import IconFolder from "@mui/icons-material/Folder";
+import IconDelete from "@mui/icons-material/Delete";
 import socketService from "../services/socketService";
 import { RootState } from "../store";
 import { useAppSelector } from "../hooks/redux";
@@ -76,6 +77,7 @@ export const Root = styled("div")(({ theme }) => ({
 
 // TODO: save doesnt acutally save
 const SettingsView = () => {
+  const newVersion = useAppSelector((state: RootState) => state.root.newVersion);
   const { handleSubmit, control } = useForm();
   const [hotkey] = useState(settings.get("clickthroughHotkey") || "Control+Shift+Space");
   const [scale, setScale] = useState(1);
@@ -85,7 +87,7 @@ const SettingsView = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socketService.send({ event: CustomEvents.WINDOW_RESIZE, data: { height: 620 } });
+    socketService.send({ event: CustomEvents.WINDOW_RESIZE, data: { height: 584 } });
     setScale(parseInt(settings.get("scale") || 1));
   }, []);
 
@@ -105,10 +107,18 @@ const SettingsView = () => {
 
   return (
     <Root>
-
-      <Box sx={{ width: 340, mb: 1, }}>
-        <Alert severity="success">Update Available - Click here to apply</Alert>
-      </Box>
+      {newVersion && (
+        <Box sx={{ width: 340, mb: 1, cursor: "pointer" }}>
+          <Alert
+            onClick={() => {
+              socketService.send({ event: CustomEvents.LOGOUT, data: { relaunch: false } });
+            }}
+            severity="success"
+          >
+            Update Available - Click here to apply
+          </Alert>
+        </Box>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={classes.container}>
@@ -179,6 +189,7 @@ const SettingsView = () => {
                 >
                   {["List", "Grid"].map(item => (
                     <FormControlLabel
+                      key={item}
                       classes={{ root: classes.radioItem }}
                       sx={{
                         backgroundColor: theme =>
@@ -260,7 +271,7 @@ const SettingsView = () => {
               )}
             />
           </Box>
-          
+
           {/* <Box sx={{ alignItems: "center", display: "flex", ml: 1, mt: -1, width: 240 }} className={classes.item}>
             <Controller
               name="compactListView"
@@ -341,6 +352,17 @@ const SettingsView = () => {
               <IconLogout classes={{ root: classes.buttonIcon }} /> Disconnect Discord Account
             </Button>
           </div>
+          <div className={classes.item}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                socketService.send({ event: CustomEvents.LOGOUT, data: { relaunch: false } });
+              }}
+            >
+              <IconDelete classes={{ root: classes.buttonIcon }} /> Quit Overlayed
+            </Button>
+          </div>
         </div>
 
         <Box sx={{ position: "absolute", bottom: 10, right: 20, marginLeft: "auto" }}>
@@ -364,7 +386,11 @@ const SettingsView = () => {
           <Button variant="contained" color="secondary" onClick={() => setIsLogoutDialogOpen(false)}>
             Cancel
           </Button>
-          <Button variant="contained" color="error" onClick={() => socketService.send({ event: CustomEvents.LOGOUT })}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => socketService.send({ event: CustomEvents.LOGOUT, data: { clearAuth: true } })}
+          >
             Disconnect
           </Button>
         </DialogActions>

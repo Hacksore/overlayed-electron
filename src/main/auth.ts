@@ -12,7 +12,11 @@ class AuthServer extends EventEmitter {
     this.app = http.createServer(this.onRequest.bind(this));
 
     // Start the server on port 3000
-    this.app.listen(this.port, "127.0.0.1");
+    try {
+      this.app.listen(this.port, "127.0.0.1");
+    } catch (err) {
+      console.log("we can't bind");
+    }
   }
 
   setHeaders(req: http.RequestOptions, res: any) {

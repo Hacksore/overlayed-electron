@@ -8,6 +8,7 @@ import AuthServer from "./auth";
 import { CustomEvents } from "../common/constants";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
+import installExtension, { REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 
 const APP_BASE_PATH = app.isPackaged
   ? path.resolve(`${__dirname}/../renderer`)
@@ -87,7 +88,7 @@ const contextMenu = Menu.buildFromTemplate([
   {
     label: "Check for updates",
     click: () => {
-      autoUpdater.checkForUpdates();
+      autoUpdater.checkForUpdatesAndNotify();
     },
   },
   {
@@ -176,15 +177,20 @@ async function createWindow() {
 
     // Crude but works for now
     if (payload.event === CustomEvents.LOGOUT) {
-      authStore.set("auth", null);
+      if (payload.data?.clearAuth) {
+        authStore.set("auth", null);
+      }
+
+      if (payload.data?.relaunch) {
+        app.relaunch();
+      }
+
       app.quit();
     }
 
     // check for discord to be running
     if (payload.event === CustomEvents.CHECK_FOR_DISCORD) {
-      console.log("Test for client");
       // first thing is test if discord is running and if not make sure they visit a new page
-
       const isClientRunning = await isDiscordRunning();
       console.log("Is discord client running", isClientRunning);
 
@@ -292,6 +298,13 @@ const init = () => {
 
       // TODO: allow custom keybindings
       globalShortcut.register("Control+Shift+Space", toggleClickthrough);
+
+      // install devtools when not packed
+      if (!app.isPackaged) {
+        installExtension([REDUX_DEVTOOLS.id, REACT_DEVELOPER_TOOLS.id])
+          .then(name => console.log(`Added Extension:  ${name}`))
+          .catch(err => console.log("An error occurred: ", err));
+      }
     })
     .then(() => {
       // create the main window no matter what
@@ -314,42 +327,49 @@ const init = () => {
   });
 
   // auto update
-  function sendStatusToWindow(text: string) {
-    log.info(text);
+  function sendStatusToWindow(hasUpdate: boolean, message: string) {
+    log.info(message);
 
     socketManager.sendElectronMessage({
       evt: CustomEvents.AUTO_UPDATE,
       data: {
-        message: text,
+        message,
+        hasUpdate,
       },
     });
   }
 
   autoUpdater.on("checking-for-update", () => {
-    sendStatusToWindow("Checking for update...");
+    sendStatusToWindow(false, "Checking for update...");
   });
 
   autoUpdater.on("update-available", () => {
-    sendStatusToWindow("Update available.");
+    sendStatusToWindow(true, "Update available.");
   });
 
   autoUpdater.on("update-not-available", () => {
-    sendStatusToWindow("Update not available.");
+    sendStatusToWindow(false, "Update not available.");
   });
 
   autoUpdater.on("error", err => {
-    sendStatusToWindow("Error in auto-updater. " + err);
+    sendStatusToWindow(false, "Error in auto-updater. " + err);
   });
 
   autoUpdater.on("download-progress", progressObj => {
-    let log_message = "Download speed: " + progressObj.bytesPerSecond;
-    log_message = log_message + " - Downloaded " + progressObj.percent + "%";
-    log_message = log_message + " (" + progressObj.transferred + "/" + progressObj.total + ")";
-    sendStatusToWindow(log_message);
+    let logMessage = "Download speed: " + progressObj.bytesPerSecond;
+    logMessage = logMessage + " - Downloaded " + progressObj.percent + "%";
+    logMessage = logMessage + " (" + progressObj.transferred + "/" + progressObj.total + ")";
+    sendStatusToWindow(false, logMessage);
   });
 
   autoUpdater.on("update-downloaded", () => {
-    sendStatusToWindow("Update downloaded");
+    sendStatusToWindow(false, "Update downloaded");
+  });
+
+  // single instance
+  app.requestSingleInstanceLock();
+  app.on("second-instance", (event, argv, cwd) => {
+    app.quit();
   });
 };
 

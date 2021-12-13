@@ -13,6 +13,7 @@ export interface AppState {
   isAuthed: boolean;
   clickThrough: boolean;
   contextMenu: any;
+  newVersion: boolean;
 }
 
 const initialState: AppState = {
@@ -29,7 +30,8 @@ const initialState: AppState = {
     id: null,
     x: null,
     y: null,
-  }
+  },
+  newVersion: false,
 };
 
 const createUserStateItem = (payload: IDiscordUser) => ({
@@ -134,6 +136,9 @@ export const appSlice = createSlice({
     },
     setContextMenu: (state, action: PayloadAction<any>) => {
       state.contextMenu = action.payload;
+    },
+    setNewVersion: (state, action: PayloadAction<boolean>) => {
+      state.newVersion = action.payload;
     },
   },
 });

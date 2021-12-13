@@ -16,6 +16,7 @@ const {
   setProfile,
   setClickThrough,
   setCurrentVoiceChannel,
+  setNewVersion,
 } = appSlice.actions;
 
 let instance;
@@ -50,6 +51,12 @@ class IPCSocketService extends EventEmitter {
   onMessage(message: any) {
     const packet = JSON.parse(message);
     const { evt, cmd = null, data } = packet;
+
+    // handle auto update messages
+    if (evt === CustomEvents.AUTO_UPDATE) {
+      const { hasUpdate } = packet.data;
+      store.dispatch(setNewVersion(hasUpdate));
+    }
 
     // if discord running send ready msg
     if (evt === CustomEvents.DISCORD_RUNNING) {

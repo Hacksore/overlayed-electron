@@ -56,7 +56,7 @@ const Toolbar = () => {
   const isLoginPage = location.pathname === "/login";
   const isSettingsPage = location.pathname === "/settings";
   const isFailedPage = location.pathname === "/failed";
-  const shouldShowIcons = !isLoginPage && !isSettingsPage && !isFailedPage;
+  const shouldShowIcons = !isSettingsPage && !isFailedPage;
 
   const getTitle = () => {
     if (location.pathname === "/settings") {
