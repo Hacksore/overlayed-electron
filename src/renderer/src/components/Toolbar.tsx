@@ -53,7 +53,6 @@ const Toolbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isLoginPage = location.pathname === "/login";
   const isSettingsPage = location.pathname === "/settings";
   const isFailedPage = location.pathname === "/failed";
   const shouldShowIcons = !isSettingsPage && !isFailedPage;

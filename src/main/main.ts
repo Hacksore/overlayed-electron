@@ -368,8 +368,9 @@ const init = () => {
 
   // single instance
   app.requestSingleInstanceLock();
-  app.on("second-instance", (event, argv, cwd) => {
-    app.quit();
+  app.on("second-instance", () => {
+    // app.quit();
+    // TODO: figure out how to best handle this
   });
 };
 
