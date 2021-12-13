@@ -308,6 +308,7 @@ const SettingsView = () => {
                   variant="standard"
                   color="info"
                   focused
+                  disabled
                   value={value}
                   onKeyDown={(event: any) => {
                     // TODO: This one is hard
