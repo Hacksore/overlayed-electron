@@ -366,7 +366,9 @@ const SettingsView = () => {
         </div>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end",  height: 60 }}>
-          <Box sx={{ display: "flex", flex: 1, alignItems: "center" }}>{window.electron.version}</Box>
+          <Box sx={{ display: "flex", flex: 1, alignItems: "center" }}>
+            <Typography sx={{ color: theme => darken(theme.palette.primary.contrastText, 0.4) }}>{window.electron.version}</Typography>
+          </Box>
           <Box sx={{ display: "flex", pr: 2, alignItems: "center" }}>
             <Button style={{ marginRight: 6 }} color="secondary" variant="contained" onClick={() => navigate(-1)}>
               Cancel
