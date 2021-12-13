@@ -107,21 +107,21 @@ const SettingsView = () => {
 
   return (
     <Root>
-      {newVersion && (
-        <Box sx={{ width: 340, mb: 1, cursor: "pointer" }}>
-          <Alert
-            onClick={() => {
-              socketService.send({ event: CustomEvents.LOGOUT, data: { relaunch: false } });
-            }}
-            severity="success"
-          >
-            Update Available - Click here to apply
-          </Alert>
-        </Box>
-      )}
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={classes.container}>
+          {newVersion && (
+            <Box sx={{ width: 340, mb: 1, cursor: "pointer" }}>
+              <Alert
+                onClick={() => {
+                  socketService.send({ event: CustomEvents.LOGOUT, data: { relaunch: false } });
+                }}
+                severity="success"
+              >
+                Update Available - Click here to apply
+              </Alert>
+            </Box>
+          )}
+
           <Typography gutterBottom variant="body2" color="textPrimary">
             UI Scale
           </Typography>
@@ -365,13 +365,16 @@ const SettingsView = () => {
           </div>
         </div>
 
-        <Box sx={{ position: "absolute", bottom: 10, right: 20, marginLeft: "auto" }}>
-          <Button style={{ marginRight: 6 }} color="secondary" variant="contained" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
-          <Button color="primary" variant="contained" type="submit">
-            Save
-          </Button>
+        <Box sx={{ display: "flex", justifyContent: "flex-end",  height: 60 }}>
+          <Box sx={{ display: "flex", flex: 1, alignItems: "center" }}>{window.electron.version}</Box>
+          <Box sx={{ display: "flex", pr: 2, alignItems: "center" }}>
+            <Button style={{ marginRight: 6 }} color="secondary" variant="contained" onClick={() => navigate(-1)}>
+              Cancel
+            </Button>
+            <Button color="primary" variant="contained" type="submit">
+              Save
+            </Button>
+          </Box>
         </Box>
       </form>
 

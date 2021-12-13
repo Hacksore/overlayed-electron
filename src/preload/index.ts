@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { shell, contextBridge, ipcRenderer } from "electron";
-
 import ElectronStore from "electron-store";
+import pkg from "../../package.json";
 
 const store = new ElectronStore({
   name: "settings",
@@ -35,4 +35,5 @@ contextBridge.exposeInMainWorld("electron", {
   platform: process.platform,
   home: process.env.HOME,
   appData: process.env.APPDATA,
+  version: pkg.version,
 });

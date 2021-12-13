@@ -26,6 +26,7 @@ declare global {
       appData: string;
       setConfigValue: (key: string, val: any) => void;
       getConfigValue: (key: string) => any;
+      version: string;
     };
   }
 }
