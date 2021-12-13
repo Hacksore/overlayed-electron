@@ -61,7 +61,7 @@ const UserGridView = ({ setDivHeight }: { setDivHeight: (height: number) => void
       <div className={classes.userWrap}>
         {users.map((props: IUser) => (
           <div key={props.id} className={classes.user}>
-            <DiscordAvatar {...props} />
+            <DiscordAvatar showIcons {...props} />
           </div>
         ))}
       </div>
