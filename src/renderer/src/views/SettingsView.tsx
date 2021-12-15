@@ -113,7 +113,7 @@ const SettingsView = () => {
             <Box sx={{ width: 340, mb: 1, cursor: "pointer" }}>
               <Alert
                 onClick={() => {
-                  socketService.send({ event: CustomEvents.LOGOUT, data: { relaunch: false } });
+                  socketService.send({ event: CustomEvents.APPLY_UPDATE });
                 }}
                 severity="success"
               >

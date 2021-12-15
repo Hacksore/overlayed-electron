@@ -16,5 +16,6 @@ export enum CustomEvents {
   I_AM_READY,
   SET_HOTKEY,
   TOGGLE_DEVTOOLS,
-  AUTO_UPDATE
+  AUTO_UPDATE,
+  APPLY_UPDATE,
 }

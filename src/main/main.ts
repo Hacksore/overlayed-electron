@@ -1,5 +1,5 @@
 import * as path from "path";
-import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme } from "electron";
+import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme, Notification } from "electron";
 import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
 import SocketManager from "./socket";
@@ -39,6 +39,7 @@ const overlayed = {
   lastChannelId: null,
   clickThrough: false,
   isPinned: false,
+  canUpdate: false,
 };
 
 // util method
@@ -138,6 +139,13 @@ async function createWindow() {
     // }, 5000);
 
     // check if we got told to open auth window
+    if (payload.evt === CustomEvents.APPLY_UPDATE) {
+      if (overlayed.canUpdate) {
+        autoUpdater.quitAndInstall();
+      }
+    }
+
+    // check if we got told to open auth window
     if (payload.evt === CustomEvents.CONNECTED_TO_DISCORD) {
       console.log("Stopping the auth serivce as we are connected");
       authApp.close();
@@ -187,7 +195,6 @@ async function createWindow() {
 
       app.quit();
     }
-
 
     // check for discord to be running
     if (payload.event === CustomEvents.CHECK_FOR_DISCORD) {
@@ -331,7 +338,7 @@ const init = () => {
     log.info("Checking for update...");
   });
 
-  autoUpdater.on("update-available", (data) => {
+  autoUpdater.on("update-available", data => {
     log.info("Update avilable", data);
 
     socketManager.sendElectronMessage({
@@ -339,9 +346,18 @@ const init = () => {
       data: {
         message: "test",
         hasUpdate: true,
-        version: data.version
+        version: data.version,
       },
     });
+
+    const notification = new Notification({ title: "New update available", body: "Click here to update" });
+    notification.on("action", () => {
+      if (overlayed.canUpdate) {
+        autoUpdater.quitAndInstall();
+      }
+    });
+
+    notification.show();
   });
 
   autoUpdater.on("update-not-available", () => {
@@ -359,8 +375,7 @@ const init = () => {
   autoUpdater.on("update-downloaded", () => {
     // TODO:
     log.info("Update download finished");
-    autoUpdater.quitAndInstall(false, false);
-
+    overlayed.canUpdate = true;
   });
 
   // single instance
@@ -369,7 +384,6 @@ const init = () => {
     // app.quit();
     // TODO: figure out how to best handle this
   });
-
 };
 
 export default init;
