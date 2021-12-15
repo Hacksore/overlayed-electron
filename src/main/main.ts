@@ -188,6 +188,7 @@ async function createWindow() {
       app.quit();
     }
 
+
     // check for discord to be running
     if (payload.event === CustomEvents.CHECK_FOR_DISCORD) {
       // first thing is test if discord is running and if not make sure they visit a new page
@@ -252,9 +253,6 @@ async function createAuthService() {
 
     // close service down
     authService.close();
-
-    // check for updates and notify
-    autoUpdater.checkForUpdatesAndNotify();
   });
 }
 
@@ -305,6 +303,9 @@ const init = () => {
           .then(name => console.log(`Added Extension:  ${name}`))
           .catch(err => console.log("An error occurred: ", err));
       }
+
+      // check for updates and notify
+      autoUpdater.checkForUpdatesAndNotify();
     })
     .then(() => {
       // create the main window no matter what
@@ -326,44 +327,40 @@ const init = () => {
     }
   });
 
-  // auto update
-  function sendStatusToWindow(hasUpdate: boolean, message: string) {
-    log.info(message);
+  autoUpdater.on("checking-for-update", () => {
+    log.info("Checking for update...");
+  });
+
+  autoUpdater.on("update-available", (data) => {
+    log.info("Update avilable", data);
 
     socketManager.sendElectronMessage({
       evt: CustomEvents.AUTO_UPDATE,
       data: {
-        message,
-        hasUpdate,
+        message: "test",
+        hasUpdate: true,
+        version: data.version
       },
     });
-  }
-
-  autoUpdater.on("checking-for-update", () => {
-    sendStatusToWindow(false, "Checking for update...");
-  });
-
-  autoUpdater.on("update-available", () => {
-    sendStatusToWindow(true, "Update available.");
   });
 
   autoUpdater.on("update-not-available", () => {
-    sendStatusToWindow(false, "Update not available.");
+    // TODO:
   });
 
-  autoUpdater.on("error", err => {
-    sendStatusToWindow(false, "Error in auto-updater. " + err);
+  autoUpdater.on("error", () => {
+    // TODO:
   });
 
-  autoUpdater.on("download-progress", progressObj => {
-    let logMessage = "Download speed: " + progressObj.bytesPerSecond;
-    logMessage = logMessage + " - Downloaded " + progressObj.percent + "%";
-    logMessage = logMessage + " (" + progressObj.transferred + "/" + progressObj.total + ")";
-    sendStatusToWindow(false, logMessage);
+  autoUpdater.on("download-progress", () => {
+    // TODO:
   });
 
   autoUpdater.on("update-downloaded", () => {
-    sendStatusToWindow(false, "Update downloaded");
+    // TODO:
+    log.info("Update download finished");
+    autoUpdater.quitAndInstall(false, false);
+
   });
 
   // single instance
@@ -372,6 +369,7 @@ const init = () => {
     // app.quit();
     // TODO: figure out how to best handle this
   });
+
 };
 
 export default init;
