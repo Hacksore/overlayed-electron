@@ -13,7 +13,11 @@ const config = {
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
     target: [
       {
-        target: ["dmg", "zip"],
+        target: "dmg",
+        arch: ["x64", "arm64"],
+      },
+      {
+        target: "zip",
         arch: ["x64", "arm64"],
       },
     ],
