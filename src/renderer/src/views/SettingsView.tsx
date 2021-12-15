@@ -39,6 +39,7 @@ const classes = {
   radio: `${PREFIX}-radio`,
   container: `${PREFIX}-container`,
   radioItem: `${PREFIX}-radioItem`,
+  checkBox: `${PREFIX}-checkBox`,
 };
 
 export const Root = styled("div")(({ theme }) => ({
@@ -56,6 +57,9 @@ export const Root = styled("div")(({ theme }) => ({
   },
   [`& .${classes.item}`]: {
     marginBottom: 16,
+  },
+  [`& .${classes.checkBox}`]: {
+
   },
   [`& .${classes.buttonIcon}`]: {
     marginRight: 10,
@@ -209,7 +213,7 @@ const SettingsView = () => {
             />
           </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", ml: 1, width: 240 }} className={classes.item}>
+          <Box sx={{ display: "flex", flexDirection: "column", ml: 1, width: 240 }} className={classes.checkBox}>
             <Controller
               name="showJoinText"
               control={control}
@@ -225,7 +229,7 @@ const SettingsView = () => {
             />
           </Box>
 
-          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 240 }} className={classes.item}>
+          <Box sx={{ alignItems: "center", display: "flex", ml: 1, width: 240 }} className={classes.checkBox}>
             <Controller
               name="hideTrayIcon"
               control={control}
@@ -241,7 +245,7 @@ const SettingsView = () => {
                         name="hideTrayIcon"
                       />
                     }
-                    label="Hide from tray icon"
+                    label="Hide tray icon"
                   />
                 </Tooltip>
               )}

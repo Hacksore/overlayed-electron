@@ -63,7 +63,7 @@ interface IDiscordAvatar extends IUser {
 }
 
 export const DiscordAvatar: FC<IDiscordAvatar> = React.memo(
-  ({ id, avatarHash, talking, muted, selfDeafened, selfMuted, showIcons }) => {
+  ({ scale: newScale, id, avatarHash, talking, muted, selfDeafened, selfMuted, showIcons }) => {
     const dispatch = useAppDispatch();
     const scale = useScale();
 
@@ -95,7 +95,7 @@ export const DiscordAvatar: FC<IDiscordAvatar> = React.memo(
         }}
         disabled={selfDeafened}
         iconColor={getIconColor()}
-        scale={scale || scale}
+        scale={newScale || scale}
       >
         <img
           onError={e => {
