@@ -7,6 +7,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 export default defineConfig({
   mode: process.env.NODE_ENV,
   root: join(__dirname, "../src/renderer"),
+  publicDir: join(__dirname, "../public"),
   plugins: [react()],
   base: "./",
   build: {
