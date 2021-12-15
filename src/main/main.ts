@@ -1,14 +1,16 @@
 import * as path from "path";
-import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme, Notification } from "electron";
+import { app, BrowserWindow, ipcMain, globalShortcut, shell, Tray, Menu, nativeTheme } from "electron";
 import ElectronStore from "electron-store";
 import { LOGIN_URL } from "./constants";
 import SocketManager from "./socket";
 import { isDiscordRunning } from "../common/util";
 import AuthServer from "./auth";
 import { CustomEvents } from "../common/constants";
-import { autoUpdater, UpdateInfo } from "electron-updater";
+import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import installExtension, { REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+
+import pkg from "../../package.json";
 
 // allow downgrade
 autoUpdater.allowDowngrade = true;
@@ -50,6 +52,13 @@ const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, 
 
 // make global
 const contextMenu = Menu.buildFromTemplate([
+  {
+    label: `Overlayed ${pkg.version}`,
+    enabled: false,
+  },
+  {
+    type: "separator",
+  },
   {
     label: "Always on Top",
     click: () => {
@@ -135,20 +144,13 @@ async function createWindow() {
 
     socketManager.onElectronMessage(msg);
 
-    // TODO: this needs to be implemented
-    // setup some ping to the client so we cant later on detect when it's not running
-    // setInterval(() => {
-    // socketManager.client.transport.ping();
-    // }, 5000);
-
-    // check if we got told to open auth window
+    // check if we should apply update
     if (payload.evt === CustomEvents.APPLY_UPDATE) {
-      if (overlayed.canUpdate) {
-        autoUpdater.quitAndInstall();
-      }
+      app.relaunch();
+      app.quit();
     }
 
-    // check if we got told to open auth window
+    // check if we are connected to the client
     if (payload.evt === CustomEvents.CONNECTED_TO_DISCORD) {
       log.info("Stopping the auth serivce as we are connected");
       authApp.close();
@@ -315,7 +317,14 @@ const init = () => {
       }
 
       // check for updates and notify
-      // autoUpdater.checkForUpdatesAndNotify();
+      setInterval(() => {
+        autoUpdater.checkForUpdatesAndNotify();
+      }, 1000 * 60 * 60); // every 60 minutes
+
+      // ping the discord client
+      setInterval(() => {
+        socketManager.client.transport.ping();
+      }, 1000 * 60); // every minute
     })
     .then(() => {
       // create the main window no matter what
@@ -347,7 +356,6 @@ const init = () => {
     socketManager.sendElectronMessage({
       evt: CustomEvents.AUTO_UPDATE,
       data: {
-        message: "test",
         hasUpdate: true,
         version: data.version,
       },
@@ -362,20 +370,9 @@ const init = () => {
     log.info("Error updating");
   });
 
-  autoUpdater.on("download-progress", () => {
-    // TODO:
-  });
-
-  autoUpdater.on("update-downloaded", (data: UpdateInfo) => {
+  autoUpdater.on("update-downloaded", () => {
     log.info("Update download finished");
     overlayed.canUpdate = true;
-
-    const notification = new Notification({ title: `Update available ${data.version}`, body: "Click here to update" });
-    notification.show();
-    notification.on("action", () => {
-      log.info("Applying update...");
-      autoUpdater.quitAndInstall();
-    });
   });
 
   // single instance
