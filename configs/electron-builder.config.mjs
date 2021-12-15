@@ -1,6 +1,30 @@
 /**
  * @type {import('electron-builder').Configuration}
  */
+
+const getDarwinTargets = () => {
+  if (process.env.CI) {
+    return [
+      {
+        target: "dmg",
+        arch: ["x64", "arm64"],
+      },
+      {
+        target: "zip",
+        arch: ["x64", "arm64"],
+      },
+    ];
+  }
+
+  // building only on m1/zip locally
+  return [
+    {
+      target: "zip",
+      arch: ["arm64"],
+    },
+  ];
+};
+
 const config = {
   appId: "com.hacksore.overlayed",
   asar: true,
@@ -11,16 +35,7 @@ const config = {
   files: ["build/**/*", "node_modules/**/*"],
   mac: {
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
-    target: [
-      {
-        target: "dmg",
-        arch: ["x64", "arm64"],
-      },
-      {
-        target: "zip",
-        arch: ["x64", "arm64"],
-      },
-    ],
+    target: getDarwinTargets(),
     icon: "public/img/icon-mac.icns",
     entitlements: "configs/entitlements.mac.inherit.plist",
   },
