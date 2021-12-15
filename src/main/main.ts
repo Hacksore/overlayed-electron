@@ -6,9 +6,12 @@ import SocketManager from "./socket";
 import { isDiscordRunning } from "../common/util";
 import AuthServer from "./auth";
 import { CustomEvents } from "../common/constants";
-import { autoUpdater } from "electron-updater";
+import { autoUpdater, UpdateInfo } from "electron-updater";
 import log from "electron-log";
 import installExtension, { REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+
+// allow downgrade
+autoUpdater.allowDowngrade = true;
 
 const APP_BASE_PATH = app.isPackaged
   ? path.resolve(`${__dirname}/../renderer`)
@@ -147,7 +150,7 @@ async function createWindow() {
 
     // check if we got told to open auth window
     if (payload.evt === CustomEvents.CONNECTED_TO_DISCORD) {
-      console.log("Stopping the auth serivce as we are connected");
+      log.info("Stopping the auth serivce as we are connected");
       authApp.close();
       authApp = null;
     }
@@ -200,7 +203,7 @@ async function createWindow() {
     if (payload.event === CustomEvents.CHECK_FOR_DISCORD) {
       // first thing is test if discord is running and if not make sure they visit a new page
       const isClientRunning = await isDiscordRunning();
-      console.log("Is discord client running", isClientRunning);
+      log.info("Is discord client running", isClientRunning);
 
       if (isClientRunning) {
         socketManager.sendElectronMessage({
@@ -312,7 +315,7 @@ const init = () => {
       }
 
       // check for updates and notify
-      autoUpdater.checkForUpdatesAndNotify();
+      // autoUpdater.checkForUpdatesAndNotify();
     })
     .then(() => {
       // create the main window no matter what
@@ -349,33 +352,30 @@ const init = () => {
         version: data.version,
       },
     });
-
-    const notification = new Notification({ title: "New update available", body: "Click here to update" });
-    notification.on("action", () => {
-      if (overlayed.canUpdate) {
-        autoUpdater.quitAndInstall();
-      }
-    });
-
-    notification.show();
   });
 
   autoUpdater.on("update-not-available", () => {
-    // TODO:
+    log.info("No updates available now");
   });
 
   autoUpdater.on("error", () => {
-    // TODO:
+    log.info("Error updating");
   });
 
   autoUpdater.on("download-progress", () => {
     // TODO:
   });
 
-  autoUpdater.on("update-downloaded", () => {
-    // TODO:
+  autoUpdater.on("update-downloaded", (data: UpdateInfo) => {
     log.info("Update download finished");
     overlayed.canUpdate = true;
+
+    const notification = new Notification({ title: `Update available ${data.version}`, body: "Click here to update" });
+    notification.show();
+    notification.on("action", () => {
+      log.info("Applying update...");
+      autoUpdater.quitAndInstall();
+    });
   });
 
   // single instance
