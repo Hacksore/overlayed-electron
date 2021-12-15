@@ -10,6 +10,7 @@ on:
 
 env:
   NODE_VERSION: "16"
+  GH_TOKEN: "${{ secrets.GH_TOKEN }}"
 
 jobs:
   build-mac:
@@ -18,7 +19,6 @@ jobs:
       GIT_BRANCH: "${{ github.ref_name }}"
       CSC_LINK: "${{ secrets.CSC_LINK }}"
       CSC_KEY_PASSWORD: "${{ secrets.CSC_KEY_PASSWORD }}"
-      GH_TOKEN: "${{ secrets.GH_TOKEN }}"
       APPLE_ID: "${{ secrets.APPLE_ID }}"
       APPLE_PASSWORD: "${{ secrets.APPLE_PASSWORD }}"      
     steps:
