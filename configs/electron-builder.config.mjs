@@ -16,6 +16,10 @@ const config = {
         target: "dmg",
         arch: ["x64", "arm64"],
       },
+      {
+        target: "zip",
+        arch: ["x64", "arm64"],
+      },
     ],
     icon: "public/img/icon-mac.icns",
     entitlements: "configs/entitlements.mac.inherit.plist",
