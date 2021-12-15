@@ -12,9 +12,6 @@ import installExtension, { REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS } from "electro
 
 import pkg from "../../package.json";
 
-// allow downgrade
-autoUpdater.allowDowngrade = true;
-
 const APP_BASE_PATH = app.isPackaged
   ? path.resolve(`${__dirname}/../renderer`)
   : path.resolve(`${__dirname}/../../public`);
