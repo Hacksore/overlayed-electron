@@ -14,4 +14,4 @@ https://user-images.githubusercontent.com/996134/144764691-03b48746-bd7f-4dee-8c
 
 ### Running locally
 
-Make sure you `npm install` all the dependencies then just run `npm start` or run the `Debug Electron` in VSCode.
+Make sure you `npm install` all the dependencies then run `npm start`

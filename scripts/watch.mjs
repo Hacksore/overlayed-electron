@@ -41,7 +41,10 @@ async function watchMain() {
     configFile: "configs/vite.main.ts",
     writeBundle() {
       electronProcess && electronProcess.kill();
-      electronProcess = spawn(electron, ["."], {
+      electronProcess = spawn(electron, [
+        "--remote-debugging-port=9223",
+        "."
+      ], {
         stdio: "inherit",
         env: Object.assign(process.env, pkg.env),
       });
