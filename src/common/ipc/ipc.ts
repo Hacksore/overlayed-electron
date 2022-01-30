@@ -2,6 +2,8 @@ import net from "net";
 import EventEmitter from "events";
 import { uuid } from "../../common/util";
 import { RPCCommands, RPCEvents } from "./constants";
+import log from "electron-log";
+
 
 const OPCodes = {
   HANDSHAKE: 0,
@@ -14,7 +16,7 @@ const OPCodes = {
 function getIPCPath(id: number) {
   if (process.platform === "win32") {
     const socketPath = `\\\\?\\pipe\\discord-ipc-${id}`;
-    console.log(`Found winderz socket @ ${socketPath}`);
+    log.debug(`Found winderz socket @ ${socketPath}`);
     return socketPath;
   }
   const {
@@ -22,7 +24,7 @@ function getIPCPath(id: number) {
   } = process;
   const prefix = XDG_RUNTIME_DIR || TMPDIR || TMP || TEMP || "/tmp";
   const socketPath = `${prefix.replace(/\/$/, "")}/discord-ipc-${id}`;
-  console.log(`Found *nix socket @ ${socketPath}`);
+  log.debug(`Found *nix socket @ ${socketPath}`);
   return socketPath;
 }
 

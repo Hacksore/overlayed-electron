@@ -86,6 +86,16 @@ class IPCSocketService extends EventEmitter {
       this.navigate("/list");
     }
 
+    // if we get an error from the API that our auth token is invalid send them to login view
+    if (evt === CustomEvents.AUTH_TOKEN_INVALID) {
+      store.dispatch(setIsAuthed(false));
+      store.dispatch(setReadyState(false));
+      store.dispatch(setProfile(null));
+
+      // set route
+      this.navigate("/login");
+    }
+
     // electron did the work for us and got a token ;)
     if (evt === CustomEvents.CLICKTHROUGH_STATUS) {
       store.dispatch(setClickThrough(packet.value));

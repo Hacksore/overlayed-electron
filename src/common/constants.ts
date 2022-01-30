@@ -18,4 +18,5 @@ export enum CustomEvents {
   TOGGLE_DEVTOOLS,
   AUTO_UPDATE,
   APPLY_UPDATE,
+  AUTH_TOKEN_INVALID
 }

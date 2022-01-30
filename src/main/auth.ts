@@ -1,5 +1,6 @@
 import EventEmitter from "events";
 import http from "http";
+import log from "electron-log";
 
 class AuthServer extends EventEmitter {
   private port = 61200;
@@ -11,11 +12,12 @@ class AuthServer extends EventEmitter {
     // Create an instance of the http server to handle HTTP requests
     this.app = http.createServer(this.onRequest.bind(this));
 
-    // Start the server on port 3000
+    // Start the server on port 61200
     try {
       this.app.listen(this.port, "127.0.0.1");
     } catch (err) {
-      console.log("we can't bind");
+      // TODO: handle this error
+      log.info("we can't bind");
     }
   }
 

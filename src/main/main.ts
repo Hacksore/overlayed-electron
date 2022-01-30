@@ -167,6 +167,8 @@ async function createWindow() {
       const auth = authStore.get("auth");
       if (auth) {
         overlayed.auth = JSON.parse(JSON.stringify(auth));
+        log.debug(overlayed.auth);
+
         socketManager.setupListeners();
 
         // tell client auth is done
@@ -200,7 +202,6 @@ async function createWindow() {
 
     // check for discord to be running
     if (payload.event === CustomEvents.CHECK_FOR_DISCORD) {
-      // first thing is test if discord is running and if not make sure they visit a new page
       const isClientRunning = await isDiscordRunning();
       log.info("Is discord client running", isClientRunning);
 
@@ -221,18 +222,14 @@ async function createWindow() {
     }
   });
 
-  // first thing is test if discord is running and if not make sure they visit a new page
-  const isClientRunning = await isDiscordRunning();
-  const appPath = isClientRunning ? "login" : "failed";
-
   if (app.isPackaged) {
     const mainUrl = path.join(__dirname, "../renderer/index.html");
-    win.loadURL(`file://${mainUrl}#/${appPath}`);
+    win.loadURL(`file://${mainUrl}#/loading`);
   } else {
     const pkg = await import("../../package.json");
     const url = `http://${pkg.env.HOST || "127.0.0.1"}:${pkg.env.PORT}`;
 
-    win.loadURL(`${url}#/${appPath}`);
+    win.loadURL(`${url}#/loading`);
   }
 }
 
@@ -308,9 +305,10 @@ const init = () => {
 
       // install devtools when not packed
       if (!app.isPackaged) {
-        installExtension([REDUX_DEVTOOLS.id, REACT_DEVELOPER_TOOLS.id])
-          .then(name => console.log(`Added Extension:  ${name}`))
-          .catch(err => console.log("An error occurred: ", err));
+        // REDUX_DEVTOOLS.id,
+        installExtension([REACT_DEVELOPER_TOOLS.id])
+          .then(name => log.debug(`Added Extension:  ${name}`))
+          .catch(err => log.debug("An error occurred: ", err));
       }
 
       // check for updates and notify

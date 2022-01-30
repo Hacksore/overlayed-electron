@@ -3,17 +3,18 @@ import { BrowserWindow } from "electron";
 import { uuid } from "../common/util";
 import { CustomEvents } from "../common/constants";
 import { RPCCommands, RPCEvents } from "../common/ipc/constants";
+import log from "electron-log";
 
 // The overlayed prod client id
 const CLIENT_ID = "905987126099836938";
 
 // Events that we want to sub/unsub from
 const SUBSCRIBABLE_EVENTS = [
-  "VOICE_STATE_CREATE",
-  "VOICE_STATE_DELETE",
-  "VOICE_STATE_UPDATE",
-  "SPEAKING_START",
-  "SPEAKING_STOP",
+  RPCEvents.VOICE_STATE_CREATE,
+  RPCEvents.VOICE_STATE_DELETE,
+  RPCEvents.VOICE_STATE_UPDATE,
+  RPCEvents.SPEAKING_START,
+  RPCEvents.SPEAKING_STOP,
 ];
 
 class SocketManager {
@@ -25,12 +26,12 @@ class SocketManager {
    * This is meant to send and recieve messages from the discord RPC
    * As well as relay the messages over IPC to the electron main/render processes
    */
-  constructor({ win, overlayed }: { win: BrowserWindow, overlayed: any }) {
+  constructor({ win, overlayed }: { win: BrowserWindow|null; overlayed: any }) {
     this._win = win;
     this.overlayed = overlayed;
     this.client = new RPCClient();
   }
-  
+
   /**
    * Destory the connected client first then create a new one
    */
@@ -43,7 +44,12 @@ class SocketManager {
     // Try and close the connection first before reconnecting
     this.resetClient();
 
+    // check if token is set
+    
+
     this.client.on("ready", async () => {
+      log.debug("got ready event from the IPC")
+
       // sub to voice channel changes
       this.client.subscribe(RPCEvents.VOICE_CHANNEL_SELECT);
 
@@ -59,7 +65,8 @@ class SocketManager {
       });
 
       // tell the main proc we are ready
-      this._win.webContents.send("toMain", { evt: CustomEvents.CONNECTED_TO_DISCORD });
+      // this._win.webContents.send("toMain",
+      this.sendElectronMessage({ evt: CustomEvents.CONNECTED_TO_DISCORD });
     });
 
     // Log in to RPC with client id
@@ -70,23 +77,32 @@ class SocketManager {
       accessToken: this.overlayed.auth.access_token,
     });
 
+    log.debug("Logging in with auth token", this.overlayed.auth.access_token)
+
     this.client.on("error", async (error: Error) => {
-      console.log("error with rpc", error);
+      log.info("error with rpc", error);
+
+      // tell client that the auth token we used is no longer valid
+      this.sendElectronMessage({
+        evt: CustomEvents.AUTH_TOKEN_INVALID,
+        data: {
+          error: error.message,
+        },
+      });
     });
 
     this.client.on("close", () => {
-      console.log("Close event");
+      log.debug("Close event");
     });
-    
+
     this.client.on("disconnected", () => {
-      console.log("lost connection to discord");
+      log.debug("lost connection to discord");
 
       // TODO: sometimes this is called when we are in dev breaking the socket?
       // tell frontend we are disconnected
-      this.sendElectronMessage({
-        evt: CustomEvents.DISCONNECTED_FROM_DISCORD
-      });
-
+      // this.sendElectronMessage({
+      //   evt: CustomEvents.DISCONNECTED_FROM_DISCORD,
+      // });
     });
 
     this.client.on("message", this.onDiscordMessage.bind(this));
@@ -152,6 +168,8 @@ class SocketManager {
    */
   onDiscordMessage(message: any) {
     const { evt, cmd, data } = message;
+    log.debug(message)
+    
     if (evt === RPCEvents.VOICE_CHANNEL_SELECT) {
       // attempt to unsub prior channel if found
       if (this.overlayed.lastChannelId) {
@@ -189,9 +207,9 @@ class SocketManager {
   /**
    * Send a message to discord
    * @param {String} cmd - the message cmd to send
-   * 
+   *
    */
-  sendDiscordMessage({ cmd, args }: {cmd: string, args: any }) {
+  sendDiscordMessage({ cmd, args }: { cmd: string; args: any }) {
     this.client.send({ cmd, args, nonce: uuid() });
   }
 }

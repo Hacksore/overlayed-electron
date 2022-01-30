@@ -154,6 +154,8 @@ class RPCClient extends EventEmitter {
         const e: any = new Error(message.data.message);
         e.code = message.data.code;
         e.data = message.data;
+        // emit error
+        this.emit("error", e);
         reject(e);
       } else {
         resolve(message.data);

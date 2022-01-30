@@ -56,9 +56,6 @@ const LoginView = () => {
   useEffect(() => {
     // resize
     socketService.send({ event: CustomEvents.WINDOW_RESIZE, data: { height: 350 } });
-
-    // ask electron if we are connected?
-    socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });
   }, []);
 
   return (

@@ -12,6 +12,9 @@ import { useEffect, useState } from "react";
 import ConnectionFailedView from "./views/ConnectionFailedView";
 import { ContextMenu } from "./components/ContextMenu";
 import { CustomEvents } from "../../common/constants";
+import LoadingView from "./views/LoadingView";
+
+// TODO: figure out how to use electron-log on client
 
 // Put this somewhere else?
 declare global {
@@ -39,7 +42,7 @@ function App() {
 
   useEffect(() => {
     // init socket service, no need for a hook
-    console.log("Load socket service");
+    console.info("Load socket service");
 
     // init socket service
     socketSerivce.init(navigate);
@@ -66,6 +69,7 @@ function App() {
     <Root>
       <Toolbar />
       <Routes>
+        <Route path="/loading" element={<LoadingView />} />
         <Route path="/login" element={<LoginView />} />
         <Route
           path="/list"
