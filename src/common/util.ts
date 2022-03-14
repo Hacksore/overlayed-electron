@@ -1,4 +1,5 @@
 import net from "net";
+import log from "electron-log";
 
 function pid() {
   if (typeof process !== "undefined") {
@@ -18,6 +19,12 @@ function getIPCPath(id: number) {
   return `${prefix.replace(/\/$/, "")}/discord-ipc-${id}`;
 }
 
+/**
+ * This will attempt to enumerate over 0-10 indexes of the known IPC paths
+ * and connect to the discord client, once a connection is made we return true
+ * @param id the namped pipe socket index
+ * @returns Promise<boolean>
+ */
 function testSocketConnection(id: number) {
   return new Promise((resolve, reject) => {
     const sock = net.createConnection(getIPCPath(id), () => {
@@ -25,30 +32,36 @@ function testSocketConnection(id: number) {
       sock.end();
     });
 
-    sock.once("error", () => {
-      reject(`error connecting to discord @ index ${id}`);
-      sock.end();
-    });
+    // set timeout, rather low but this should be in the miliseconds range
+    sock.setTimeout(50);
 
-    sock.once("close", () => {
+    const handleFailure = () => {
       reject(`error connecting to discord @ index ${id}`);
-      sock.end();
-    });
+      sock.end();      
+    }
+
+    sock.once("error", handleFailure);
+    sock.once("close", handleFailure);
+    sock.once("timeout", handleFailure)
   });
 }
 
 async function isDiscordRunning() {
-  for (let i = 0; i < 10; i++) {
+  log.debug("Start isDiscordRunning...");
+
+  for (let i = 0; i < 10; i++) {    
     try {
-      const res = await testSocketConnection(i);
-      if (res) {
+      const active = await testSocketConnection(i);
+      log.debug("isDiscordRunning", `id ${i}`, active);
+      if (active) {
         return true;
       }
     } catch (err) {
-      // Do nothing
+      log.debug("isDiscordRunning failed for", `id ${i}`);
     }
   }
 
+  log.debug("Finish isDiscordRunning...");
   return false;
 }
 

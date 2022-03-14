@@ -1,12 +1,14 @@
-import { CircularProgress, Typography } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import { useEffect } from "react";
+import { AnyAsyncThunk } from "@reduxjs/toolkit/dist/matchers";
+import { useEffect, useState } from "react";
+import { clearInterval } from "timers";
 import { CustomEvents } from "../../../common/constants";
 import socketService from "../services/socketService";
 
 const PREFIX = "LoadingView";
 const classes = {
-  root: `${PREFIX}-root`,
+  error: `${PREFIX}-root`,
 };
 
 export const Root = styled("div")(({ theme }) => ({
@@ -18,6 +20,9 @@ export const Root = styled("div")(({ theme }) => ({
   flexDirection: "column",
   borderBottomLeftRadius: 6,
   borderBottomRightRadius: 6,
+  [`& .${classes.error}`]: {
+    margin: `${theme.spacing(1)} 0 ${theme.spacing(1)} 0`,
+  },
 }));
 
 const QUOTES = [
@@ -29,17 +34,54 @@ const QUOTES = [
   "Inspecting element",
 ];
 
+const DiscordConnectionError = () => {
+  return <>Can't connect to discord!</>;
+};
+
+const GenericError = () => {
+  return (
+    <div className={classes.error}>
+      <Typography variant="h5">Can't seem to load ☠️</Typography>
+      <Typography variant="body2">At this point you should probably raise an issue</Typography>
+      <Button
+        onClick={(e: any) => {
+          e.preventDefault();
+          window.electron.openInBrowser("https://github.com/Hacksore/overlayed/issues/new");
+        }}
+        component="a"
+        variant="contained"
+        sx={{ mt: 2 }}
+      >
+        Raise issue
+      </Button>
+    </div>
+  );
+};
+
 const LoadingView = () => {
+  const [failed, setFailed] = useState(false);
+
   useEffect(() => {
+    // emit ready
     socketService.send({ event: CustomEvents.I_AM_READY });
+
+    // wait for at least 15 seconds
+    const timerId = setTimeout(() => setFailed(true), 1000 * 15);
+    // return () => clearInterval(timerId);
   }, []);
 
   return (
     <Root>
-      <Typography variant="h5" gutterBottom>
-        {QUOTES[Math.floor(Math.random() * QUOTES.length)]}
-      </Typography>
-      <CircularProgress />
+      {!failed ? (
+        <>
+          <Typography variant="h5" gutterBottom>
+            {QUOTES[Math.floor(Math.random() * QUOTES.length)]}
+          </Typography>
+          <CircularProgress />
+        </>
+      ) : (
+        <GenericError />
+      )}
     </Root>
   );
 };

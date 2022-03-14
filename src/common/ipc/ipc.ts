@@ -16,7 +16,7 @@ const OPCodes = {
 function getIPCPath(id: number) {
   if (process.platform === "win32") {
     const socketPath = `\\\\?\\pipe\\discord-ipc-${id}`;
-    log.debug(`Found winderz socket @ ${socketPath}`);
+    log.debug(`Found winderz namedpipe @ ${socketPath}`);
     return socketPath;
   }
   const {

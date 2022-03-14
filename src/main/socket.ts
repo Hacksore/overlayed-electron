@@ -42,10 +42,7 @@ class SocketManager {
 
   setupListeners() {
     // Try and close the connection first before reconnecting
-    this.resetClient();
-
-    // check if token is set
-    
+    this.resetClient();  
 
     this.client.on("ready", async () => {
       log.debug("got ready event from the IPC")
@@ -65,7 +62,6 @@ class SocketManager {
       });
 
       // tell the main proc we are ready
-      // this._win.webContents.send("toMain",
       this.sendElectronMessage({ evt: CustomEvents.CONNECTED_TO_DISCORD });
     });
 
@@ -92,17 +88,20 @@ class SocketManager {
     });
 
     this.client.on("close", () => {
-      log.debug("Close event");
+      log.debug("lost connection to discord");
+
+      this.sendElectronMessage({
+        evt: CustomEvents.DISCONNECTED_FROM_DISCORD,       
+      });
     });
 
     this.client.on("disconnected", () => {
       log.debug("lost connection to discord");
 
-      // TODO: sometimes this is called when we are in dev breaking the socket?
       // tell frontend we are disconnected
-      // this.sendElectronMessage({
-      //   evt: CustomEvents.DISCONNECTED_FROM_DISCORD,
-      // });
+      this.sendElectronMessage({
+        evt: CustomEvents.DISCONNECTED_FROM_DISCORD,
+      });
     });
 
     this.client.on("message", this.onDiscordMessage.bind(this));

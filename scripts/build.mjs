@@ -2,9 +2,8 @@ process.env.NODE_ENV = "production";
 
 import { build as viteBuild } from "vite";
 import chalk from "chalk";
-import path from "path";
 
-const TAG = chalk.bgBlue("[build.mjs]");
+const TAG = chalk.bgBlue("[build]");
 
 const viteConfigs = {
   main: "configs/vite.main.ts",

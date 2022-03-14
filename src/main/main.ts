@@ -24,8 +24,8 @@ const iconPath = `${__dirname}/img/${iconFile}`;
 
 let win: BrowserWindow;
 let authWin: BrowserWindow;
-let authApp: any = null;
 let socketManager: any = null;
+let authService: any = null;
 let tray = null;
 
 // use this namespace to be able to pass by ref to other files
@@ -135,6 +135,9 @@ async function createWindow() {
     overlayed,
   });
 
+  // load the auth service
+  authService = new AuthServer();
+
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", async (_, msg) => {
     const payload = JSON.parse(msg);
@@ -147,13 +150,6 @@ async function createWindow() {
       app.quit();
     }
 
-    // check if we are connected to the client
-    if (payload.evt === CustomEvents.CONNECTED_TO_DISCORD) {
-      log.info("Stopping the auth serivce as we are connected");
-      authApp.close();
-      authApp = null;
-    }
-
     // check if we got told to open auth window
     if (payload.evt === CustomEvents.LOGIN) {
       if (!authWin) {
@@ -164,8 +160,16 @@ async function createWindow() {
     if (payload.evt === CustomEvents.I_AM_READY) {
       log.info("Got ready event from renderer process");
 
+      // we are not authed move client to the login page only if discord is running
+      const isClientRunning = await isDiscordRunning();
+      if (isClientRunning) {     
+        setBrowserPath("/login");    
+      } else {
+        setBrowserPath("/failed");
+      }
+
       const auth = authStore.get("auth");
-      if (auth) {
+      if (auth && isClientRunning) {
         overlayed.auth = JSON.parse(JSON.stringify(auth));
         log.debug(overlayed.auth);
 
@@ -176,6 +180,9 @@ async function createWindow() {
           evt: CustomEvents.OAUTH_DANCE_COMPLETED,
           data: overlayed.auth,
         });
+
+        // disable the local auth service
+        authService.close();
       }
     }
 
@@ -222,15 +229,32 @@ async function createWindow() {
     }
   });
 
+  // default to loading route
+  setBrowserPath("/loading");
+}
+
+// create method to set page url
+async function setBrowserPath(newPath: string) {
+  // if we are on this route already skeeeep
+  if (getBrowserPath() === newPath) {
+    return;
+  }
+
   if (app.isPackaged) {
     const mainUrl = path.join(__dirname, "../renderer/index.html");
-    win.loadURL(`file://${mainUrl}#/loading`);
+    win.loadURL(`file://${mainUrl}#${newPath}`);
   } else {
     const pkg = await import("../../package.json");
     const url = `http://${pkg.env.HOST || "127.0.0.1"}:${pkg.env.PORT}`;
 
-    win.loadURL(`${url}#/loading`);
+    win.loadURL(`${url}#${newPath}`);
   }
+}
+
+// get the current path ex: /loading
+function getBrowserPath(): string {
+  const url = win.webContents.getURL();
+  return url.split("#")[1];
 }
 
 /**
@@ -238,9 +262,8 @@ async function createWindow() {
  * from the main site with a valid auth token
  */
 async function createAuthService() {
-  const authService = new AuthServer();
 
-  authService.on("token", auth => {
+  authService.on("token", (auth: any) => {
     overlayed.auth = { ...auth };
 
     socketManager.setupListeners();
@@ -258,7 +281,9 @@ async function createAuthService() {
     win.show();
 
     // close service down
-    authService.close();
+    if (authService) {
+      authService.close();
+    }
   });
 }
 

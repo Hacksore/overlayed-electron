@@ -8,7 +8,7 @@ const isProd = process.env.NODE_ENV === "production";
 const FILTERD_EVENTS: Array<string> = ["root/updateUser", "root/setUserTalking"];
 const logger = createLogger({
   // @ts-ignore
-  predicate: (_, action) => !isProd && !FILTERD_EVENTS.includes(action.type),
+  // predicate: (_, action) => !isProd && !FILTERD_EVENTS.includes(action.type),
 });
 
 export const store = configureStore({
