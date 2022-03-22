@@ -74,7 +74,6 @@ export const appSlice = createSlice({
       state.profile = action.payload;
     },
     setAppUsers: (state, action: PayloadAction<Array<IDiscordUser>>) => {
-      // don't get updates yet until the client is read
       const users = action.payload.map((item: IDiscordUser) => createUserStateItem(item));
       state.users = users;
     },

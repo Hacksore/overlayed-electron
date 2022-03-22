@@ -14,7 +14,7 @@ class AuthServer extends EventEmitter {
 
     // Start the server on port 61200
     try {
-      this.app.listen(this.port, "127.0.0.1");
+      this.start();
     } catch (err) {
       // TODO: handle this error
       log.info("we can't bind");
@@ -44,11 +44,15 @@ class AuthServer extends EventEmitter {
     this.setHeaders(req, res);
 
     if (req.url === "/auth" && req.method === "POST") {
+      log.info("Got request from browser");
       const chunks: any = [];
       req.on("data", (chunk: any) => chunks.push(chunk));
       req.on("end", () => {
         const data: any = Buffer.concat(chunks);
+        log.info("Sending token to electron via port", this.port);
         this.emit("token", JSON.parse(data.toString()));
+        log.debug("Token", data.toString());
+
       });
 
       return res.end(
@@ -65,7 +69,12 @@ class AuthServer extends EventEmitter {
     );
   }
 
+  start() {
+    this.app.listen(this.port, "127.0.0.1");
+  }
+
   close() {
+    log.debug("Closing auth service");
     this.app.close();
   }
 }

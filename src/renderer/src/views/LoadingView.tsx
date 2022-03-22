@@ -1,8 +1,6 @@
 import { Button, CircularProgress, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import { AnyAsyncThunk } from "@reduxjs/toolkit/dist/matchers";
 import { useEffect, useState } from "react";
-import { clearInterval } from "timers";
 import { CustomEvents } from "../../../common/constants";
 import socketService from "../services/socketService";
 
@@ -34,15 +32,25 @@ const QUOTES = [
   "Inspecting element",
 ];
 
-const DiscordConnectionError = () => {
-  return <>Can't connect to discord!</>;
-};
-
 const GenericError = () => {
   return (
     <div className={classes.error}>
       <Typography variant="h5">Can't seem to load ☠️</Typography>
       <Typography variant="body2">At this point you should probably raise an issue</Typography>
+      <Button component="a" variant="contained" color="secondary" sx={{ mt: 2, mr: 1 }}>
+        Login
+      </Button>
+      <Button
+        onClick={() => {
+          socketService.send({ event: CustomEvents.CHECK_FOR_DISCORD });
+        }}
+        component="a"
+        color="secondary"
+        variant="contained"
+        sx={{ mt: 2, mr: 1 }}
+      >
+        Check for discord
+      </Button>
       <Button
         onClick={(e: any) => {
           e.preventDefault();
@@ -67,7 +75,9 @@ const LoadingView = () => {
 
     // wait for at least 15 seconds
     const timerId = setTimeout(() => setFailed(true), 1000 * 15);
-    // return () => clearInterval(timerId);
+
+    // clear timer on unmount
+    return () => clearInterval(timerId);
   }, []);
 
   return (

@@ -60,7 +60,12 @@ class IPCSocketService extends EventEmitter {
 
     // if discord running send ready msg
     if (evt === CustomEvents.DISCORD_RUNNING) {
-      this.send({ evt: CustomEvents.I_AM_READY });
+      // this.send({ evt: CustomEvents.I_AM_READY });
+    }
+
+    // if we have no auth token go to login screen
+    if (evt === CustomEvents.LOGIN_FAILED) {
+      this.navigate("/loading");
     }
 
     // if has lost connection/cant connect to discord
@@ -82,7 +87,7 @@ class IPCSocketService extends EventEmitter {
       store.dispatch(setReadyState(true));
       store.dispatch(setProfile(data.profile));
 
-      // set route
+      // set route as we are ready and authed
       this.navigate("/list");
     }
 
@@ -158,8 +163,4 @@ class IPCSocketService extends EventEmitter {
   }
 }
 
-if (!instance) {
-  instance = new IPCSocketService();
-}
-
-export default instance as IPCSocketService;
+export default new IPCSocketService();

@@ -26,7 +26,7 @@ class SocketManager {
    * This is meant to send and recieve messages from the discord RPC
    * As well as relay the messages over IPC to the electron main/render processes
    */
-  constructor({ win, overlayed }: { win: BrowserWindow|null; overlayed: any }) {
+  constructor({ win, overlayed }: { win: BrowserWindow | null; overlayed: any }) {
     this._win = win;
     this.overlayed = overlayed;
     this.client = new RPCClient();
@@ -42,10 +42,10 @@ class SocketManager {
 
   setupListeners() {
     // Try and close the connection first before reconnecting
-    this.resetClient();  
+    this.resetClient();
 
     this.client.on("ready", async () => {
-      log.debug("got ready event from the IPC")
+      log.debug("got ready event from the IPC");
 
       // sub to voice channel changes
       this.client.subscribe(RPCEvents.VOICE_CHANNEL_SELECT);
@@ -73,7 +73,7 @@ class SocketManager {
       accessToken: this.overlayed.auth.access_token,
     });
 
-    log.debug("Logging in with auth token", this.overlayed.auth.access_token)
+    log.debug("Logging in with auth token", this.overlayed.auth.access_token);
 
     this.client.on("error", async (error: Error) => {
       log.info("error with rpc", error);
@@ -91,7 +91,7 @@ class SocketManager {
       log.debug("lost connection to discord");
 
       this.sendElectronMessage({
-        evt: CustomEvents.DISCONNECTED_FROM_DISCORD,       
+        evt: CustomEvents.DISCONNECTED_FROM_DISCORD,
       });
     });
 
@@ -167,8 +167,8 @@ class SocketManager {
    */
   onDiscordMessage(message: any) {
     const { evt, cmd, data } = message;
-    log.debug(message)
-    
+    log.debug(message);
+
     if (evt === RPCEvents.VOICE_CHANNEL_SELECT) {
       // attempt to unsub prior channel if found
       if (this.overlayed.lastChannelId) {

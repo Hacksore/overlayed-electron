@@ -24,7 +24,7 @@ const iconPath = `${__dirname}/img/${iconFile}`;
 
 let win: BrowserWindow;
 let authWin: BrowserWindow;
-let socketManager: any = null;
+let socketManager: SocketManager;
 let authService: any = null;
 let tray = null;
 
@@ -138,6 +138,9 @@ async function createWindow() {
   // load the auth service
   authService = new AuthServer();
 
+  // create auth service
+  createAuthService();
+
   // load socket manager to handle all IPC and socket events
   ipcMain.on("toMain", async (_, msg) => {
     const payload = JSON.parse(msg);
@@ -162,27 +165,22 @@ async function createWindow() {
 
       // we are not authed move client to the login page only if discord is running
       const isClientRunning = await isDiscordRunning();
-      if (isClientRunning) {     
-        setBrowserPath("/login");    
-      } else {
-        setBrowserPath("/failed");
-      }
-
+      log.debug("Is discord client running", isClientRunning);
       const auth = authStore.get("auth");
+      // we are going to try the auth token we have to setup listeners
+      // there is not guarantee that the token works so we have to handle that elsewhere
       if (auth && isClientRunning) {
         overlayed.auth = JSON.parse(JSON.stringify(auth));
         log.debug(overlayed.auth);
 
         socketManager.setupListeners();
 
-        // tell client auth is done
-        socketManager.sendElectronMessage({
-          evt: CustomEvents.OAUTH_DANCE_COMPLETED,
-          data: overlayed.auth,
-        });
+      } else {
 
-        // disable the local auth service
-        authService.close();
+        log.debug("Was not able to setup discord listeners - tell client");
+        socketManager.sendElectronMessage({
+          evt: CustomEvents.LOGIN_FAILED,
+        });
       }
     }
 
@@ -262,23 +260,18 @@ function getBrowserPath(): string {
  * from the main site with a valid auth token
  */
 async function createAuthService() {
-
   authService.on("token", (auth: any) => {
     overlayed.auth = { ...auth };
 
     socketManager.setupListeners();
-
-    // tell client auth is done
-    socketManager.sendElectronMessage({
-      evt: CustomEvents.OAUTH_DANCE_COMPLETED,
-      data: overlayed.auth, // TODO: we probably don't need this
-    });
 
     // save token to store
     authStore.set("auth", overlayed.auth);
 
     // bring window to top after getting a token
     win.show();
+    win.focus();
+    win.moveTop();
 
     // close service down
     if (authService) {
@@ -286,8 +279,6 @@ async function createAuthService() {
     }
   });
 }
-
-createAuthService();
 
 function toggleClickthrough() {
   overlayed.clickThrough = !overlayed.clickThrough;
@@ -330,8 +321,7 @@ const init = () => {
 
       // install devtools when not packed
       if (!app.isPackaged) {
-        // REDUX_DEVTOOLS.id,
-        installExtension([REACT_DEVELOPER_TOOLS.id])
+        installExtension([REACT_DEVELOPER_TOOLS.id, REDUX_DEVTOOLS.id])
           .then(name => log.debug(`Added Extension:  ${name}`))
           .catch(err => log.debug("An error occurred: ", err));
       }
@@ -343,7 +333,7 @@ const init = () => {
 
       // ping the discord client
       setInterval(() => {
-        socketManager.client.transport.ping();
+        // socketManager.client.transport.ping();
       }, 1000 * 60); // every minute
     })
     .then(() => {
